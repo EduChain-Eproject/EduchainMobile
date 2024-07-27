@@ -1,11 +1,22 @@
+import 'package:educhain/core/types/jwt_response.dart';
+
+import '../models/login_request.dart';
+import '../models/register_request.dart';
+
 abstract class AuthEvent {}
 
 class AppStarted extends AuthEvent {}
 
-class LoggedIn extends AuthEvent {
-  final String token;
+class LoginRequested extends AuthEvent {
+  final LoginRequest request;
 
-  LoggedIn(this.token);
+  LoginRequested(this.request);
 }
 
-class LoggedOut extends AuthEvent {}
+class RegisterRequested extends AuthEvent {
+  final RegisterRequest request;
+
+  RegisterRequested(this.request);
+}
+
+class LogOutRequested extends AuthEvent {}

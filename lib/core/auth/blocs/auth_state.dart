@@ -1,3 +1,5 @@
+import '../../models/user.dart';
+
 abstract class AuthState {}
 
 class AuthInitial extends AuthState {}
@@ -5,15 +7,19 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
-  final String role;
+  final User user;
 
-  AuthAuthenticated(this.role);
+  AuthAuthenticated(this.user);
 }
 
 class AuthUnauthenticated extends AuthState {}
 
 class AuthError extends AuthState {
-  final Map<String, dynamic>? message;
+  final Map<String, dynamic>? errors;
 
-  AuthError(this.message);
+  AuthError(this.errors);
 }
+
+class AuthLoginSuccess extends AuthState {}
+
+class AuthRegisterSuccess extends AuthState {}

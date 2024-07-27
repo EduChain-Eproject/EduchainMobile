@@ -13,32 +13,26 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<AuthBloc>().add(AppStarted());
-  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => getIt<AuthBloc>()),
+        BlocProvider(
+          create: (context) {
+            final authBloc = getIt<AuthBloc>();
+            authBloc.add(AppStarted());
+            return authBloc;
+          },
+        ),
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Blog App',
-        theme: AppTheme.darkThemeMode,
-        home: const SplashPage(),
-      ),
+          debugShowCheckedModeBanner: false,
+          title: 'Blog App',
+          theme: AppTheme.darkThemeMode,
+          home: const SplashScreen()),
     );
   }
 }

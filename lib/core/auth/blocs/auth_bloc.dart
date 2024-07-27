@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../auth_service.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -10,17 +8,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc(this.authService) : super(AuthInitial()) {
     on<AppStarted>(_onAppStarted);
-    on<LoggedIn>(_onLoggedIn);
-    on<LoggedOut>(_onLoggedOut);
+    on<LogOutRequested>(_onLogOutRequested);
+    on<LoginRequested>(_onLoginRequested);
+    on<RegisterRequested>(_onRegisterRequested);
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
-    await authService.getToken(
-        onTokenNotFound: () => emit(AuthUnauthenticated()),
-        onToken: (String token) async {
+    await authService.getTokens(
+        onTokensNotFound: () => emit(AuthUnauthenticated()),
+        onTokens: (String accessToken, String refreshToken) async {
           try {
             emit(AuthLoading());
-            final role = await authService.getUserRole(token);
+            final role = await authService.getUser(accessToken);
             role.on(
               onError: (error) => emit(AuthError(error)),
               onSuccess: (data) => emit(AuthAuthenticated(data)),
@@ -31,17 +30,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         });
   }
 
-  Future<void> _onLoggedIn(LoggedIn event, Emitter<AuthState> emit) async {
-    await authService.storeToken(event.token);
-    final role = await authService.getUserRole(event.token);
-    role.on(
+  Future<void> _onLogOutRequested(
+      LogOutRequested event, Emitter<AuthState> emit) async {
+    await authService.logout();
+    await authService.removeTokens();
+    emit(AuthUnauthenticated());
+  }
+
+  Future<void> _onLoginRequested(
+      LoginRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    final response = await authService.signIn(event.request);
+    response.on(
       onError: (error) => emit(AuthError(error)),
-      onSuccess: (data) => emit(AuthAuthenticated(data)),
+      onSuccess: (jwtResponse) async {
+        await authService.storeTokens(jwtResponse);
+        final role = await authService.getUser(jwtResponse.accessToken);
+        role.on(
+          onError: (error) => emit(AuthError(error)),
+          onSuccess: (data) => emit(AuthAuthenticated(data)),
+        );
+        emit(AuthLoginSuccess());
+      },
     );
   }
 
-  Future<void> _onLoggedOut(LoggedOut event, Emitter<AuthState> emit) async {
-    await authService.removeToken();
-    emit(AuthUnauthenticated());
+  Future<void> _onRegisterRequested(
+      RegisterRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    final response = await authService.signUp(event.request);
+    response.on(
+      onError: (error) => emit(AuthError(error)),
+      onSuccess: (user) {
+        emit(AuthRegisterSuccess());
+      },
+    );
   }
 }

@@ -5,11 +5,12 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl = 'https://your-api-url.com';
+  final String apiUrl =
+      'https://fbb2-2402-800-63f0-8566-1cfa-ce08-1e8e-8c17.ngrok-free.app';
 
   Future<Map<String, String>> _getHeaders() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = prefs.getString('accessToken');
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
@@ -30,7 +31,7 @@ abstract class ApiService {
           final responseData = jsonDecode(response.body);
           return Response(data: fromJson(responseData));
         } else {
-          return Response(data: response.body as T);
+          return Response(data: jsonDecode(response.body) as T);
         }
       } else {
         return Response(error: {
@@ -57,7 +58,7 @@ abstract class ApiService {
           return Response(
               data: List<T>.from(data.map((item) => fromJson(item))));
         } else {
-          return Response(data: response.body as List<T>);
+          return Response(data: jsonDecode(response.body) as List<T>);
         }
       } else {
         return Response(error: {
@@ -99,7 +100,7 @@ abstract class ApiService {
   ApiResponse<T> post<T>(
     String endpoint,
     T Function(Map<String, dynamic>)? fromJson,
-    Map<String, dynamic> data,
+    Map<String, dynamic>? data,
   ) async {
     try {
       final headers = await _getHeaders();
@@ -111,7 +112,7 @@ abstract class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (fromJson != null) {
           final responseData = jsonDecode(response.body);
-          return Response(data: fromJson(responseData));
+          return Response(data: fromJson(responseData['object']));
         } else {
           return Response(data: response.body as T);
         }

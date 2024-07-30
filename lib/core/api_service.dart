@@ -5,17 +5,7 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl =
-      'https://fbb2-2402-800-63f0-8566-1cfa-ce08-1e8e-8c17.ngrok-free.app';
-
-  Future<Map<String, String>> _getHeaders() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('accessToken');
-    return {
-      'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
-  }
+  final String apiUrl = 'https://28a5-118-69-183-66.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -34,10 +24,7 @@ abstract class ApiService {
           return Response(data: jsonDecode(response.body) as T);
         }
       } else {
-        return Response(error: {
-          'message': 'Failed to fetch data',
-          'status': response.statusCode.toString()
-        });
+        return _handleErrorResponse<T>(response);
       }
     } catch (e) {
       return Response(error: {'message': 'Error: $e'});
@@ -61,10 +48,7 @@ abstract class ApiService {
           return Response(data: jsonDecode(response.body) as List<T>);
         }
       } else {
-        return Response(error: {
-          'message': 'Failed to fetch data',
-          'status': response.statusCode.toString()
-        });
+        return _handleErrorResponse<List<T>>(response);
       }
     } catch (e) {
       return Response(error: {'message': 'Error: $e'});
@@ -87,10 +71,7 @@ abstract class ApiService {
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
         return Response(data: Page.fromJson(jsonResponse['data'], fromJson));
       } else {
-        return Response(error: {
-          'message': 'Failed to fetch data',
-          'status': response.statusCode.toString()
-        });
+        return _handleErrorResponse<Page<T>>(response);
       }
     } catch (e) {
       return Response(error: {'message': 'Error: $e'});
@@ -117,10 +98,7 @@ abstract class ApiService {
           return Response(data: response.body as T);
         }
       } else {
-        return Response(error: {
-          'message': 'Failed to call api',
-          'status': response.statusCode.toString()
-        });
+        return _handleErrorResponse<T>(response);
       }
     } catch (e) {
       return Response(error: {'message': 'Error: $e'});
@@ -143,10 +121,7 @@ abstract class ApiService {
         final responseData = jsonDecode(response.body) as Map<String, dynamic>;
         return Response(data: fromJson(responseData));
       } else {
-        return Response(error: {
-          'message': 'Failed to update',
-          'status': response.statusCode.toString()
-        });
+        return _handleErrorResponse<T>(response);
       }
     } catch (e) {
       return Response(error: {'message': 'Error: $e'});
@@ -159,14 +134,35 @@ abstract class ApiService {
       final response =
           await http.delete(Uri.parse('$apiUrl/$endpoint'), headers: headers);
       if (response.statusCode != 204) {
-        return Response(error: {
-          'message': 'Failed to delete',
-          'status': response.statusCode.toString()
-        });
+        return _handleErrorResponse(response);
       }
       return Response();
     } catch (e) {
       return Response(error: {'message': 'Error: $e'});
+    }
+  }
+
+  Future<Map<String, String>> _getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken');
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  Response<T> _handleErrorResponse<T>(http.Response response) {
+    final Map<String, dynamic> responseData =
+        jsonDecode(response.body)['errors'];
+    if (responseData.containsKey('message')) {
+      return Response(
+        error: {'message': responseData['message']},
+      );
+    } else {
+      responseData['message'] = 'call api failed';
+      return Response(
+        error: responseData,
+      );
     }
   }
 }

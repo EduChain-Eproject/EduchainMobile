@@ -5,34 +5,61 @@ import 'package:educhain/features/teacher/screens/teacher_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../auth/blocs/auth_bloc.dart';
-import '../auth/blocs/auth_state.dart';
+import '../auth/bloc/auth_bloc.dart';
+import '../auth/bloc/auth_state.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  late Future<MaterialPageRoute> _navigationFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _navigationFuture = _checkAuthStatus(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          if (state.user.role == 'STUDENT') {
-            Navigator.push(context, StudentHomeScreen.route());
-          } else if (state.user.role == 'TEACHER') {
-            Navigator.push(context, TeacherHomeScreen.route());
-          }
-        } else if (state is AuthUnauthenticated) {
-          Navigator.push(context, LoginScreen.route());
-        } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content:
-                    Text('Authentication Error: ${state.errors!['message']}')),
-          );
-          Navigator.push(context, LoginScreen.route());
+    return FutureBuilder<MaterialPageRoute>(
+      future: _navigationFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(context, snapshot.data!);
+          });
+          return const SizedBox
+              .shrink(); // Return empty widget while navigation happens
         }
       },
-      child: const Loader(),
     );
   }
+}
+
+Future<MaterialPageRoute> _checkAuthStatus(BuildContext context) async {
+  final authBloc = BlocProvider.of<AuthBloc>(context);
+  final state = authBloc.state;
+
+  if (state is AuthAuthenticated) {
+    if (state.user.role == 'STUDENT') {
+      return StudentHomeScreen.route();
+    } else if (state.user.role == 'TEACHER') {
+      return TeacherHomeScreen.route();
+    }
+  } else if (state is AuthUnauthenticated) {
+    return LoginScreen.route();
+  } else if (state is AuthError) {
+    return LoginScreen.route(); // Redirect to LoginScreen on error
+  }
+  // Default to LoginScreen if state is unknown
+  return LoginScreen.route();
 }

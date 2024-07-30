@@ -6,14 +6,14 @@ class Response<T> {
 
   bool get isSuccess => data != null;
 
-  void on({
+  Future<void> on({
     required Function(Map<String, dynamic> error) onError,
     required Function(T data) onSuccess,
-  }) {
+  }) async {
     if (isSuccess) {
-      onSuccess(data as T);
+      await onSuccess(data as T);
     } else {
-      onError(error!);
+      await onError(error!);
     }
   }
 

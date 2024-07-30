@@ -19,8 +19,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         onTokens: (String accessToken, String refreshToken) async {
           try {
             emit(AuthLoading());
-            final role = await authService.getUser(accessToken);
-            role.on(
+            final user = await authService.getUser(accessToken);
+            user.on(
               onError: (error) => emit(AuthError(error)),
               onSuccess: (data) => emit(AuthAuthenticated(data)),
             );
@@ -39,18 +39,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLoginRequested(
       LoginRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+    emit(
+        AuthLoading()); // Uncomment this line if you want to show loading state
     final response = await authService.signIn(event.request);
-    response.on(
-      onError: (error) => emit(AuthError(error)),
+    await response.on(
+      onError: (error) async {
+        emit(AuthError(error));
+      },
       onSuccess: (jwtResponse) async {
         await authService.storeTokens(jwtResponse);
-        final role = await authService.getUser(jwtResponse.accessToken);
-        role.on(
-          onError: (error) => emit(AuthError(error)),
-          onSuccess: (data) => emit(AuthAuthenticated(data)),
-        );
         emit(AuthLoginSuccess());
+        try {
+          emit(AuthLoading());
+          final user = await authService.getUser(jwtResponse.accessToken);
+          await user.on(
+            onError: (error) async {
+              emit(AuthError(error));
+            },
+            onSuccess: (data) async {
+              emit(AuthAuthenticated(data));
+            },
+          );
+        } catch (e) {
+          emit(AuthUnauthenticated());
+        }
       },
     );
   }

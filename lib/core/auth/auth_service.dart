@@ -13,7 +13,7 @@ class AuthService extends ApiService {
     final response =
         await get<User>('COMMON/getUser', (json) => User.fromJson(json));
     if (!response.isSuccess) {
-      // removeTokens();
+      removeTokens();
     }
     return response;
   }

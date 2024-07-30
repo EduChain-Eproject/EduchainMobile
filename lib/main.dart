@@ -1,11 +1,19 @@
+import 'package:educhain/features/auth/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'core/auth/blocs/auth_bloc.dart';
-import 'core/auth/blocs/auth_event.dart';
-import 'core/theme/theme.dart';
-import 'core/widgets/splash_page.dart';
 import 'init_dependency.dart';
+import 'core/widgets/splash_page.dart';
+import 'core/theme/theme.dart';
+import 'core/auth/bloc/auth_bloc.dart';
+import 'core/auth/bloc/auth_event.dart';
+import 'features/student.learning/award/bloc/award_bloc.dart';
+import 'features/student.learning/course/bloc/course_bloc.dart';
+import 'features/student.learning/homework/bloc/homework_bloc.dart';
+import 'features/student.learning/lesson/bloc/lesson_bloc.dart';
+import 'features/teacher.teaching/course/bloc/teacher_course_bloc.dart';
+import 'features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
+import 'features/teacher.teaching/lesson/bloc/teacher_lesson_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,12 +35,34 @@ class MyApp extends StatelessWidget {
             return authBloc;
           },
         ),
+        BlocProvider(
+          create: (context) => getIt<CourseBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<LessonBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<HomeworkBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<AwardBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<TeacherCourseBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<TeacherLessonBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<TeacherHomeworkBloc>(),
+        ),
       ],
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Blog App',
-          theme: AppTheme.darkThemeMode,
-          home: const SplashScreen()),
+        debugShowCheckedModeBanner: false,
+        title: 'Blog App',
+        theme: AppTheme.darkThemeMode,
+        home: const SplashScreen(),
+      ),
     );
   }
 }

@@ -1,11 +1,13 @@
+import 'package:educhain/core/types/text_field_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:educhain/core/auth/blocs/auth_bloc.dart';
-import 'package:educhain/core/auth/blocs/auth_event.dart';
-import 'package:educhain/core/auth/blocs/auth_state.dart';
+import 'package:educhain/core/auth/bloc/auth_bloc.dart';
+import 'package:educhain/core/auth/bloc/auth_event.dart';
+import 'package:educhain/core/auth/bloc/auth_state.dart';
 import 'package:educhain/core/auth/models/register_request.dart';
 import 'package:educhain/core/widgets/unauthenticated_widget.dart';
+import '../widgets/validated_text_field.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -20,79 +22,78 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final List<TextFieldModel> _textFields = [
+    'First Name',
+    'Last Name',
+    'Email',
+    'Password',
+    'Address',
+    'Phone',
+  ]
+      .map((label) => label == 'Password'
+          ? TextFieldModel(label: label, obscureText: true)
+          : TextFieldModel(label: label))
+      .toList();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register')),
+      appBar: AppBar(title: const Text('Register')),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthRegisterSuccess) {
             Navigator.push(context,
                 LoginScreen.route()); // Navigate back to login or another page
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errors!['message'])),
-            );
+            setState(() {
+              for (var element in _textFields) {
+                element.errorText = state.errors?[element.camelLabel];
+              }
+            });
           }
         },
         builder: (context, state) {
           if (state is AuthLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              children: [
-                TextField(
-                  controller: _firstNameController,
-                  decoration: InputDecoration(labelText: 'First Name'),
-                ),
-                TextField(
-                  controller: _lastNameController,
-                  decoration: InputDecoration(labelText: 'Last Name'),
-                ),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                ),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                ),
-                TextField(
-                  controller: _addressController,
-                  decoration: InputDecoration(labelText: 'Address'),
-                ),
-                TextField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(labelText: 'Phone'),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    final registerRequest = RegisterRequest(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                      firstName: _firstNameController.text,
-                      lastName: _lastNameController.text,
-                      address: _addressController.text,
-                      phone: _phoneController.text,
-                    );
-                    context
-                        .read<AuthBloc>()
-                        .add(RegisterRequested(registerRequest));
+              children: _textFields.map<Widget>((e) {
+                return ValidatedTextField(
+                  controller: e.controller,
+                  label: e.label,
+                  errorText: e.errorText,
+                  obscureText: e.obscureText,
+                  keyboardType: e.keyboardType,
+                  onChanged: (value) {
+                    setState(() {
+                      e.errorText = null;
+                    });
                   },
-                  child: Text('Register'),
+                );
+              }).toList()
+                ..add(const SizedBox(
+                  height: 20,
+                ))
+                ..add(
+                  ElevatedButton(
+                    onPressed: () {
+                      final registerRequest = RegisterRequest(
+                        email: _textFields[2].controller.text, // Email
+                        password: _textFields[3].controller.text, // Password
+                        firstName: _textFields[0].controller.text, // First Name
+                        lastName: _textFields[1].controller.text, // Last Name
+                        address: _textFields[4].controller.text, // Address
+                        phone: _textFields[5].controller.text, // Phone
+                      );
+                      context
+                          .read<AuthBloc>()
+                          .add(RegisterRequested(registerRequest));
+                    },
+                    child: const Text('Register'),
+                  ),
                 ),
-              ],
             ),
           );
         },

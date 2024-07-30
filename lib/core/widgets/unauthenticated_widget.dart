@@ -1,10 +1,11 @@
-import 'package:educhain/features/student/screens/student_home_screen.dart';
-import 'package:educhain/features/teacher/screens/teacher_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:educhain/core/widgets/layouts/student_layout.dart';
+
 import '../auth/bloc/auth_bloc.dart';
 import '../auth/bloc/auth_state.dart';
+import 'layouts/teacher_layout.dart';
 
 class UnauthenticatedWidget extends StatelessWidget {
   final Widget child;
@@ -18,11 +19,11 @@ class UnauthenticatedWidget extends StatelessWidget {
         if (state is AuthAuthenticated) {
           if (state.user.role == 'TEACHER') {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(context, TeacherHomeScreen.route());
+              Navigator.pushReplacement(context, TeacherLayout.route());
             });
           } else {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(context, StudentHomeScreen.route());
+              Navigator.pushReplacement(context, StudentLayout.route());
             });
           }
           return const SizedBox.shrink();

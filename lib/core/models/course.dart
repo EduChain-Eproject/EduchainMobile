@@ -1,25 +1,53 @@
+import 'user_interests.dart';
+import 'category.dart';
 import 'blog.dart';
 import 'chapter.dart';
+import 'course_feedback.dart';
+import 'user.dart';
+import 'user_course.dart';
 
 class Course {
   final int? id;
-  final String? courseName;
+  final String? title;
   final String? description;
+  final double? price;
+  final CourseStatus? status;
+
   final List<Chapter>? chapterDtos;
   final List<Blog>? blogDtos;
+  final User? teacherDto;
+  final List<CourseFeedback>? courseFeedbackDtos;
+  final List<Category>? categoryDtos;
+  final List<User>? participatedUserDtos;
+  final List<UserInterests>? userInterestDtos;
+  final int? numberOfEnrolledStudents;
+  final UserCourse? currentUserCourse;
+  final List<Course>? relatedCourseDtos;
 
   Course({
     this.id,
-    this.courseName,
+    this.price,
+    this.status,
+    this.title,
     this.description,
     this.chapterDtos,
     this.blogDtos,
+    this.teacherDto,
+    this.courseFeedbackDtos,
+    this.categoryDtos,
+    this.participatedUserDtos,
+    this.userInterestDtos,
+    this.numberOfEnrolledStudents,
+    this.currentUserCourse,
+    this.relatedCourseDtos,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
       id: json['id'] as int?,
-      courseName: json['courseName'] as String?,
+      price: json['price'] as double?,
+      status: CourseStatusFromJson(json['status']),
+      title: json['title'] as String?,
       description: json['description'] as String?,
       chapterDtos: (json['chapterDtos'] as List<dynamic>?)
           ?.map((e) => Chapter.fromJson(e as Map<String, dynamic>))
@@ -27,16 +55,78 @@ class Course {
       blogDtos: (json['blogDtos'] as List<dynamic>?)
           ?.map((e) => Blog.fromJson(e as Map<String, dynamic>))
           .toList(),
+      teacherDto: json['teacherDto'] != null
+          ? User.fromJson(json['teacherDto'] as Map<String, dynamic>)
+          : null,
+      courseFeedbackDtos: (json['courseFeedbackDtos'] as List<dynamic>?)
+          ?.map((e) => CourseFeedback.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      categoryDtos: (json['categoryDtos'] as List<dynamic>?)
+          ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      participatedUserDtos: (json['participatedUserDtos'] as List<dynamic>?)
+          ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      userInterestDtos: (json['userInterestDtos'] as List<dynamic>?)
+          ?.map((e) => UserInterests.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      numberOfEnrolledStudents: json['numberOfEnrolledStudents'] as int?,
+      currentUserCourse: json['currentUserCourse'] != null
+          ? UserCourse.fromJson(
+              json['currentUserCourse'] as Map<String, dynamic>)
+          : null,
+      relatedCourseDtos: (json['relatedCourseDtos'] as List<dynamic>?)
+          ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'courseName': courseName,
+      'price': price,
+      'status': status?.name,
+      'title': title,
       'description': description,
       'chapterDtos': chapterDtos?.map((e) => e.toJson()).toList(),
       'blogDtos': blogDtos?.map((e) => e.toJson()).toList(),
+      'teacherDto': teacherDto?.toJson(),
+      'courseFeedbackDtos': courseFeedbackDtos?.map((e) => e.toJson()).toList(),
+      'categoryDtos': categoryDtos?.map((e) => e.toJson()).toList(),
+      'participatedUserDtos':
+          participatedUserDtos?.map((e) => e.toJson()).toList(),
+      'userInterestDtos': userInterestDtos?.map((e) => e.toJson()).toList(),
+      'numberOfEnrolledStudents': numberOfEnrolledStudents,
+      'currentUserCourse': currentUserCourse?.toJson(),
+      'relatedCourseDtos': relatedCourseDtos?.map((e) => e.toJson()).toList(),
     };
+  }
+}
+
+enum CourseStatus {
+  DRAFT,
+  UNDER_REVIEW,
+  APPROVED,
+  DELETED,
+  DEACTIVATED,
+  REACTIVATED
+}
+
+CourseStatus CourseStatusFromJson(String status) {
+  switch (status) {
+    case 'DRAFT':
+      return CourseStatus.DRAFT;
+    case 'UNDER_REVIEW':
+      return CourseStatus.UNDER_REVIEW;
+    case 'APPROVED':
+      return CourseStatus.APPROVED;
+    case 'DELETED':
+      return CourseStatus.DELETED;
+    case 'DEACTIVATED':
+      return CourseStatus.DEACTIVATED;
+    case 'REACTIVATED':
+      return CourseStatus.REACTIVATED;
+    default:
+      throw ArgumentError('Unknown status: $status');
   }
 }

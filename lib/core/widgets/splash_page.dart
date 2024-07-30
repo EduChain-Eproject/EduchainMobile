@@ -1,11 +1,11 @@
-import 'package:educhain/features/auth/screens/login_screen.dart';
-import 'package:educhain/features/student/screens/student_home_screen.dart';
-import 'package:educhain/features/teacher/screens/teacher_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:educhain/core/widgets/layouts/teacher_layout.dart';
+import 'package:educhain/features/auth/screens/login_screen.dart';
 import '../auth/bloc/auth_bloc.dart';
 import '../auth/bloc/auth_state.dart';
+import 'layouts/student_layout.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -50,15 +50,15 @@ Future<MaterialPageRoute> _checkAuthStatus(BuildContext context) async {
 
   if (state is AuthAuthenticated) {
     if (state.user.role == 'STUDENT') {
-      return StudentHomeScreen.route();
+      return StudentLayout.route();
     } else if (state.user.role == 'TEACHER') {
-      return TeacherHomeScreen.route();
+      return TeacherLayout.route();
     }
   } else if (state is AuthUnauthenticated) {
     return LoginScreen.route();
   } else if (state is AuthError) {
-    return LoginScreen.route(); // Redirect to LoginScreen on error
+    return LoginScreen.route();
   }
-  // Default to LoginScreen if state is unknown
+
   return LoginScreen.route();
 }

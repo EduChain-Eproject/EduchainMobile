@@ -1,29 +1,32 @@
 class Page<T> {
-  final int page;
-  final int limit;
-  final int total;
-  final List<T> data;
+  final int number;
+  final int size;
+  final int totalElements;
+  final int totalPages;
+  final List<T> content;
 
   Page({
-    required this.page,
-    required this.limit,
-    required this.total,
-    required this.data,
+    required this.number,
+    required this.size,
+    required this.totalElements,
+    required this.totalPages,
+    required this.content,
   });
 
   factory Page.fromJson(
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromJson,
   ) {
-    final data = (json['data'] as List<dynamic>)
+    final content = (json['content'] as List<dynamic>)
         .map((item) => fromJson(item as Map<String, dynamic>))
         .toList();
 
     return Page<T>(
-      page: json['page'],
-      limit: json['limit'],
-      total: json['total'],
-      data: data,
+      number: json['number'],
+      size: json['size'],
+      totalElements: json['totalElements'],
+      totalPages: json['totalPages'],
+      content: content,
     );
   }
 }

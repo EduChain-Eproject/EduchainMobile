@@ -1,14 +1,9 @@
 import 'package:educhain/core/auth/bloc/auth_bloc.dart';
 import 'package:educhain/core/auth/bloc/auth_event.dart';
-import 'package:educhain/core/widgets/authenticated_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TeacherHomeScreen extends StatefulWidget {
-  static route() => MaterialPageRoute(
-        builder: (context) =>
-            const AuthenticatedWidget(child: TeacherHomeScreen()),
-      );
   const TeacherHomeScreen({super.key});
 
   @override

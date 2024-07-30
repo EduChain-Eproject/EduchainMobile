@@ -12,9 +12,13 @@ class Page<T> {
   });
 
   factory Page.fromJson(
-      Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJson) {
-    final data =
-        (json['data'] as List<dynamic>).map((item) => fromJson(item)).toList();
+    Map<String, dynamic> json,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    final data = (json['data'] as List<dynamic>)
+        .map((item) => fromJson(item as Map<String, dynamic>))
+        .toList();
+
     return Page<T>(
       page: json['page'],
       limit: json['limit'],

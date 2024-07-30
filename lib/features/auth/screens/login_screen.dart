@@ -2,6 +2,7 @@ import 'package:educhain/core/auth/bloc/auth_bloc.dart';
 import 'package:educhain/core/auth/bloc/auth_event.dart';
 import 'package:educhain/core/auth/bloc/auth_state.dart';
 import 'package:educhain/core/auth/models/login_request.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/types/text_field_model.dart';
 import 'package:educhain/core/widgets/unauthenticated_widget.dart';
 import 'package:educhain/features/auth/screens/register_screen.dart';
@@ -56,7 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(children: [
               const SizedBox(height: 150),
-              Text(message ?? ""),
+              Text(
+                message,
+                style: const TextStyle(color: AppPallete.errorColor),
+              ),
               ..._textFields.map<Widget>((field) {
                 return ValidatedTextField(
                   controller: field.controller,

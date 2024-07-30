@@ -1,58 +1,46 @@
 import 'dart:convert';
+import 'package:educhain/init_dependency.dart';
 import 'package:http/http.dart' as http;
 import 'types/api_response.dart';
 import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl = 'https://28a5-118-69-183-66.ngrok-free.app';
+  final String apiUrl =
+      'https://2d98-2402-800-63b7-d5cc-cc5-a77e-f3bd-86f.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
     T Function(Map<String, dynamic>)? fromJson,
   ) async {
-    try {
-      final headers = await _getHeaders();
-      final response =
-          await http.get(Uri.parse('$apiUrl/$endpoint'), headers: headers);
-
-      if (response.statusCode == 200) {
-        if (fromJson != null) {
-          final responseData = jsonDecode(response.body);
-          return Response(data: fromJson(responseData));
+    return _performApiCall<T>(
+      (headers) => http.get(Uri.parse('$apiUrl/$endpoint'), headers: headers),
+      (data) {
+        if (data is Map<String, dynamic> && fromJson != null) {
+          return fromJson(data);
         } else {
-          return Response(data: jsonDecode(response.body) as T);
+          throw FormatException('Expected list but got ${data.runtimeType}');
         }
-      } else {
-        return _handleErrorResponse<T>(response);
-      }
-    } catch (e) {
-      return Response(error: {'message': 'Error: $e'});
-    }
+      },
+    );
   }
 
   ApiResponse<List<T>> getList<T>(
     String endpoint,
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(Map<String, dynamic>) fromJson,
   ) async {
-    try {
-      final headers = await _getHeaders();
-      final response =
-          await http.get(Uri.parse('$apiUrl/$endpoint'), headers: headers);
-      if (response.statusCode == 200) {
-        if (fromJson != null) {
-          final data = jsonDecode(response.body);
-          return Response(
-              data: List<T>.from(data.map((item) => fromJson(item))));
+    return _performApiCall<List<T>>(
+      (headers) => http.get(Uri.parse('$apiUrl/$endpoint'), headers: headers),
+      (data) {
+        if (data is List) {
+          return data
+              .map((item) => fromJson(item as Map<String, dynamic>))
+              .toList();
         } else {
-          return Response(data: jsonDecode(response.body) as List<T>);
+          throw FormatException('Expected list but got ${data.runtimeType}');
         }
-      } else {
-        return _handleErrorResponse<List<T>>(response);
-      }
-    } catch (e) {
-      return Response(error: {'message': 'Error: $e'});
-    }
+      },
+    );
   }
 
   ApiResponse<Page<T>> getPageableList<T>(
@@ -61,21 +49,13 @@ abstract class ApiService {
     int limit,
     T Function(Map<String, dynamic>) fromJson,
   ) async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.get(
+    return _performApiCall<Page<T>>(
+      (headers) => http.get(
         Uri.parse('$apiUrl/$endpoint?page=$page&limit=$limit'),
         headers: headers,
-      );
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-        return Response(data: Page.fromJson(jsonResponse['data'], fromJson));
-      } else {
-        return _handleErrorResponse<Page<T>>(response);
-      }
-    } catch (e) {
-      return Response(error: {'message': 'Error: $e'});
-    }
+      ),
+      (data) => Page.fromJson(data, fromJson),
+    );
   }
 
   ApiResponse<T> post<T>(
@@ -83,19 +63,100 @@ abstract class ApiService {
     T Function(Map<String, dynamic>)? fromJson,
     Map<String, dynamic>? data,
   ) async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.post(
+    return _performApiCall<T>(
+      (headers) => http.post(
         Uri.parse('$apiUrl/$endpoint'),
         headers: headers,
         body: jsonEncode(data),
-      );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        if (fromJson != null) {
-          final responseData = jsonDecode(response.body);
-          return Response(data: fromJson(responseData['object']));
+      ),
+      (data) {
+        if (data is Map<String, dynamic> && fromJson != null) {
+          return fromJson(data);
         } else {
-          return Response(data: response.body as T);
+          throw FormatException('Expected list but got ${data.runtimeType}');
+        }
+      },
+    );
+  }
+
+  ApiResponse<T> put<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic> data,
+  ) async {
+    return _performApiCall<T>(
+      (headers) => http.put(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: headers,
+        body: jsonEncode(data),
+      ),
+      (data) {
+        if (data is Map<String, dynamic>) {
+          return fromJson(data);
+        } else {
+          throw FormatException('Expected list but got ${data.runtimeType}');
+        }
+      },
+    );
+  }
+
+  ApiResponse<void> delete(String endpoint) async {
+    return _performApiCall<void>(
+      (headers) =>
+          http.delete(Uri.parse('$apiUrl/$endpoint'), headers: headers),
+      null,
+    );
+  }
+
+  Future<Response<T>> _performApiCall<T>(
+    Future<http.Response> Function(Map<String, String> headers) apiCall,
+    T Function(dynamic data)? fromJson,
+  ) async {
+    try {
+      final headers = await _getHeaders();
+      var response = await apiCall(headers);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+
+        if (fromJson != null) {
+          // Check if responseData is a Map or List
+          if (responseData is List) {
+            // Handle List responses
+            return Response(data: fromJson(responseData));
+          } else if (responseData is Map) {
+            // Handle Map responses
+            return Response(data: fromJson(responseData));
+          } else {
+            // Unexpected format
+            return Response(error: {'message': 'Unexpected data format'});
+          }
+        } else {
+          return Response(data: responseData as T);
+        }
+      } else if (response.statusCode == 403) {
+        final newAccessToken = await _refreshToken();
+        if (newAccessToken != null) {
+          final retryHeaders = await _getHeaders();
+          response = await apiCall(retryHeaders);
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final responseData = jsonDecode(response.body);
+            if (fromJson != null) {
+              if (responseData is List) {
+                return Response(data: fromJson(responseData));
+              } else if (responseData is Map) {
+                return Response(data: fromJson(responseData));
+              } else {
+                return Response(error: {'message': 'Unexpected data format'});
+              }
+            } else {
+              return Response(data: responseData as T);
+            }
+          } else {
+            return _handleErrorResponse<T>(response);
+          }
+        } else {
+          return _handleErrorResponse<T>(response);
         }
       } else {
         return _handleErrorResponse<T>(response);
@@ -105,45 +166,8 @@ abstract class ApiService {
     }
   }
 
-  ApiResponse<T> put<T>(
-    String endpoint,
-    T Function(Map<String, dynamic>) fromJson,
-    Map<String, dynamic> data,
-  ) async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.put(
-        Uri.parse('$apiUrl/$endpoint'),
-        headers: headers,
-        body: jsonEncode(data),
-      );
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-        return Response(data: fromJson(responseData));
-      } else {
-        return _handleErrorResponse<T>(response);
-      }
-    } catch (e) {
-      return Response(error: {'message': 'Error: $e'});
-    }
-  }
-
-  ApiResponse<void> delete(String endpoint) async {
-    try {
-      final headers = await _getHeaders();
-      final response =
-          await http.delete(Uri.parse('$apiUrl/$endpoint'), headers: headers);
-      if (response.statusCode != 204) {
-        return _handleErrorResponse(response);
-      }
-      return Response();
-    } catch (e) {
-      return Response(error: {'message': 'Error: $e'});
-    }
-  }
-
   Future<Map<String, String>> _getHeaders() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = getIt<SharedPreferences>();
     final token = prefs.getString('accessToken');
     return {
       'Content-Type': 'application/json',
@@ -163,6 +187,37 @@ abstract class ApiService {
       return Response(
         error: responseData,
       );
+    }
+  }
+
+  Future<String?> _refreshToken() async {
+    final prefs = getIt<SharedPreferences>();
+    final accessToken = prefs.getString('accessToken');
+    final refreshToken = prefs.getString('refreshToken');
+    if (accessToken != null && refreshToken != null) {
+      final response = await http.post(
+        Uri.parse('$apiUrl/Auth/reset-access-token'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'accessToken': accessToken,
+          'refreshToken': refreshToken,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final newAccessToken = responseData['accessToken'];
+        final newRefreshToken = responseData['refreshToken'];
+        await prefs.setString('accessToken', newAccessToken);
+        await prefs.setString('refreshToken', newRefreshToken);
+        return newAccessToken;
+      } else {
+        await prefs.remove('accessToken');
+        await prefs.remove('refreshToken');
+        return null;
+      }
+    } else {
+      return null;
     }
   }
 }

@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/course_bloc.dart';
 import '../models/course_search_request.dart';
-import 'course_detail_screen.dart';
+import '../widgets/category_dropdown.dart';
+import '../widgets/course_list.dart';
+import '../widgets/course_search_bar.dart';
 
 class CourseListScreen extends StatefulWidget {
   const CourseListScreen({super.key});
@@ -25,7 +27,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
     _courseBloc = getIt<CourseBloc>();
     _courseBloc.add(FetchCategories());
     _courseBloc
-        .add(SearchCourses(CourseSearchRequest(search: "", categoryIds: [])));
+        .add(SearchCourses(CourseSearchRequest(search: '', categoryIds: [])));
   }
 
   @override
@@ -34,12 +36,15 @@ class _CourseListScreenState extends State<CourseListScreen> {
       value: _courseBloc,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Courses'),
+          title: const Text('Courses'),
         ),
         body: Column(
           children: [
-            _buildSearchBar(),
-            _buildCategoryDropdown(),
+            CourseSearchBar(onSearch: _searchCourses),
+            CategoryDropdown(
+              categories: _categories,
+              onCategorySelected: _searchCourses,
+            ),
             Expanded(
               child: BlocConsumer<CourseBloc, CourseState>(
                 listener: (context, state) {
@@ -50,35 +55,17 @@ class _CourseListScreenState extends State<CourseListScreen> {
                   }
                 },
                 builder: (context, state) {
-                  if (state is CategoriesLoading) {
-                    return Center(child: CircularProgressIndicator());
+                  if (state is CategoriesLoading || state is CoursesLoading) {
+                    return const Center(child: CircularProgressIndicator());
                   } else if (state is CategoriesError) {
                     return Center(child: Text('Error: ${state.message}'));
-                  } else if (state is CoursesLoading) {
-                    return Center(child: CircularProgressIndicator());
+                  } else if (state is CoursesError) {
+                    return Center(child: Text('Error: ${state.message}'));
                   } else if (state is CoursesLoaded) {
-                    // for the first time, course not loaded here
                     final courses = state.courses.content;
-                    return ListView.builder(
-                      itemCount: courses.length,
-                      itemBuilder: (context, index) {
-                        final course = courses[index];
-                        return ListTile(
-                          title: Text(course.title ?? ""),
-                          subtitle: Text(course.description ?? ""),
-                          onTap: () {
-                            if (course.id != null) {
-                              Navigator.push(
-                                context,
-                                CourseDetailScreen.route(course.id!),
-                              );
-                            }
-                          },
-                        );
-                      },
-                    );
+                    return CourseList(courses: courses);
                   } else {
-                    return Center(child: Text('No courses available'));
+                    return const Center(child: Text('No courses available'));
                   }
                 },
               ),
@@ -89,45 +76,18 @@ class _CourseListScreenState extends State<CourseListScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        decoration: InputDecoration(
-          labelText: 'Search Courses',
-          border: OutlineInputBorder(),
-        ),
-        onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
-          _searchCourses(null);
-        },
-      ),
-    );
-  }
+  void _searchCourses(String searchQuery, int? selectedCategory) {
+    setState(() {
+      _searchQuery = searchQuery;
+    });
 
-  Widget _buildCategoryDropdown() {
-    return DropdownButtonFormField<int>(
-      hint: Text('Select Category'),
-      items: _categories
-          .map((category) => DropdownMenuItem<int>(
-                value: category.id,
-                child: Text(category.categoryName ?? ""),
-              ))
-          .toList(),
-      onChanged: (selectedCategory) {
-        _searchCourses(selectedCategory);
-      },
-    );
-  }
-
-  void _searchCourses(int? selectedCategory) {
     final selectedCategoryIds = <int>[];
 
-    // Add selectedCategory to the list if it is not null
     if (selectedCategory != null) {
       selectedCategoryIds.add(selectedCategory);
+    } else {
+      // If "all" is selected, use an empty array to represent all categories
+      selectedCategoryIds.clear();
     }
 
     final searchRequest = CourseSearchRequest(

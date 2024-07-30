@@ -1,5 +1,4 @@
 import 'course.dart';
-import 'course_feedback.dart';
 import 'lesson.dart';
 
 class Chapter {

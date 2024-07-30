@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:educhain/features/student.learning/course/course_service.dart';
-import 'package:meta/meta.dart';
 
 part 'course_event.dart';
 part 'course_state.dart';

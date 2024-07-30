@@ -1,4 +1,3 @@
-import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/features/auth/screens/login_screen.dart';
 import 'package:educhain/features/student/screens/student_home_screen.dart';
 import 'package:educhain/features/teacher/screens/teacher_home_screen.dart';

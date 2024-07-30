@@ -1,5 +1,3 @@
-import 'package:educhain/core/types/jwt_response.dart';
-
 import '../models/login_request.dart';
 import '../models/register_request.dart';
 

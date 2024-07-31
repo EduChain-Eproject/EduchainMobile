@@ -18,9 +18,9 @@ class Answer {
 
   factory Answer.fromJson(Map<String, dynamic> json) {
     return Answer(
-      id: json['id'] as int?,
-      questionId: json['questionId'] as int?,
-      answerText: json['answerText'] as String?,
+      id: json['id'],
+      questionId: json['questionId'],
+      answerText: json['answerText'],
       questionDto: json['questionDto'] != null
           ? Question.fromJson(json['questionDto'])
           : null,
@@ -30,13 +30,13 @@ class Answer {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'questionId': questionId,
-      'answerText': answerText,
-      'questionDto': questionDto?.toJson(),
-      'userAnswerDtos': userAnswerDtos?.toJson(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'questionId': questionId,
+  //     'answerText': answerText,
+  //     'questionDto': questionDto?.toJson(),
+  //     'userAnswerDtos': userAnswerDtos?.toJson(),
+  //   };
+  // }
 }

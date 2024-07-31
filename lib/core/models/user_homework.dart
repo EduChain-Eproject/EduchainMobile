@@ -1,53 +1,64 @@
+import 'award.dart';
 import 'homework.dart';
 import 'user.dart';
 import 'user_answer.dart';
 
 class UserHomework {
   final int? id;
-  final int? userId;
-  final int? homeworkId;
-  final User? userDto;
-  final Homework? homeworkDto;
   final DateTime? submissionDate;
+  final double? progress;
+  final double? grade;
+  final bool? isSubmitted;
+  final Homework? homeworkDto;
+  final User? userDto;
   final List<UserAnswer>? userAnswerDtos;
+  final Award? userAwardDto;
 
   UserHomework({
     this.id,
-    this.userId,
-    this.homeworkId,
-    this.userDto,
-    this.homeworkDto,
     this.submissionDate,
+    this.progress,
+    this.grade,
+    this.isSubmitted,
+    this.homeworkDto,
+    this.userDto,
     this.userAnswerDtos,
+    this.userAwardDto,
   });
 
   factory UserHomework.fromJson(Map<String, dynamic> json) {
     return UserHomework(
-      id: json['id'] as int?,
-      userId: json['userId'] as int?,
-      homeworkId: json['homeworkId'] as int?,
-      userDto: json['userDto'] != null ? User.fromJson(json['userDto']) : null,
-      homeworkDto: json['homeworkDto'] != null
-          ? Homework.fromJson(json['homeworkDto'])
-          : null,
+      id: json['id'],
       submissionDate: json['submissionDate'] != null
           ? DateTime.parse(json['submissionDate'])
           : null,
-      userAnswerDtos: (json['userAnswerDtos'] as List<dynamic>?)
-          ?.map((e) => UserAnswer.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      progress: json['progress']?.toDouble(),
+      grade: json['grade']?.toDouble(),
+      isSubmitted: json['isSubmitted'],
+      homeworkDto: json['homeworkDto'] != null
+          ? Homework.fromJson(json['homeworkDto'])
+          : null,
+      userDto: json['userDto'] != null ? User.fromJson(json['userDto']) : null,
+      userAnswerDtos: json['userAnswerDtos'] != null
+          ? (json['userAnswerDtos'] as List)
+              .map((item) => UserAnswer.fromJson(item))
+              .toList()
+          : null,
+      userAwardDto: json['userAwardDto'] != null
+          ? Award.fromJson(json['userAwardDto'])
+          : null,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'userId': userId,
-      'homeworkId': homeworkId,
-      'userDto': userDto?.toJson(),
-      'homeworkDto': homeworkDto?.toJson(),
-      'submissionDate': submissionDate?.toIso8601String(),
-      'userAnswerDtos': userAnswerDtos?.map((e) => e.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'userId': userId,
+  //     'homeworkId': homeworkId,
+  //     'userDto': userDto?.toJson(),
+  //     'homeworkDto': homeworkDto?.toJson(),
+  //     'submissionDate': submissionDate?.toIso8601String(),
+  //     'userAnswerDtos': userAnswerDtos?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }

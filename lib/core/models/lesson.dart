@@ -36,15 +36,15 @@ class Lesson {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'lessonTitle': lessonTitle,
-      'description': description,
-      'videoTitle': videoTitle,
-      'videoURL': videoURL,
-      'chapterDto': chapterDto?.toJson(),
-      'homeworkDtos': homeworkDtos?.map((e) => e.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'lessonTitle': lessonTitle,
+  //     'description': description,
+  //     'videoTitle': videoTitle,
+  //     'videoURL': videoURL,
+  //     'chapterDto': chapterDto?.toJson(),
+  //     'homeworkDtos': homeworkDtos?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }

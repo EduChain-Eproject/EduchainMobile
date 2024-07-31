@@ -24,12 +24,12 @@ class Category {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'categoryDescription': categoryDescription,
-      'categoryName': categoryName,
-      'courseDtos': courseDtos?.map((e) => e.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'categoryDescription': categoryDescription,
+  //     'categoryName': categoryName,
+  //     'courseDtos': courseDtos?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }

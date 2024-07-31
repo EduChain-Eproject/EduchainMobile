@@ -9,9 +9,9 @@ class CountStudent {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'allStudent': allStudent,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'allStudent': allStudent,
+  //   };
+  // }
 }

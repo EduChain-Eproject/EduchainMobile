@@ -15,11 +15,11 @@ class JwtResponse {
     );
   }
 
-  // Convert JwtResponse to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'accessToken': accessToken,
-      'refreshToken': refreshToken,
-    };
-  }
+  // // Convert JwtResponse to JSON
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'accessToken': accessToken,
+  //     'refreshToken': refreshToken,
+  //   };
+  // }
 }

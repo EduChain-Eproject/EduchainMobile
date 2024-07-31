@@ -27,19 +27,23 @@ class Question {
 
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
-      id: json['id'] as int?,
-      questionText: json['questionText'] as String?,
-      homeworkId: json['homeworkId'] as int?,
-      correctAnswerId: json['correctAnswerId'] as int?,
+      id: json['id'],
+      questionText: json['questionText'],
+      homeworkId: json['homeworkId'],
+      correctAnswerId: json['correctAnswerId'],
       homeworkDto: json['homeworkDto'] != null
           ? Homework.fromJson(json['homeworkDto'])
           : null,
-      answerDtos: (json['answerDtos'] as List<dynamic>?)
-          ?.map((e) => Answer.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      userAnswerDtos: (json['userAnswerDtos'] as List<dynamic>?)
-          ?.map((e) => UserAnswer.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      answerDtos: json['answerDtos'] != null
+          ? (json['answerDtos'] as List)
+              .map((item) => Answer.fromJson(item))
+              .toList()
+          : null,
+      userAnswerDtos: json['userAnswerDtos'] != null
+          ? (json['userAnswerDtos'] as List)
+              .map((item) => UserAnswer.fromJson(item))
+              .toList()
+          : null,
       correctAnswerDto: json['correctAnswerDto'] != null
           ? Answer.fromJson(json['correctAnswerDto'])
           : null,
@@ -49,17 +53,17 @@ class Question {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'questionText': questionText,
-      'homeworkId': homeworkId,
-      'correctAnswerId': correctAnswerId,
-      'homeworkDto': homeworkDto?.toJson(),
-      'answerDtos': answerDtos?.map((e) => e.toJson()).toList(),
-      'userAnswerDtos': userAnswerDtos?.map((e) => e.toJson()).toList(),
-      'correctAnswerDto': correctAnswerDto?.toJson(),
-      'currentUserAnswerDto': currentUserAnswerDto?.toJson(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'questionText': questionText,
+  //     'homeworkId': homeworkId,
+  //     'correctAnswerId': correctAnswerId,
+  //     'homeworkDto': homeworkDto?.toJson(),
+  //     'answerDtos': answerDtos?.map((e) => e.toJson()).toList(),
+  //     'userAnswerDtos': userAnswerDtos?.map((e) => e.toJson()).toList(),
+  //     'correctAnswerDto': correctAnswerDto?.toJson(),
+  //     'currentUserAnswerDto': currentUserAnswerDto?.toJson(),
+  //   };
+  // }
 }

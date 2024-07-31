@@ -33,15 +33,15 @@ class UserInterests {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'student_id': studentId,
-      'course_id': courseId,
-      'description': description,
-      'title': title,
-      'price': price,
-      'teacherName': teacherName,
-      'categoryList': categoryList?.map((e) => e.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'student_id': studentId,
+  //     'course_id': courseId,
+  //     'description': description,
+  //     'title': title,
+  //     'price': price,
+  //     'teacherName': teacherName,
+  //     'categoryList': categoryList?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }

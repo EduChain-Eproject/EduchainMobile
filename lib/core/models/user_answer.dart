@@ -28,11 +28,11 @@ class UserAnswer {
 
   factory UserAnswer.fromJson(Map<String, dynamic> json) {
     return UserAnswer(
-      id: json['id'] as int?,
-      isCorrect: json['isCorrect'] as bool?,
-      userHomeworkId: json['userHomeworkId'] as int?,
-      questionId: json['questionId'] as int?,
-      answerId: json['answerId'] as int?,
+      id: json['id'],
+      isCorrect: json['isCorrect'],
+      userHomeworkId: json['userHomeworkId'],
+      questionId: json['questionId'],
+      answerId: json['answerId'],
       userDto: json['userDto'] != null ? User.fromJson(json['userDto']) : null,
       userHomeworkDto: json['userHomeworkDto'] != null
           ? UserHomework.fromJson(json['userHomeworkDto'])
@@ -45,17 +45,17 @@ class UserAnswer {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'isCorrect': isCorrect,
-      'userHomeworkId': userHomeworkId,
-      'questionId': questionId,
-      'answerId': answerId,
-      'userDto': userDto?.toJson(),
-      'userHomeworkDto': userHomeworkDto?.toJson(),
-      'questionDto': questionDto?.toJson(),
-      'answerDto': answerDto?.toJson(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'isCorrect': isCorrect,
+  //     'userHomeworkId': userHomeworkId,
+  //     'questionId': questionId,
+  //     'answerId': answerId,
+  //     'userDto': userDto?.toJson(),
+  //     'userHomeworkDto': userHomeworkDto?.toJson(),
+  //     'questionDto': questionDto?.toJson(),
+  //     'answerDto': answerDto?.toJson(),
+  //   };
+  // }
 }

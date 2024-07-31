@@ -81,26 +81,26 @@ class Course {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'price': price,
-      'status': status?.name,
-      'title': title,
-      'description': description,
-      'chapterDtos': chapterDtos?.map((e) => e.toJson()).toList(),
-      'blogDtos': blogDtos?.map((e) => e.toJson()).toList(),
-      'teacherDto': teacherDto?.toJson(),
-      'courseFeedbackDtos': courseFeedbackDtos?.map((e) => e.toJson()).toList(),
-      'categoryDtos': categoryDtos?.map((e) => e.toJson()).toList(),
-      'participatedUserDtos':
-          participatedUserDtos?.map((e) => e.toJson()).toList(),
-      'userInterestDtos': userInterestDtos?.map((e) => e.toJson()).toList(),
-      'numberOfEnrolledStudents': numberOfEnrolledStudents,
-      'currentUserCourse': currentUserCourse?.toJson(),
-      'relatedCourseDtos': relatedCourseDtos?.map((e) => e.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'price': price,
+  //     'status': status?.name,
+  //     'title': title,
+  //     'description': description,
+  //     'chapterDtos': chapterDtos?.map((e) => e.toJson()).toList(),
+  //     'blogDtos': blogDtos?.map((e) => e.toJson()).toList(),
+  //     'teacherDto': teacherDto?.toJson(),
+  //     'courseFeedbackDtos': courseFeedbackDtos?.map((e) => e.toJson()).toList(),
+  //     'categoryDtos': categoryDtos?.map((e) => e.toJson()).toList(),
+  //     'participatedUserDtos':
+  //         participatedUserDtos?.map((e) => e.toJson()).toList(),
+  //     'userInterestDtos': userInterestDtos?.map((e) => e.toJson()).toList(),
+  //     'numberOfEnrolledStudents': numberOfEnrolledStudents,
+  //     'currentUserCourse': currentUserCourse?.toJson(),
+  //     'relatedCourseDtos': relatedCourseDtos?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }
 
 enum CourseStatus {

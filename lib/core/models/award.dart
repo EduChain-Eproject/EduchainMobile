@@ -2,54 +2,39 @@ import 'homework.dart';
 import 'user.dart';
 
 class Award {
-  final int id;
-  final String status;
+  final int? id;
+  final String? status;
   final DateTime? submissionDate;
   final DateTime? reviewDate;
-  final String comments;
-  final int homeworkDtoId;
-  final User userDto;
-  final Homework homeworkDto;
+  final String? comments;
+  final Homework? homeworkDto;
+  final User? userDto;
 
   Award({
-    required this.id,
-    required this.status,
+    this.id,
+    this.status,
     this.submissionDate,
     this.reviewDate,
-    required this.comments,
-    required this.homeworkDtoId,
-    required this.userDto,
-    required this.homeworkDto,
+    this.comments,
+    this.homeworkDto,
+    this.userDto,
   });
 
   factory Award.fromJson(Map<String, dynamic> json) {
     return Award(
-      id: json['id'] as int,
-      status: json['status'] as String,
-      submissionDate: json.containsKey('submissionDate')
-          ? DateTime.parse(json['submissionDate'])
-          : null,
-      reviewDate: json.containsKey('reviewDate')
+      id: json['id'],
+      status: json['status'],
+      // submissionDate: json['submissionDate'] != null
+      //     ? DateTime.parse(json['submissionDate'])
+      //     : null,
+      reviewDate: json['reviewDate'] != null
           ? DateTime.parse(json['reviewDate'])
           : null,
-      comments: json['comments'] as String,
-      homeworkDtoId: json['homeworkDtoId'] as int,
-      userDto: User.fromJson(json['userDto'] as Map<String, dynamic>),
-      homeworkDto:
-          Homework.fromJson(json['homeworkDto'] as Map<String, dynamic>),
+      comments: json['comments'],
+      homeworkDto: json['homeworkDto'] != null
+          ? Homework.fromJson(json['homeworkDto'])
+          : null,
+      userDto: json['userDto'] != null ? User.fromJson(json['userDto']) : null,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'status': status,
-      'submissionDate': submissionDate?.toIso8601String(),
-      'reviewDate': reviewDate?.toIso8601String(),
-      'comments': comments,
-      'homeworkDtoId': homeworkDtoId,
-      'userDto': userDto.toJson(),
-      'homeworkDto': homeworkDto.toJson(),
-    };
   }
 }

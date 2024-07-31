@@ -44,17 +44,17 @@ class Blog {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'createdAt': createdAt?.toIso8601String(),
-      'title': title,
-      'blogText': blogText,
-      'voteUp': voteUp,
-      'photo': photo,
-      'user': user?.toJson(),
-      'blogCategory': blogCategory?.toJson(),
-      'blogComments': blogComments?.map((e) => e.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'createdAt': createdAt?.toIso8601String(),
+  //     'title': title,
+  //     'blogText': blogText,
+  //     'voteUp': voteUp,
+  //     'photo': photo,
+  //     'user': user?.toJson(),
+  //     'blogCategory': blogCategory?.toJson(),
+  //     'blogComments': blogComments?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }

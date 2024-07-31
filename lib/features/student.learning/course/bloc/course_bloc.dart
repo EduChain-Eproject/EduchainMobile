@@ -16,7 +16,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
     on<FetchCategories>((event, emit) async {
       emit(CategoriesLoading());
       final response = await courseService.fetchCategories();
-      response.on(
+      await response.on(
         onSuccess: (categories) => emit(CategoriesLoaded(categories)),
         onError: (error) => emit(CategoriesError(error['message'])),
       );
@@ -25,7 +25,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
     on<SearchCourses>((event, emit) async {
       emit(CoursesLoading());
       final response = await courseService.searchCourses(event.searchRequest);
-      response.on(
+      await response.on(
         onSuccess: (courses) => emit(CoursesLoaded(courses)),
         onError: (error) => emit(CoursesError(error['message'])),
       );
@@ -34,7 +34,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
     on<FetchCourseDetail>((event, emit) async {
       emit(CourseDetailLoading());
       final response = await courseService.getCourseDetail(event.courseId);
-      response.on(
+      await response.on(
         onSuccess: (courseDetail) => emit(CourseDetailLoaded(courseDetail)),
         onError: (error) => emit(CourseDetailError(error['message'])),
       );

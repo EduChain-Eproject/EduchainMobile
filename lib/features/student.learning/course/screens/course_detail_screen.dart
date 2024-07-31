@@ -1,3 +1,4 @@
+import 'package:educhain/features/student.learning/lesson/screens/lesson_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -110,22 +111,27 @@ class _CourseDetailViewState extends State<CourseDetailView> {
                   if (course.chapterDtos != null &&
                       course.chapterDtos!.isNotEmpty) ...[
                     Text('Chapters:',
-                        style: Theme.of(context).textTheme.bodySmall),
-                    ...course.chapterDtos!.map((chapter) => ListTile(
+                        style: Theme.of(context).textTheme.titleSmall),
+                    ...course.chapterDtos!.map((chapter) => ExpansionTile(
                           title: Text(chapter.chapterTitle ?? 'Untitled'),
                           subtitle: Text(
                               'Lessons: ${chapter.lessonDtos?.length ?? 0}'),
-                        )),
-                    const SizedBox(height: 16.0),
-                  ],
-                  if (course.courseFeedbackDtos != null &&
-                      course.courseFeedbackDtos!.isNotEmpty) ...[
-                    Text('Feedback:',
-                        style: Theme.of(context).textTheme.bodySmall),
-                    ...course.courseFeedbackDtos!.map((feedback) => ListTile(
-                          // title: Text(feedback.comment ?? 'No comment'),
-                          subtitle:
-                              Text('Rating: ${feedback.rating ?? 'No rating'}'),
+                          children: chapter.lessonDtos
+                                  ?.map((lesson) => ListTile(
+                                        title: Text(lesson.lessonTitle ??
+                                            'Untitled Lesson'),
+                                        subtitle: Text(
+                                            'Description: ${lesson.description ?? 'No Description'}'),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            LessonDetailScreen.route(
+                                                lesson.id!),
+                                          );
+                                        },
+                                      ))
+                                  .toList() ??
+                              [],
                         )),
                     const SizedBox(height: 16.0),
                   ],

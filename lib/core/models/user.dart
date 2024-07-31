@@ -46,19 +46,19 @@ class User {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
-      'avatarPath': avatarPath,
-      'phone': phone,
-      'address': address,
-      'role': role,
-      'email': email,
-      'userAwardDtos': userAwardDtos?.map((item) => item.toJson()).toList(),
-      'userHomeworkDtos':
-          userHomeworkDtos?.map((item) => item.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'firstName': firstName,
+  //     'lastName': lastName,
+  //     'avatarPath': avatarPath,
+  //     'phone': phone,
+  //     'address': address,
+  //     'role': role,
+  //     'email': email,
+  //     'userAwardDtos': userAwardDtos?.map((item) => item.toJson()).toList(),
+  //     'userHomeworkDtos':
+  //         userHomeworkDtos?.map((item) => item.toJson()).toList(),
+  //   };
+  // }
 }

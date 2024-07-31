@@ -37,18 +37,18 @@ class UserCourse {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'teacherName': teacherName,
-      'teacherEmail': teacherEmail,
-      'title': title,
-      'enrollmentDate': enrollmentDate?.toIso8601String(),
-      'price': price,
-      'completionStatus': completionStatus?.name,
-      'categoryList':
-          categoryList?.map((category) => category.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'teacherName': teacherName,
+  //     'teacherEmail': teacherEmail,
+  //     'title': title,
+  //     'enrollmentDate': enrollmentDate?.toIso8601String(),
+  //     'price': price,
+  //     'completionStatus': completionStatus?.name,
+  //     'categoryList':
+  //         categoryList?.map((category) => category.toJson()).toList(),
+  //   };
+  // }
 }
 
 enum CompletionStatus { NOT_STARTED, IN_PROGRESS, COMPLETED }

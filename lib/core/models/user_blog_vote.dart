@@ -17,11 +17,11 @@ class UserBlogVote {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'userId': userId,
-      'blogId': blogId,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'userId': userId,
+  //     'blogId': blogId,
+  //   };
+  // }
 }

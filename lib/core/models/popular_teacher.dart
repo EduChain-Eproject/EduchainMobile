@@ -33,15 +33,15 @@ class PopularTeacher {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'firstName': firstName,
-      'lastName': lastName,
-      'phone': phone,
-      'teacherEmail': teacherEmail,
-      'avatarPath': avatarPath,
-      'studentParticipating': studentParticipating,
-      'mostPopularCourse': mostPopularCourse?.toJson(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'firstName': firstName,
+  //     'lastName': lastName,
+  //     'phone': phone,
+  //     'teacherEmail': teacherEmail,
+  //     'avatarPath': avatarPath,
+  //     'studentParticipating': studentParticipating,
+  //     'mostPopularCourse': mostPopularCourse?.toJson(),
+  //   };
+  // }
 }

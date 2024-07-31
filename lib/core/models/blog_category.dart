@@ -18,11 +18,11 @@ class BlogCategory {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'createdAt': createdAt?.toIso8601String(),
-      'categoryName': categoryName,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'createdAt': createdAt?.toIso8601String(),
+  //     'categoryName': categoryName,
+  //   };
+  // }
 }

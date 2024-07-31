@@ -22,7 +22,6 @@ class HomeworkDetailScreen extends StatelessWidget {
       create: (context) =>
           getIt<HomeworkBloc>()..add(FetchHomeworkDetail(homeworkId)),
       child: Scaffold(
-        appBar: AppBar(title: const Text('Homework Detail')),
         body: BlocBuilder<HomeworkBloc, HomeworkState>(
           builder: (context, state) {
             if (state is HomeworkLoading) {

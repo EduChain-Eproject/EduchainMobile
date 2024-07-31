@@ -1,7 +1,6 @@
 part of 'lesson_bloc.dart';
 
 abstract class LessonState {
-  @override
   List<Object> get props => [];
 }
 

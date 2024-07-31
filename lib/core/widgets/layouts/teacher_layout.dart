@@ -51,10 +51,10 @@ class _TeacherLayoutState extends State<TeacherLayout> {
               icon: Icon(Icons.home),
               label: 'Home',
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.person),
-            //   label: 'Profile',
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
           ],
         ));
   }

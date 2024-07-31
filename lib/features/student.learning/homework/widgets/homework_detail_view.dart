@@ -1,9 +1,9 @@
 import 'package:educhain/core/models/award.dart';
 import 'package:educhain/core/models/user_homework.dart';
+import 'package:educhain/features/student.learning/award/screens/award_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:educhain/core/models/homework.dart';
 
-import 'award_tile.dart';
 import 'question_tile.dart';
 import 'user_homework_status.dart';
 
@@ -42,11 +42,22 @@ class HomeworkDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
 
+          // Display user's homework status
+          if (userHomework != null) ...[
+            Text('Your Homework Status:',
+                style: Theme.of(context).textTheme.titleMedium),
+            UserHomeworkStatus(userHomework: userHomework!),
+          ],
+
           // Display award status if it exists
           if (award != null) ...[
-            Text('Award Status:',
-                style: Theme.of(context).textTheme.titleMedium),
-            AwardTile(award: award!),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context, AwardDetailScreen.route(award!.id ?? 0));
+              },
+              child: const Text('View your award detail'),
+            ),
             const SizedBox(height: 16.0),
           ],
 
@@ -56,13 +67,6 @@ class HomeworkDetailView extends StatelessWidget {
             Text('Questions:', style: Theme.of(context).textTheme.titleMedium),
             ...homework.questionDtos!.map((question) => QuestionTile(
                 question: question, showCorrectAnswers: isHomeworkCompleted)),
-          ],
-
-          // Display user's homework status
-          if (userHomework != null) ...[
-            Text('Your Homework Status:',
-                style: Theme.of(context).textTheme.titleMedium),
-            UserHomeworkStatus(userHomework: userHomework!),
           ],
 
           // Display submit button if homework is not completed

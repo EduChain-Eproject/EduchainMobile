@@ -3,38 +3,61 @@ import 'user.dart';
 
 class Award {
   final int? id;
-  final String? status;
+  final AwardStatus status;
   final DateTime? submissionDate;
   final DateTime? reviewDate;
   final String? comments;
-  final Homework? homeworkDto;
+  final int? homeworkDtoId;
   final User? userDto;
+  final Homework? homeworkDto;
 
-  Award({
+  const Award({
     this.id,
-    this.status,
+    required this.status,
     this.submissionDate,
     this.reviewDate,
     this.comments,
-    this.homeworkDto,
+    this.homeworkDtoId,
     this.userDto,
+    this.homeworkDto,
   });
+
+  List<Object?> get props => [
+        id,
+        status,
+        submissionDate,
+        reviewDate,
+        comments,
+        homeworkDtoId,
+        userDto,
+        homeworkDto,
+      ];
 
   factory Award.fromJson(Map<String, dynamic> json) {
     return Award(
-      id: json['id'],
-      status: json['status'],
-      // submissionDate: json['submissionDate'] != null
+      id: json['id'] as int?,
+      status: AwardStatus.values.firstWhere(
+        (e) => e.toString() == 'AwardStatus.${json['status']}',
+      ),
+      // submissionDate: json.containsKey('submissionDate')
       //     ? DateTime.parse(json['submissionDate'])
       //     : null,
-      reviewDate: json['reviewDate'] != null
-          ? DateTime.parse(json['reviewDate'])
-          : null,
-      comments: json['comments'],
+      // reviewDate: json.containsKey('reviewDate')
+      //     ? DateTime.parse(json['reviewDate'])
+      //     : null,
+      comments: json['comments'] as String?,
+      homeworkDtoId: json['homeworkDtoId'] as int?,
+      userDto: json['userDto'] != null ? User.fromJson(json['userDto']) : null,
       homeworkDto: json['homeworkDto'] != null
           ? Homework.fromJson(json['homeworkDto'])
           : null,
-      userDto: json['userDto'] != null ? User.fromJson(json['userDto']) : null,
     );
   }
+}
+
+enum AwardStatus {
+  PENDING,
+  APPROVED,
+  REJECTED,
+  RECEIVED,
 }

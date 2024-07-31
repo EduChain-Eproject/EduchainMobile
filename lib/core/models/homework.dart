@@ -2,7 +2,6 @@ import 'award.dart';
 import 'lesson.dart';
 import 'question.dart';
 import 'user.dart';
-import 'user_answer.dart';
 import 'user_homework.dart';
 
 class Homework {

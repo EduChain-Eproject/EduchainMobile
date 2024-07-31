@@ -23,12 +23,41 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
     });
 
     on<SearchCourses>((event, emit) async {
+      CoursesLoaded? currentState;
+      if (state is CoursesLoaded && event.isLoadingMore) {
+        currentState = state as CoursesLoaded;
+      } else {
+        currentState = null;
+      }
       emit(CoursesLoading());
-      final response = await courseService.searchCourses(event.searchRequest);
-      await response.on(
-        onSuccess: (courses) => emit(CoursesLoaded(courses)),
-        onError: (error) => emit(CoursesError(error['message'])),
-      );
+
+      try {
+        final response = await courseService.searchCourses(event.searchRequest);
+
+        await response.on(
+          onSuccess: (newCourses) {
+            if (currentState != null) {
+              final updatedCourses = Page<Course>(
+                number: newCourses.number,
+                size: newCourses.size,
+                totalElements: newCourses.totalElements,
+                totalPages: newCourses.totalPages,
+                content: [
+                  ...currentState.courses.content,
+                  ...newCourses.content
+                ],
+              );
+
+              emit(CoursesLoaded(updatedCourses));
+            } else {
+              emit(CoursesLoaded(newCourses));
+            }
+          },
+          onError: (error) => emit(CoursesError(error['message'])),
+        );
+      } catch (e) {
+        emit(CoursesError(e.toString()));
+      }
     });
 
     on<FetchCourseDetail>((event, emit) async {

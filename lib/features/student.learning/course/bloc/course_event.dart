@@ -6,8 +6,9 @@ class FetchCategories extends CourseEvent {}
 
 class SearchCourses extends CourseEvent {
   final CourseSearchRequest searchRequest;
+  final bool isLoadingMore;
 
-  SearchCourses(this.searchRequest);
+  SearchCourses(this.searchRequest, {this.isLoadingMore = false});
 }
 
 class FetchCourseDetail extends CourseEvent {

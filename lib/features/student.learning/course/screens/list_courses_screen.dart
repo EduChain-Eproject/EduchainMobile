@@ -20,14 +20,15 @@ class _CourseListScreenState extends State<CourseListScreen> {
   late CourseBloc _courseBloc;
   String _searchQuery = '';
   List<Category> _categories = [];
+  int _currentPage = 0;
+  String _sortBy = 'title';
 
   @override
   void initState() {
     super.initState();
     _courseBloc = getIt<CourseBloc>();
     _courseBloc.add(FetchCategories());
-    _courseBloc
-        .add(SearchCourses(CourseSearchRequest(search: '', categoryIds: [])));
+    _searchCourses();
   }
 
   @override
@@ -37,6 +38,18 @@ class _CourseListScreenState extends State<CourseListScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Courses'),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: _onSortOptionSelected,
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(value: 'title', child: Text('Sort by Title')),
+                  PopupMenuItem(value: 'price', child: Text('Sort by Price')),
+                ];
+              },
+              icon: const Icon(Icons.sort),
+            ),
+          ],
         ),
         body: Column(
           children: [
@@ -52,6 +65,11 @@ class _CourseListScreenState extends State<CourseListScreen> {
                     setState(() {
                       _categories = state.categories;
                     });
+                  } else if (state is CoursesLoaded) {
+                    // Update the page number for pagination
+                    setState(() {
+                      _currentPage = state.courses.number;
+                    });
                   }
                 },
                 builder: (context, state) {
@@ -63,7 +81,16 @@ class _CourseListScreenState extends State<CourseListScreen> {
                     return Center(child: Text('Error: ${state.message}'));
                   } else if (state is CoursesLoaded) {
                     final courses = state.courses.content;
-                    return CourseList(courses: courses);
+                    return Column(
+                      children: [
+                        Expanded(child: CourseList(courses: courses)),
+                        if (state.courses.number < state.courses.totalPages - 1)
+                          TextButton(
+                            onPressed: _loadMoreCourses,
+                            child: const Text('Load More'),
+                          ),
+                      ],
+                    );
                   } else {
                     return const Center(child: Text('No courses available'));
                   }
@@ -76,9 +103,10 @@ class _CourseListScreenState extends State<CourseListScreen> {
     );
   }
 
-  void _searchCourses(String searchQuery, int? selectedCategory) {
+  void _searchCourses(
+      [String? searchQuery, int? selectedCategory, bool? isLoadingMore]) {
     setState(() {
-      _searchQuery = searchQuery;
+      if (searchQuery != null) _searchQuery = searchQuery;
     });
 
     final selectedCategoryIds = <int>[];
@@ -86,15 +114,32 @@ class _CourseListScreenState extends State<CourseListScreen> {
     if (selectedCategory != null) {
       selectedCategoryIds.add(selectedCategory);
     } else {
-      // If "all" is selected, use an empty array to represent all categories
       selectedCategoryIds.clear();
     }
 
     final searchRequest = CourseSearchRequest(
       search: _searchQuery,
+      page: _currentPage,
+      sortBy: _sortBy,
       categoryIds: selectedCategoryIds,
     );
 
-    _courseBloc.add(SearchCourses(searchRequest));
+    bool more = isLoadingMore != null ? true : false;
+
+    _courseBloc.add(SearchCourses(searchRequest, isLoadingMore: more));
+  }
+
+  void _loadMoreCourses() {
+    setState(() {
+      _currentPage++;
+    });
+    _searchCourses('', null, true);
+  }
+
+  void _onSortOptionSelected(String sortOption) {
+    setState(() {
+      _sortBy = sortOption;
+    });
+    _searchCourses();
   }
 }

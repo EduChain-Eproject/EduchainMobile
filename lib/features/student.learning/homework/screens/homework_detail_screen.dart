@@ -28,7 +28,11 @@ class HomeworkDetailScreen extends StatelessWidget {
             if (state is HomeworkLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is HomeworkLoaded) {
-              return HomeworkDetailView(homework: state.homework);
+              return HomeworkDetailView(
+                homework: state.homework,
+                userHomework: state.userHomework,
+                award: state.award,
+              );
             } else if (state is HomeworkError) {
               return Center(child: Text('Error: ${state.message}'));
             } else {

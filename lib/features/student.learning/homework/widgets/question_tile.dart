@@ -5,8 +5,11 @@ import 'package:educhain/core/models/question.dart';
 
 class QuestionTile extends StatelessWidget {
   final Question question;
+  final bool showCorrectAnswers;
 
-  const QuestionTile({Key? key, required this.question}) : super(key: key);
+  const QuestionTile(
+      {Key? key, required this.question, this.showCorrectAnswers = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,7 @@ class QuestionTile extends StatelessWidget {
                   color: _getColorForAnswer(answer, currentUserAnswer),
                 ),
                 onTap: () {
-                  // Handle answer selection if necessary
+                  // TODO: Handle answer selection if necessary
                 },
               ),
           ] else
@@ -40,17 +43,36 @@ class QuestionTile extends StatelessWidget {
   }
 
   IconData _getIconForAnswer(Answer answer, UserAnswer? currentUserAnswer) {
-    if (currentUserAnswer != null && currentUserAnswer.answerId == answer.id) {
-      return answerIsCorrect(answer) ? Icons.check_circle : Icons.error;
+    if (showCorrectAnswers) {
+      if (currentUserAnswer != null &&
+          currentUserAnswer.answerId == answer.id) {
+        return answerIsCorrect(answer) ? Icons.check_circle : Icons.error;
+      }
+      return answerIsCorrect(answer)
+          ? Icons.check_circle
+          : Icons.radio_button_unchecked;
+    } else {
+      if (currentUserAnswer != null &&
+          currentUserAnswer.answerId == answer.id) {
+        return Icons.radio_button_checked;
+      }
+      return Icons.radio_button_unchecked;
     }
-    return Icons.radio_button_unchecked;
   }
 
   Color _getColorForAnswer(Answer answer, UserAnswer? currentUserAnswer) {
-    if (currentUserAnswer != null && currentUserAnswer.answerId == answer.id) {
-      return answerIsCorrect(answer) ? Colors.green : Colors.red;
+    if (showCorrectAnswers) {
+      if (currentUserAnswer != null &&
+          currentUserAnswer.answerId == answer.id) {
+        return answerIsCorrect(answer) ? Colors.green : Colors.red;
+      }
+      return answerIsCorrect(answer) ? Colors.green : Colors.grey;
+    } else {
+      return currentUserAnswer != null &&
+              currentUserAnswer.answerId == answer.id
+          ? Colors.blue
+          : Colors.grey;
     }
-    return Colors.grey;
   }
 
   bool answerIsCorrect(Answer answer) {

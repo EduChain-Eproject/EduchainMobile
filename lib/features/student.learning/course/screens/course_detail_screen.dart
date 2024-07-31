@@ -5,11 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:educhain/core/widgets/authenticated_widget.dart';
 import 'package:educhain/init_dependency.dart';
 import '../bloc/course_bloc.dart';
+import '../widgets/chapter_section.dart';
+import '../widgets/course_info.dart';
+import '../widgets/related_course_section.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   static Route route(int courseId) => MaterialPageRoute(
-      builder: (context) =>
-          AuthenticatedWidget(child: CourseDetailScreen(courseId: courseId)));
+        builder: (context) => AuthenticatedWidget(
+          child: CourseDetailScreen(courseId: courseId),
+        ),
+      );
 
   final int courseId;
 
@@ -51,103 +56,46 @@ class _CourseDetailViewState extends State<CourseDetailView> {
               title: const Text('Course Detail'),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ),
             body: const Center(child: CircularProgressIndicator()),
           );
         } else if (state is CourseDetailLoaded) {
           final course = state.courseDetail;
+          final isEnrolled = course.currentUserCourse != null;
 
           return Scaffold(
             appBar: AppBar(
               title: Text(course.title ?? 'Course Detail'),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: [
-                  Text(
-                    course.title ?? '',
-                    style: Theme.of(context).textTheme.bodySmall,
+                  CourseInfo(course: course),
+                  const SizedBox(height: 16.0),
+                  ChaptersSection(
+                    chapters: course.chapterDtos ?? [],
+                    onLessonTap: (lessonId) {
+                      if (isEnrolled) {
+                        Navigator.push(
+                          context,
+                          LessonDetailScreen.route(lessonId),
+                        );
+                      } else {
+                        _showEnrollmentPrompt(context);
+                      }
+                    },
                   ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    course.description ?? '',
-                    style: Theme.of(context).textTheme.bodySmall,
+                  const SizedBox(height: 16.0),
+                  RelatedCoursesSection(
+                    relatedCourses: course.relatedCourseDtos ?? [],
                   ),
-                  const SizedBox(height: 16.0),
-                  if (course.price != null)
-                    Text(
-                      'Price: \$${course.price}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  const SizedBox(height: 16.0),
-                  if (course.numberOfEnrolledStudents != null)
-                    Text(
-                      'Enrolled Students: ${course.numberOfEnrolledStudents}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  const SizedBox(height: 16.0),
-                  if (course.teacherDto != null) ...[
-                    Text(
-                      'Teacher: ${course.teacherDto!.firstName ?? 'Unknown'}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    Text(
-                      'Email: ${course.teacherDto!.email ?? 'Unknown'}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 16.0),
-                  ],
-                  if (course.chapterDtos != null &&
-                      course.chapterDtos!.isNotEmpty) ...[
-                    Text('Chapters:',
-                        style: Theme.of(context).textTheme.titleSmall),
-                    ...course.chapterDtos!.map((chapter) => ExpansionTile(
-                          title: Text(chapter.chapterTitle ?? 'Untitled'),
-                          subtitle: Text(
-                              'Lessons: ${chapter.lessonDtos?.length ?? 0}'),
-                          children: chapter.lessonDtos
-                                  ?.map((lesson) => ListTile(
-                                        title: Text(lesson.lessonTitle ??
-                                            'Untitled Lesson'),
-                                        subtitle: Text(
-                                            'Description: ${lesson.description ?? 'No Description'}'),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            LessonDetailScreen.route(
-                                                lesson.id!),
-                                          );
-                                        },
-                                      ))
-                                  .toList() ??
-                              [],
-                        )),
-                    const SizedBox(height: 16.0),
-                  ],
-                  if (course.relatedCourseDtos != null &&
-                      course.relatedCourseDtos!.isNotEmpty) ...[
-                    Text('Related Courses:',
-                        style: Theme.of(context).textTheme.bodySmall),
-                    ...course.relatedCourseDtos!
-                        .map((relatedCourse) => ListTile(
-                              title: Text(relatedCourse.title ?? 'No title'),
-                              onTap: () {
-                                // Navigate to related course detail page
-                              },
-                            )),
-                    const SizedBox(height: 16.0),
-                  ],
                 ],
               ),
             ),
@@ -164,6 +112,30 @@ class _CourseDetailViewState extends State<CourseDetailView> {
           );
         }
       },
+    );
+  }
+
+  void _showEnrollmentPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Enrollment Required'),
+        content: const Text(
+            'You need to enroll in this course to view the lesson details.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // TODO: Navigate to the enrollment page or handle enrollment
+              Navigator.of(context).pop();
+            },
+            child: const Text('Enroll'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
     );
   }
 }

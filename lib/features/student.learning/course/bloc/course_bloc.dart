@@ -1,8 +1,8 @@
-import 'package:bloc/bloc.dart';
 import 'package:educhain/core/models/category.dart';
 import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/types/page.dart';
 import 'package:educhain/features/student.learning/course/course_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/course_search_request.dart';
 

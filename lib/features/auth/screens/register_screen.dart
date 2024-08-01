@@ -7,7 +7,7 @@ import 'package:educhain/core/auth/bloc/auth_event.dart';
 import 'package:educhain/core/auth/bloc/auth_state.dart';
 import 'package:educhain/core/auth/models/register_request.dart';
 import 'package:educhain/core/widgets/unauthenticated_widget.dart';
-import '../widgets/validated_text_field.dart';
+import '../../../core/widgets/validated_text_field.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {

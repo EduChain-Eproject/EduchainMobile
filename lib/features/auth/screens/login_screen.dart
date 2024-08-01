@@ -9,7 +9,7 @@ import 'package:educhain/features/auth/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../widgets/validated_text_field.dart';
+import '../../../core/widgets/validated_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   static route() => MaterialPageRoute(

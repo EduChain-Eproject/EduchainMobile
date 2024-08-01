@@ -81,6 +81,43 @@ class Course {
     );
   }
 
+  Course copyWith({
+    int? id,
+    String? title,
+    String? description,
+    double? price,
+    CourseStatus? status,
+    List<Chapter>? chapterDtos,
+    List<Blog>? blogDtos,
+    User? teacherDto,
+    List<CourseFeedback>? courseFeedbackDtos,
+    List<Category>? categoryDtos,
+    List<User>? participatedUserDtos,
+    List<UserInterests>? userInterestDtos,
+    int? numberOfEnrolledStudents,
+    UserCourse? currentUserCourse,
+    List<Course>? relatedCourseDtos,
+  }) {
+    return Course(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      status: status ?? this.status,
+      chapterDtos: chapterDtos ?? this.chapterDtos,
+      blogDtos: blogDtos ?? this.blogDtos,
+      teacherDto: teacherDto ?? this.teacherDto,
+      courseFeedbackDtos: courseFeedbackDtos ?? this.courseFeedbackDtos,
+      categoryDtos: categoryDtos ?? this.categoryDtos,
+      participatedUserDtos: participatedUserDtos ?? this.participatedUserDtos,
+      userInterestDtos: userInterestDtos ?? this.userInterestDtos,
+      numberOfEnrolledStudents:
+          numberOfEnrolledStudents ?? this.numberOfEnrolledStudents,
+      currentUserCourse: currentUserCourse ?? this.currentUserCourse,
+      relatedCourseDtos: relatedCourseDtos ?? this.relatedCourseDtos,
+    );
+  }
+
   // Map<String, dynamic> toJson() {
   //   return {
   //     'id': id,

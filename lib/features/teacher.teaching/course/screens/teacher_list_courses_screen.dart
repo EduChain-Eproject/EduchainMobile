@@ -1,33 +1,35 @@
-import 'package:educhain/core/models/category.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/course_bloc.dart';
+import '../bloc/teacher_course_bloc.dart';
 import '../models/course_search_request.dart';
-import '../widgets/category_dropdown.dart';
 import '../widgets/course_list.dart';
 import '../widgets/course_search_bar.dart';
+import 'teacher_course_form_screen.dart';
 
-class CourseListScreen extends StatefulWidget {
-  const CourseListScreen({super.key});
+class TeacherCourseListScreen extends StatefulWidget {
+  static Route route() => MaterialPageRoute(
+        builder: (context) => const TeacherCourseListScreen(),
+      );
+
+  const TeacherCourseListScreen({super.key});
 
   @override
-  _CourseListScreenState createState() => _CourseListScreenState();
+  _TeacherCourseListScreenState createState() =>
+      _TeacherCourseListScreenState();
 }
 
-class _CourseListScreenState extends State<CourseListScreen> {
-  late CourseBloc _courseBloc;
+class _TeacherCourseListScreenState extends State<TeacherCourseListScreen> {
+  late TeacherCourseBloc _courseBloc;
   String _searchQuery = '';
-  List<Category> _categories = [];
   int _currentPage = 0;
   String _sortBy = 'title';
 
   @override
   void initState() {
     super.initState();
-    _courseBloc = getIt<CourseBloc>();
-    _courseBloc.add(FetchCategories());
+    _courseBloc = getIt<TeacherCourseBloc>();
     _searchCourses();
   }
 
@@ -37,14 +39,16 @@ class _CourseListScreenState extends State<CourseListScreen> {
       value: _courseBloc,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Courses'),
+          title: const Text('My TeacherCourses'),
           actions: [
             PopupMenuButton<String>(
               onSelected: _onSortOptionSelected,
               itemBuilder: (BuildContext context) {
                 return [
-                  PopupMenuItem(value: 'title', child: Text('Sort by Title')),
-                  PopupMenuItem(value: 'price', child: Text('Sort by Price')),
+                  const PopupMenuItem(
+                      value: 'title', child: Text('Sort by Title')),
+                  const PopupMenuItem(
+                      value: 'price', child: Text('Sort by Price')),
                 ];
               },
               icon: const Icon(Icons.sort),
@@ -54,18 +58,10 @@ class _CourseListScreenState extends State<CourseListScreen> {
         body: Column(
           children: [
             CourseSearchBar(onSearch: _searchCourses),
-            CategoryDropdown(
-              categories: _categories,
-              onCategorySelected: _searchCourses,
-            ),
             Expanded(
-              child: BlocConsumer<CourseBloc, CourseState>(
+              child: BlocConsumer<TeacherCourseBloc, TeacherCourseState>(
                 listener: (context, state) {
-                  if (state is CategoriesLoaded) {
-                    setState(() {
-                      _categories = state.categories;
-                    });
-                  } else if (state is CoursesLoaded) {
+                  if (state is TeacherCoursesLoaded) {
                     // Update the page number for pagination
                     setState(() {
                       _currentPage = state.courses.number;
@@ -73,13 +69,11 @@ class _CourseListScreenState extends State<CourseListScreen> {
                   }
                 },
                 builder: (context, state) {
-                  if (state is CategoriesLoading || state is CoursesLoading) {
+                  if (state is TeacherCoursesLoading) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (state is CategoriesError) {
+                  } else if (state is TeacherCoursesError) {
                     return Center(child: Text('Error: ${state.message}'));
-                  } else if (state is CoursesError) {
-                    return Center(child: Text('Error: ${state.message}'));
-                  } else if (state is CoursesLoaded) {
+                  } else if (state is TeacherCoursesLoaded) {
                     final courses = state.courses.content;
                     return Column(
                       children: [
@@ -99,40 +93,35 @@ class _CourseListScreenState extends State<CourseListScreen> {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _createNewCourse,
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
 
-  void _searchCourses(
-      [String? searchQuery, int? selectedCategory, bool? isLoadingMore]) {
+  void _searchCourses([String? searchQuery, bool? isLoadingMore]) {
     setState(() {
       if (searchQuery != null) _searchQuery = searchQuery;
     });
-
-    final selectedCategoryIds = <int>[];
-
-    if (selectedCategory != null) {
-      selectedCategoryIds.add(selectedCategory);
-    } else {
-      selectedCategoryIds.clear();
-    }
 
     final searchRequest = CourseSearchRequest(
       search: _searchQuery,
       page: _currentPage,
       sortBy: _sortBy,
-      categoryIds: selectedCategoryIds,
+      categoryIds: [],
     );
 
-    _courseBloc.add(
-        SearchCourses(searchRequest, isLoadingMore: isLoadingMore != null));
+    _courseBloc.add(FetchTeacherCourses(searchRequest,
+        isLoadingMore: isLoadingMore != null));
   }
 
   void _loadMoreCourses() {
     setState(() {
       _currentPage++;
     });
-    _searchCourses('', null, true);
+    _searchCourses('', true);
   }
 
   void _onSortOptionSelected(String sortOption) {
@@ -140,5 +129,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
       _sortBy = sortOption;
     });
     _searchCourses();
+  }
+
+  void _createNewCourse() {
+    Navigator.push(context, TeacherCourseFormScreen.route(null));
   }
 }

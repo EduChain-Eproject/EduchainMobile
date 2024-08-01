@@ -13,7 +13,6 @@ import 'features/student.learning/homework/bloc/homework_bloc.dart';
 import 'features/student.learning/lesson/bloc/lesson_bloc.dart';
 import 'features/teacher.teaching/course/bloc/teacher_course_bloc.dart';
 import 'features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
-import 'features/teacher.teaching/lesson/bloc/teacher_lesson_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,9 +51,6 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<TeacherCourseBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<TeacherLessonBloc>(),
         ),
         BlocProvider(
           create: (context) => getIt<TeacherHomeworkBloc>(),

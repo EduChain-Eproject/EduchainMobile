@@ -17,8 +17,6 @@ import 'package:educhain/features/teacher.teaching/course/bloc/teacher_course_bl
 import 'package:educhain/features/teacher.teaching/course/teacher_course_service.dart';
 import 'package:educhain/features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
 import 'package:educhain/features/teacher.teaching/homework/teacher_homework_service.dart';
-import 'package:educhain/features/teacher.teaching/lesson/bloc/teacher_lesson_bloc.dart';
-import 'package:educhain/features/teacher.teaching/lesson/teacher_lesson_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -49,10 +47,6 @@ Future<void> initDependencies() async {
   getIt.registerSingleton<TeacherCourseService>(TeacherCourseService());
   getIt.registerFactory<TeacherCourseBloc>(
       () => TeacherCourseBloc(getIt<TeacherCourseService>()));
-
-  getIt.registerSingleton<TeacherLessonService>(TeacherLessonService());
-  getIt.registerFactory<TeacherLessonBloc>(
-      () => TeacherLessonBloc(getIt<TeacherLessonService>()));
 
   getIt.registerSingleton<TeacherHomeworkService>(TeacherHomeworkService());
   getIt.registerFactory<TeacherHomeworkBloc>(

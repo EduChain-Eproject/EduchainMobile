@@ -15,6 +15,7 @@ class Homework {
   final List<Question>? questionDtos;
   final List<UserHomework>? userHomeworkDtos;
   final List<Award>? userAwardDtos;
+  final bool isLoadingDetail; // New field to indicate loading state
 
   Homework({
     this.id,
@@ -27,6 +28,7 @@ class Homework {
     this.questionDtos,
     this.userHomeworkDtos,
     this.userAwardDtos,
+    this.isLoadingDetail = false, // Default value is false
   });
 
   factory Homework.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,33 @@ class Homework {
     );
   }
 
+  Homework copyWith({
+    int? id,
+    String? title,
+    String? description,
+    int? userId,
+    int? lessonId,
+    User? userDto,
+    Lesson? lessonDto,
+    List<Question>? questionDtos,
+    List<UserHomework>? userHomeworkDtos,
+    List<Award>? userAwardDtos,
+    bool? isLoadingDetail,
+  }) {
+    return Homework(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      userId: userId ?? this.userId,
+      lessonId: lessonId ?? this.lessonId,
+      userDto: userDto ?? this.userDto,
+      lessonDto: lessonDto ?? this.lessonDto,
+      questionDtos: questionDtos ?? this.questionDtos,
+      userHomeworkDtos: userHomeworkDtos ?? this.userHomeworkDtos,
+      userAwardDtos: userAwardDtos ?? this.userAwardDtos,
+      isLoadingDetail: isLoadingDetail ?? this.isLoadingDetail,
+    );
+  }
   // Map<String, dynamic> toJson() {
   //   return {
   //     'id': id,

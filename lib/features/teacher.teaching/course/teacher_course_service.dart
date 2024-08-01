@@ -40,7 +40,7 @@ class TeacherCourseService extends ApiService {
 
   ApiResponse<Course> updateCourse(
       int courseId, UpdateCourseRequest request) async {
-    return post<Course>(
+    return put<Course>(
       'TEACHER/api/course/update/$courseId',
       (json) => Course.fromJson(json),
       request.toJson(),
@@ -57,7 +57,7 @@ class TeacherCourseService extends ApiService {
 
   ApiResponse<Chapter> updateChapter(
       int chapterId, UpdateChapterRequest request) async {
-    return post<Chapter>(
+    return put<Chapter>(
       'TEACHER/api/chapter/update/$chapterId',
       (json) => Chapter.fromJson(json),
       request.toJson(),
@@ -74,7 +74,7 @@ class TeacherCourseService extends ApiService {
 
   ApiResponse<Lesson> updateLesson(
       int lessonId, UpdateLessonRequest request) async {
-    return post<Lesson>(
+    return put<Lesson>(
       'TEACHER/api/lesson/update/$lessonId',
       (json) => Lesson.fromJson(json),
       request.toJson(),

@@ -1,5 +1,6 @@
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/lesson.dart';
+import 'package:educhain/features/teacher.teaching/homework/screens/teacher_list_homeworks_by_lesson_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'lesson_dialog.dart';
@@ -75,6 +76,8 @@ class _ChapterTileState extends State<ChapterTile> {
         ..._lessons.map((lesson) {
           return ListTile(
             title: Text(lesson.lessonTitle ?? ''),
+            onTap: () => Navigator.push(context,
+                TeacherListHomeworksByLessonScreen.route(lesson.id ?? 0)),
             trailing: IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () => _editLesson(context, lesson),

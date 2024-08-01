@@ -36,6 +36,26 @@ class Lesson {
     );
   }
 
+  Lesson copyWith({
+    int? id,
+    String? lessonTitle,
+    String? description,
+    String? videoTitle,
+    String? videoURL,
+    Chapter? chapterDto,
+    List<Homework>? homeworkDtos,
+  }) {
+    return Lesson(
+      id: id ?? this.id,
+      lessonTitle: lessonTitle ?? this.lessonTitle,
+      description: description ?? this.description,
+      videoTitle: videoTitle ?? this.videoTitle,
+      videoURL: videoURL ?? this.videoURL,
+      chapterDto: chapterDto ?? this.chapterDto,
+      homeworkDtos: homeworkDtos ?? this.homeworkDtos,
+    );
+  }
+
   // Map<String, dynamic> toJson() {
   //   return {
   //     'id': id,

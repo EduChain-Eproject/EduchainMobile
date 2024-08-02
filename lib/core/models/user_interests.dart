@@ -1,47 +1,26 @@
-import 'category.dart';
+import 'course.dart';
+import 'user.dart';
 
 class UserInterests {
-  final int? studentId;
-  final int? courseId;
-  final String? description;
-  final String? title;
-  final double? price;
-  final String? teacherName;
-  final List<Category>? categoryList;
+  final int? id;
+  final User? userDto;
+  final Course? courseDto;
 
   UserInterests({
-    this.studentId,
-    this.courseId,
-    this.description,
-    this.title,
-    this.price,
-    this.teacherName,
-    this.categoryList,
+    this.id,
+    this.userDto,
+    this.courseDto,
   });
 
   factory UserInterests.fromJson(Map<String, dynamic> json) {
     return UserInterests(
-      studentId: json['student_id'] as int?,
-      courseId: json['course_id'] as int?,
-      description: json['description'] as String?,
-      title: json['title'] as String?,
-      price: json['price'] as double?,
-      teacherName: json['teacherName'] as String?,
-      categoryList: (json['categoryList'] as List<dynamic>?)
-          ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      id: json['id'] as int?,
+      userDto: json['userDto'] != null
+          ? User.fromJson(json['userDto'] as Map<String, dynamic>)
+          : null,
+      courseDto: json['courseDto'] != null
+          ? Course.fromJson(json['courseDto'] as Map<String, dynamic>)
+          : null,
     );
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'student_id': studentId,
-  //     'course_id': courseId,
-  //     'description': description,
-  //     'title': title,
-  //     'price': price,
-  //     'teacherName': teacherName,
-  //     'categoryList': categoryList?.map((e) => e.toJson()).toList(),
-  //   };
-  // }
 }

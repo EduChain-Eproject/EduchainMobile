@@ -1,6 +1,9 @@
 import 'package:educhain/core/models/user_homework.dart';
 
 import 'award.dart';
+import 'course.dart';
+import 'user_course.dart';
+import 'user_interests.dart';
 
 class User {
   final int? id;
@@ -13,6 +16,10 @@ class User {
   final String? email;
   final List<Award>? userAwardDtos;
   final List<UserHomework>? userHomeworkDtos;
+  final List<UserCourse>? courseDtosParticipated;
+  final List<UserInterests>? userInterestDtos;
+  final int? numberOfStudents;
+  final Course? mostPopularCourse;
 
   User({
     this.id,
@@ -25,6 +32,10 @@ class User {
     this.email,
     this.userAwardDtos,
     this.userHomeworkDtos,
+    this.courseDtosParticipated,
+    this.userInterestDtos,
+    this.numberOfStudents,
+    this.mostPopularCourse,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -43,22 +54,16 @@ class User {
       userHomeworkDtos: (json['userHomeworkDtos'] as List<dynamic>?)
           ?.map((item) => UserHomework.fromJson(item as Map<String, dynamic>))
           .toList(),
+      courseDtosParticipated: (json['courseDtosParticipated'] as List<dynamic>?)
+          ?.map((item) => UserCourse.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      userInterestDtos: (json['userInterestDtos'] as List<dynamic>?)
+          ?.map((item) => UserInterests.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      numberOfStudents: json['numberOfStudents'] as int?,
+      mostPopularCourse: json['mostPopularCourse'] != null
+          ? Course.fromJson(json['mostPopularCourse'] as Map<String, dynamic>)
+          : null,
     );
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'firstName': firstName,
-  //     'lastName': lastName,
-  //     'avatarPath': avatarPath,
-  //     'phone': phone,
-  //     'address': address,
-  //     'role': role,
-  //     'email': email,
-  //     'userAwardDtos': userAwardDtos?.map((item) => item.toJson()).toList(),
-  //     'userHomeworkDtos':
-  //         userHomeworkDtos?.map((item) => item.toJson()).toList(),
-  //   };
-  // }
 }

@@ -34,11 +34,19 @@ class TeacherHomeworkService extends ApiService {
     );
   }
 
-  ApiResponse<Homework> updateHomework(UpdateHomeworkRequest request) {
+  ApiResponse<Homework> updateHomework(
+      int homeworkId, UpdateHomeworkRequest request) {
     return put<Homework>(
-      'TEACHER/api/homework/update',
+      'TEACHER/api/homework/update/$homeworkId',
       Homework.fromJson,
       request.toJson(),
+    );
+  }
+
+  ApiResponse<Homework> deleteHomework(int homeworkId) {
+    return delete<Homework>(
+      'TEACHER/api/homework/delete/$homeworkId',
+      Homework.fromJson,
     );
   }
 
@@ -56,6 +64,13 @@ class TeacherHomeworkService extends ApiService {
       'TEACHER/api/question/update/$questionId',
       Question.fromJson,
       request.toJson(),
+    );
+  }
+
+  ApiResponse<Question> deleteQuestion(int questionId) {
+    return delete<Question>(
+      'TEACHER/api/question/delete/$questionId',
+      Question.fromJson,
     );
   }
 

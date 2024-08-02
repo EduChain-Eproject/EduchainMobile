@@ -21,8 +21,8 @@ class TeacherListHomeworksByLessonScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          getIt<TeacherHomeworkBloc>()..add(TeacherFetchHomeworks(lessonId)),
+      create: (context) => context.read<TeacherHomeworkBloc>()
+        ..add(TeacherFetchHomeworks(lessonId)),
       child: Scaffold(
         appBar: AppBar(title: const Text('Homeworks')),
         body: BlocBuilder<TeacherHomeworkBloc, TeacherHomeworkState>(

@@ -47,6 +47,13 @@ class TeacherCourseService extends ApiService {
     );
   }
 
+  ApiResponse<Course> deactivateCourse(int courseId) async {
+    return delete<Course>(
+      'TEACHER/api/course/deactivate/$courseId',
+      (json) => Course.fromJson(json),
+    );
+  }
+
   ApiResponse<Chapter> createChapter(CreateChapterRequest request) async {
     return post<Chapter>(
       'TEACHER/api/chapter/create',
@@ -64,6 +71,13 @@ class TeacherCourseService extends ApiService {
     );
   }
 
+  ApiResponse<Chapter> deleteChapter(int chapterId) async {
+    return delete<Chapter>(
+      'TEACHER/api/chapter/delete/$chapterId',
+      (json) => Chapter.fromJson(json),
+    );
+  }
+
   ApiResponse<Lesson> createLesson(CreateLessonRequest request) async {
     return post<Lesson>(
       'TEACHER/api/lesson/create',
@@ -78,6 +92,13 @@ class TeacherCourseService extends ApiService {
       'TEACHER/api/lesson/update/$lessonId',
       (json) => Lesson.fromJson(json),
       request.toJson(),
+    );
+  }
+
+  ApiResponse<Lesson> deleteLesson(int lessonId) async {
+    return delete<Lesson>(
+      'TEACHER/api/lesson/delete/$lessonId',
+      (json) => Lesson.fromJson(json),
     );
   }
 }

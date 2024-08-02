@@ -53,6 +53,29 @@ class Question {
     );
   }
 
+  Question copyWith({
+    int? id,
+    String? questionText,
+    int? homeworkId,
+    int? correctAnswerId,
+    Homework? homeworkDto,
+    List<Answer>? answerDtos,
+    List<UserAnswer>? userAnswerDtos,
+    Answer? correctAnswerDto,
+    UserAnswer? currentUserAnswerDto,
+  }) {
+    return Question(
+      id: id ?? this.id,
+      questionText: questionText ?? this.questionText,
+      homeworkId: homeworkId ?? this.homeworkId,
+      correctAnswerId: correctAnswerId ?? this.correctAnswerId,
+      homeworkDto: homeworkDto ?? this.homeworkDto,
+      answerDtos: answerDtos ?? this.answerDtos,
+      userAnswerDtos: userAnswerDtos ?? this.userAnswerDtos,
+      correctAnswerDto: correctAnswerDto ?? this.correctAnswerDto,
+      currentUserAnswerDto: currentUserAnswerDto ?? this.currentUserAnswerDto,
+    );
+  }
   // Map<String, dynamic> toJson() {
   //   return {
   //     'id': id,

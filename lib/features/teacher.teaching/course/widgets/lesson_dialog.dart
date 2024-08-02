@@ -96,7 +96,6 @@ class _LessonDialogState extends State<LessonDialog> {
         description: _descriptionController.text,
         videoURL: _videoUrlController.text,
       );
-      // TODO:
 
       widget.onSave?.call(lesson);
 

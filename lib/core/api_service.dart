@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
   final String apiUrl =
-      'https://cb19-2402-800-63b7-d5cc-cf3-e193-e79e-18cc.ngrok-free.app';
+      'https://e44d-2402-800-63b7-d5cc-e010-731e-5580-5581.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -100,11 +100,20 @@ abstract class ApiService {
     );
   }
 
-  ApiResponse<void> delete(String endpoint) async {
-    return _performApiCall<void>(
+  ApiResponse<T> delete<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>)? fromJson,
+  ) async {
+    return _performApiCall<T>(
       (headers) =>
           http.delete(Uri.parse('$apiUrl/$endpoint'), headers: headers),
-      null,
+      (data) {
+        if (data is Map<String, dynamic> && fromJson != null) {
+          return fromJson(data);
+        } else {
+          throw FormatException('Expected list but got ${data.runtimeType}');
+        }
+      },
     );
   }
 

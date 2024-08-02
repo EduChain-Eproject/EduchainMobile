@@ -120,14 +120,18 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
           title: _titleController.text,
           description: _descriptionController.text,
         );
-        context.read<TeacherHomeworkBloc>().add(TeacherUpdateHomework(request));
+        // TODO
+        // context
+        //     .read<TeacherHomeworkBloc>()
+        //     .add(TeacherUpdateHomework(widget.homework!.id!, request));
       } else {
         final request = CreateHomeworkRequest(
           lessonId: widget.homework?.lessonId ?? 0,
           title: _titleController.text,
           description: _descriptionController.text,
         );
-        context.read<TeacherHomeworkBloc>().add(TeacherCreateHomework(request));
+        // TODO
+        // context.read<TeacherHomeworkBloc>().add(TeacherCreateHomework(request));
       }
 
       setState(() {
@@ -145,6 +149,8 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
         builder: (context) => QuestionDialog(
           onSave: (newQuestion) {
             setState(() {
+              // TODO
+
               _questions.add(newQuestion);
             });
           },
@@ -160,6 +166,7 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
         initialQuestion: question,
         onSave: (updatedQuestion) {
           setState(() {
+            // TODO
             final index =
                 _questions.indexWhere((q) => q.id == updatedQuestion.id);
             if (index != -1) {
@@ -172,6 +179,7 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
   }
 
   void _deleteQuestion(Question question) {
+    // TODO
     setState(() {
       _questions.removeWhere((q) => q.id == question.id);
     });

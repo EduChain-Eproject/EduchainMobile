@@ -1,8 +1,11 @@
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/widgets/authenticated_widget.dart';
+import 'package:educhain/features/teacher.teaching/course/models/create_chapter_request.dart';
+import 'package:educhain/features/teacher.teaching/course/models/update_chapter_request.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/teacher_course_bloc.dart';
 import '../models/create_course_request.dart';
@@ -43,16 +46,6 @@ class _CourseFormScreenState extends State<TeacherCourseFormScreen> {
     _priceController =
         TextEditingController(text: widget.course?.price?.toString());
     _chapters = widget.course?.chapterDtos ?? [];
-  }
-
-  void _updateChapter(Chapter updatedChapter) {
-    setState(() {
-      final index =
-          _chapters.indexWhere((chapter) => chapter.id == updatedChapter.id);
-      if (index != -1) {
-        _chapters[index] = updatedChapter;
-      }
-    });
   }
 
   @override
@@ -115,6 +108,7 @@ class _CourseFormScreenState extends State<TeacherCourseFormScreen> {
                   chapter: chapter,
                   onEditChapter: () => _editChapter(context, chapter),
                   onChapterUpdated: _updateChapter,
+                  onDeleteChapter: () => _deleteChapter(chapter),
                 );
               }).toList(),
               ListTile(
@@ -138,11 +132,34 @@ class _CourseFormScreenState extends State<TeacherCourseFormScreen> {
     // Implement avatar selection logic here
   }
 
+  void _deleteChapter(Chapter chapter) {
+    // TODO
+    // context.read<TeacherCourseBloc>().add(TeacherDeleteChapter(chapter.id!));
+    setState(() {
+      _chapters.removeWhere((c) => c.id == chapter.id);
+    });
+  }
+
+  void _updateChapter(Chapter updatedChapter) {
+    setState(() {
+      final index =
+          _chapters.indexWhere((chapter) => chapter.id == updatedChapter.id);
+      if (index != -1) {
+        _chapters[index] = updatedChapter;
+      }
+    });
+  }
+
   void _addChapter(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => ChapterDialog(
         onSave: (newChapter) {
+          // TODO
+          // context.read<TeacherCourseBloc>().add(TeacherCreateChapter(
+          //     CreateChapterRequest(
+          //         courseId: widget.course!.id!,
+          //         chapterTitle: newChapter.chapterTitle!)));
           setState(() {
             _chapters.add(newChapter);
           });
@@ -158,6 +175,11 @@ class _CourseFormScreenState extends State<TeacherCourseFormScreen> {
         initialChapter: chapter,
         course: widget.course,
         onSave: (updatedChapter) {
+          // TODO
+          // context.read<TeacherCourseBloc>().add(TeacherUpdateChapter(
+          //     updatedChapter.id!,
+          //     UpdateChapterRequest(
+          //         chapterTitle: updatedChapter.chapterTitle!)));
           _updateChapter(updatedChapter);
         },
       ),
@@ -181,10 +203,11 @@ class _CourseFormScreenState extends State<TeacherCourseFormScreen> {
             );
 
       if (courseId == null) {
-        getIt<TeacherCourseBloc>()
+        context
+            .read<TeacherCourseBloc>()
             .add(TeacherCreateCourse(courseRequest as CreateCourseRequest));
       } else {
-        getIt<TeacherCourseBloc>().add(TeacherUpdateCourse(
+        context.read<TeacherCourseBloc>().add(TeacherUpdateCourse(
             courseId, courseRequest as UpdateCourseRequest));
       }
 

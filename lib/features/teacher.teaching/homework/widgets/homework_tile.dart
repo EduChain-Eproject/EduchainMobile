@@ -1,3 +1,4 @@
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:flutter/material.dart';
 
 import 'package:educhain/core/models/homework.dart';
@@ -55,6 +56,10 @@ class _HomeworkTileState extends State<HomeworkTile> {
         if (_showDetail)
           BlocBuilder<TeacherHomeworkBloc, TeacherHomeworkState>(
             builder: (context, state) {
+              if (state is TeacherHomeworkDetailLoading &&
+                  state.homeworkId == widget.homework.id) {
+                return const Loader();
+              }
               if (state is TeacherHomeworksLoaded &&
                   state.lesson.homeworkDtos!
                       .any((hw) => hw.id == widget.homework.id)) {

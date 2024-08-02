@@ -32,14 +32,44 @@ class TeacherCourseDetailError extends TeacherCourseState {
   TeacherCourseDetailError(this.message);
 }
 
-class ChapterSaved extends TeacherCourseState {
-  final Chapter chapter;
+class TeacherCourseSaving extends TeacherCourseState {}
 
-  ChapterSaved(this.chapter);
+class TeacherCourseSaved extends TeacherCourseState {
+  final Course course;
+
+  TeacherCourseSaved(this.course);
 }
 
-class LessonSaved extends TeacherCourseState {
+class TeacherCourseSaveError extends TeacherCourseState {
+  final Map<String, dynamic>? errors;
+
+  TeacherCourseSaveError(this.errors);
+}
+
+class TeacherChapterSaving extends TeacherCourseState {}
+
+class TeacherChapterSaved extends TeacherCourseState {
+  final Chapter chapter;
+
+  TeacherChapterSaved(this.chapter);
+}
+
+class TeacherChapterSaveError extends TeacherCourseState {
+  final Map<String, dynamic>? errors;
+
+  TeacherChapterSaveError(this.errors);
+}
+
+class TeacherLessonSaving extends TeacherCourseState {}
+
+class TeacherLessonSaved extends TeacherCourseState {
   final Lesson lesson;
 
-  LessonSaved(this.lesson);
+  TeacherLessonSaved(this.lesson);
+}
+
+class TeacherLessonSaveError extends TeacherCourseState {
+  final Map<String, dynamic>? errors;
+
+  TeacherLessonSaveError(this.errors);
 }

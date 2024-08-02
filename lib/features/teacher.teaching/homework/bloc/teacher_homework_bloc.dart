@@ -33,10 +33,13 @@ class TeacherHomeworkBloc
     on<TeacherFetchHomeworkDetail>((event, emit) async {
       if (state is TeacherHomeworksLoaded) {
         final currentState = state as TeacherHomeworksLoaded;
+
+        emit(TeacherHomeworkDetailLoading(event.homeworkId));
+
         final lesson = currentState.lesson;
         final homeworks = lesson.homeworkDtos?.map((hw) {
           if (hw.id == event.homeworkId) {
-            return hw.copyWith(isLoadingDetail: true); // Indicate loading
+            return hw.copyWith(isLoadingDetail: true);
           }
           return hw;
         }).toList();
@@ -49,8 +52,7 @@ class TeacherHomeworkBloc
           onSuccess: (homeworkDetail) {
             final updatedHomeworks = lesson.homeworkDtos?.map((hw) {
               if (hw.id == event.homeworkId) {
-                return homeworkDetail.copyWith(
-                    isLoadingDetail: false); // Clear loading state
+                return homeworkDetail.copyWith(isLoadingDetail: false);
               }
               return hw;
             }).toList();
@@ -61,8 +63,7 @@ class TeacherHomeworkBloc
           onError: (error) {
             final homeworksWithError = lesson.homeworkDtos?.map((hw) {
               if (hw.id == event.homeworkId) {
-                return hw.copyWith(
-                    isLoadingDetail: false); // Clear loading state on error
+                return hw.copyWith(isLoadingDetail: false);
               }
               return hw;
             }).toList();
@@ -75,20 +76,66 @@ class TeacherHomeworkBloc
     });
 
     on<TeacherCreateHomework>((event, emit) async {
+      emit(TeacherHomeworkSaving());
       final response =
           await teacherHomeworkService.createHomework(event.request);
       await response.on(
-        onSuccess: (_) => emit(TeacherHomeworksLoading()),
-        onError: (errors) => emit(TeacherHomeworksError(errors)),
+        onSuccess: (homework) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks =
+                List<Homework>.from(currentState.lesson.homeworkDtos ?? [])
+                  ..add(homework);
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherHomeworkSaved(homework));
+        },
+        onError: (errors) => emit(TeacherHomeworkSaveError(errors)),
       );
     });
 
     on<TeacherUpdateHomework>((event, emit) async {
-      final response =
-          await teacherHomeworkService.updateHomework(event.request);
+      emit(TeacherHomeworkSaving());
+      final response = await teacherHomeworkService.updateHomework(
+          event.homeworkId, event.request);
       await response.on(
-        onSuccess: (_) => emit(TeacherHomeworksLoading()),
-        onError: (errors) => emit(TeacherHomeworksError(errors)),
+        onSuccess: (homework) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks =
+                currentState.lesson.homeworkDtos?.map((hw) {
+              if (hw.id == event.homeworkId) {
+                return homework;
+              }
+              return hw;
+            }).toList();
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherHomeworkSaved(homework));
+        },
+        onError: (errors) => emit(TeacherHomeworkSaveError(errors)),
+      );
+    });
+
+    on<TeacherDeleteHomework>((event, emit) async {
+      emit(TeacherHomeworkDeleting());
+      final response =
+          await teacherHomeworkService.deleteHomework(event.homeworkId);
+      await response.on(
+        onSuccess: (_) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks = currentState.lesson.homeworkDtos
+                ?.where((hw) => hw.id != event.homeworkId)
+                .toList();
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherHomeworkDeleted(event.homeworkId));
+        },
+        onError: (errors) => emit(TeacherHomeworkDeleteError(errors)),
       );
     });
 
@@ -97,18 +144,79 @@ class TeacherHomeworkBloc
       final response =
           await teacherHomeworkService.createQuestion(event.request);
       await response.on(
-        onSuccess: (question) => emit(TeacherQuestionSaved(question)),
+        onSuccess: (question) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks =
+                currentState.lesson.homeworkDtos?.map((hw) {
+              if (hw.id == event.homeworkId) {
+                final updatedQuestions = [question, ...?hw.questionDtos];
+                return hw.copyWith(questionDtos: updatedQuestions);
+              }
+              return hw;
+            }).toList();
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherQuestionSaved(question));
+        },
         onError: (errors) => emit(TeacherQuestionSaveError(errors)),
       );
     });
-
     on<TeacherUpdateQuestion>((event, emit) async {
       emit(TeacherQuestionSaving());
       final response = await teacherHomeworkService.updateQuestion(
           event.questionId, event.request);
       await response.on(
-        onSuccess: (question) => emit(TeacherQuestionSaved(question)),
+        onSuccess: (question) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks =
+                currentState.lesson.homeworkDtos?.map((hw) {
+              if (hw.id == event.homeworkId) {
+                final updatedQuestions = hw.questionDtos?.map((q) {
+                  if (q.id == event.questionId) {
+                    return question;
+                  }
+                  return q;
+                }).toList();
+                return hw.copyWith(questionDtos: updatedQuestions);
+              }
+              return hw;
+            }).toList();
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherQuestionSaved(question));
+        },
         onError: (errors) => emit(TeacherQuestionSaveError(errors)),
+      );
+    });
+
+    on<TeacherDeleteQuestion>((event, emit) async {
+      emit(TeacherQuestionDeleting());
+      final response =
+          await teacherHomeworkService.deleteQuestion(event.questionId);
+      await response.on(
+        onSuccess: (_) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks =
+                currentState.lesson.homeworkDtos?.map((hw) {
+              if (hw.id == event.homeworkId) {
+                final updatedQuestions = hw.questionDtos
+                    ?.where((q) => q.id != event.questionId)
+                    .toList();
+                return hw.copyWith(questionDtos: updatedQuestions);
+              }
+              return hw;
+            }).toList();
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherQuestionDeleted(event.questionId));
+        },
+        onError: (errors) => emit(TeacherQuestionDeleteError(errors)),
       );
     });
 
@@ -117,7 +225,33 @@ class TeacherHomeworkBloc
       final response = await teacherHomeworkService.updateAnswer(
           event.answerId, event.request);
       await response.on(
-        onSuccess: (answer) => emit(TeacherAnswerSaved(answer)),
+        onSuccess: (answer) {
+          if (state is TeacherHomeworksLoaded) {
+            final currentState = state as TeacherHomeworksLoaded;
+            final updatedHomeworks =
+                currentState.lesson.homeworkDtos?.map((hw) {
+              if (hw.id == event.homeworkId) {
+                final updatedQuestions = hw.questionDtos?.map((q) {
+                  if (q.id == event.questionId) {
+                    final updatedAnswers = q.answerDtos?.map((a) {
+                      if (a.id == event.answerId) {
+                        return answer;
+                      }
+                      return a;
+                    }).toList();
+                    return q.copyWith(answerDtos: updatedAnswers);
+                  }
+                  return q;
+                }).toList();
+                return hw.copyWith(questionDtos: updatedQuestions);
+              }
+              return hw;
+            }).toList();
+            emit(TeacherHomeworksLoaded(
+                currentState.lesson.copyWith(homeworkDtos: updatedHomeworks)));
+          }
+          emit(TeacherAnswerSaved(answer));
+        },
         onError: (errors) => emit(TeacherAnswerSaveError(errors)),
       );
     });

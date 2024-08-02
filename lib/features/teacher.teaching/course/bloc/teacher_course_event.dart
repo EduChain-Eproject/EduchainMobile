@@ -15,24 +15,6 @@ class FetchCourseDetail extends TeacherCourseEvent {
   FetchCourseDetail(this.courseId);
 }
 
-class TeacherSaveCourse extends TeacherCourseEvent {
-  final Course course;
-
-  TeacherSaveCourse(this.course);
-}
-
-class TeacherSaveChapter extends TeacherCourseEvent {
-  final Chapter chapter;
-
-  TeacherSaveChapter(this.chapter);
-}
-
-class TeacherSaveLesson extends TeacherCourseEvent {
-  final Lesson lesson;
-
-  TeacherSaveLesson(this.lesson);
-}
-
 class TeacherCreateCourse extends TeacherCourseEvent {
   final CreateCourseRequest request;
 
@@ -44,6 +26,12 @@ class TeacherUpdateCourse extends TeacherCourseEvent {
   final UpdateCourseRequest request;
 
   TeacherUpdateCourse(this.courseId, this.request);
+}
+
+class TeacherDeactivateCourse extends TeacherCourseEvent {
+  final int courseId;
+
+  TeacherDeactivateCourse(this.courseId);
 }
 
 class TeacherCreateChapter extends TeacherCourseEvent {
@@ -59,6 +47,12 @@ class TeacherUpdateChapter extends TeacherCourseEvent {
   TeacherUpdateChapter(this.chapterId, this.request);
 }
 
+class TeacherDeleteChapter extends TeacherCourseEvent {
+  final int chapterId;
+
+  TeacherDeleteChapter(this.chapterId);
+}
+
 class TeacherCreateLesson extends TeacherCourseEvent {
   final CreateLessonRequest request;
 
@@ -70,4 +64,10 @@ class TeacherUpdateLesson extends TeacherCourseEvent {
   final UpdateLessonRequest request;
 
   TeacherUpdateLesson(this.lessonId, this.request);
+}
+
+class TeacherDeleteLesson extends TeacherCourseEvent {
+  final int lessonId;
+
+  TeacherDeleteLesson(this.lessonId);
 }

@@ -36,7 +36,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           if (currentState != null) {
             final updatedCourses = Page<Course>(
               number: newCourses.number,
-              size: newCourses.size,
               totalElements: newCourses.totalElements,
               totalPages: newCourses.totalPages,
               content: [...currentState.courses.content, ...newCourses.content],
@@ -71,7 +70,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
             final currentState = state as TeacherCoursesLoaded;
             final updatedCourses = Page<Course>(
               number: currentState.courses.number,
-              size: currentState.courses.size,
               totalElements: currentState.courses.totalElements + 1,
               totalPages: currentState.courses.totalPages,
               content: [course, ...currentState.courses.content],
@@ -97,7 +95,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
             }).toList();
             final updatedPage = Page<Course>(
               number: currentState.courses.number,
-              size: currentState.courses.size,
               totalElements: currentState.courses.totalElements,
               totalPages: currentState.courses.totalPages,
               content: updatedCourses,
@@ -123,7 +120,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
             }).toList();
             final updatedPage = Page<Course>(
               number: currentState.courses.number,
-              size: currentState.courses.size,
               totalElements: currentState.courses.totalElements,
               totalPages: currentState.courses.totalPages,
               content: updatedCourses,

@@ -103,10 +103,11 @@ abstract class ApiService {
   ApiResponse<T> delete<T>(
     String endpoint,
     T Function(Map<String, dynamic>)? fromJson,
+    Map<String, dynamic>? data,
   ) async {
     return _performApiCall<T>(
-      (headers) =>
-          http.delete(Uri.parse('$apiUrl/$endpoint'), headers: headers),
+      (headers) => http.delete(Uri.parse('$apiUrl/$endpoint'),
+          headers: headers, body: data),
       (data) {
         if (data is Map<String, dynamic> && fromJson != null) {
           return fromJson(data);

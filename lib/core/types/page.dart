@@ -1,13 +1,11 @@
 class Page<T> {
   final int number;
-  final int size;
   final int totalElements;
   final int totalPages;
   final List<T> content;
 
   Page({
     required this.number,
-    required this.size,
     required this.totalElements,
     required this.totalPages,
     required this.content,
@@ -23,7 +21,6 @@ class Page<T> {
 
     return Page<T>(
       number: json['number'],
-      size: json['size'],
       totalElements: json['totalElements'],
       totalPages: json['totalPages'],
       content: content,

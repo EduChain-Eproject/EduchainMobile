@@ -39,7 +39,6 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
             if (currentState != null) {
               final updatedCourses = Page<Course>(
                 number: newCourses.number,
-                size: newCourses.size,
                 totalElements: newCourses.totalElements,
                 totalPages: newCourses.totalPages,
                 content: [

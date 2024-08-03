@@ -3,8 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/auth/auth_service.dart';
 import 'core/auth/bloc/auth_bloc.dart';
-import 'features/student/bloc/student_home_bloc.dart';
+import 'package:educhain/features/profile/profile_service.dart';
+import 'package:educhain/features/profile/bloc/profile_bloc.dart';
 import 'package:educhain/features/student/student_home_service.dart';
+import 'package:educhain/features/student/bloc/student_home_bloc.dart';
 import 'package:educhain/features/student.learning/award/award_service.dart';
 import 'package:educhain/features/student.learning/award/bloc/award_bloc.dart';
 import 'package:educhain/features/student.learning/course/bloc/course_bloc.dart';
@@ -26,6 +28,12 @@ Future<void> initDependencies() async {
 
   getIt.registerSingleton<AuthService>(AuthService());
   getIt.registerFactory<AuthBloc>(() => AuthBloc(getIt<AuthService>()));
+
+  getIt.registerSingleton<ProfileService>(ProfileService());
+  getIt.registerFactory<ProfileBloc>(() => ProfileBloc(
+        getIt<ProfileService>(),
+        getIt<AuthBloc>(),
+      ));
 
   getIt.registerSingleton<StudentHomeService>(StudentHomeService());
   getIt.registerFactory<StudentHomeBloc>(

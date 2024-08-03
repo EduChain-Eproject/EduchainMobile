@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:educhain/core/widgets/layouts/teacher_layout.dart';
 import 'package:educhain/features/auth/screens/login_screen.dart';
 import '../auth/bloc/auth_bloc.dart';
-import '../auth/bloc/auth_state.dart';
 import 'layouts/student_layout.dart';
 
 class SplashScreen extends StatefulWidget {

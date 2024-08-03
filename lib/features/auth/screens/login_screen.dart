@@ -1,6 +1,4 @@
 import 'package:educhain/core/auth/bloc/auth_bloc.dart';
-import 'package:educhain/core/auth/bloc/auth_event.dart';
-import 'package:educhain/core/auth/bloc/auth_state.dart';
 import 'package:educhain/core/auth/models/login_request.dart';
 import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/types/text_field_model.dart';

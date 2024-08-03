@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:educhain/core/widgets/layouts/student_layout.dart';
 
 import '../auth/bloc/auth_bloc.dart';
-import '../auth/bloc/auth_state.dart';
 import 'layouts/teacher_layout.dart';
 
 class UnauthenticatedWidget extends StatelessWidget {

@@ -1,7 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:educhain/core/models/user.dart';
 import '../auth_service.dart';
-import 'auth_event.dart';
-import 'auth_state.dart';
+import '../models/login_request.dart';
+import '../models/register_request.dart';
+
+part 'auth_event.dart';
+part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService authService;
@@ -11,6 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogOutRequested>(_onLogOutRequested);
     on<LoginRequested>(_onLoginRequested);
     on<RegisterRequested>(_onRegisterRequested);
+    on<UserUpdated>(_onUserUpdated);
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
@@ -39,8 +45,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLoginRequested(
       LoginRequested event, Emitter<AuthState> emit) async {
-    emit(
-        AuthLoading()); // Uncomment this line if you want to show loading state
+    emit(AuthLoading());
     final response = await authService.signIn(event.request);
     await response.on(
       onError: (error) async {
@@ -77,5 +82,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthRegisterSuccess());
       },
     );
+  }
+
+  Future<void> _onUserUpdated(
+      UserUpdated event, Emitter<AuthState> emit) async {
+    emit(AuthAuthenticated(event.user));
   }
 }

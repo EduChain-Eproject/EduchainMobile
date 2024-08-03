@@ -1,5 +1,4 @@
-import '../models/login_request.dart';
-import '../models/register_request.dart';
+part of 'auth_bloc.dart';
 
 abstract class AuthEvent {}
 
@@ -18,3 +17,9 @@ class RegisterRequested extends AuthEvent {
 }
 
 class LogOutRequested extends AuthEvent {}
+
+class UserUpdated extends AuthEvent {
+  final User user;
+
+  UserUpdated(this.user);
+}

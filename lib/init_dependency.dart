@@ -1,3 +1,4 @@
+import 'package:educhain/features/student.learning/course/blocs/category/category_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,7 @@ import 'package:educhain/features/student/student_home_service.dart';
 import 'package:educhain/features/student/bloc/student_home_bloc.dart';
 import 'package:educhain/features/student.learning/award/award_service.dart';
 import 'package:educhain/features/student.learning/award/bloc/award_bloc.dart';
-import 'package:educhain/features/student.learning/course/bloc/course_bloc.dart';
+import 'package:educhain/features/student.learning/course/blocs/course/course_bloc.dart';
 import 'package:educhain/features/student.learning/course/course_service.dart';
 import 'package:educhain/features/student.learning/homework/bloc/homework_bloc.dart';
 import 'package:educhain/features/student.learning/homework/homework_service.dart';
@@ -40,6 +41,8 @@ Future<void> initDependencies() async {
       () => StudentHomeBloc(getIt<StudentHomeService>()));
 
   getIt.registerSingleton<CourseService>(CourseService());
+  getIt.registerFactory<CategoriesBloc>(
+      () => CategoriesBloc(getIt<CourseService>()));
   getIt.registerFactory<CourseBloc>(() => CourseBloc(getIt<CourseService>()));
 
   getIt.registerSingleton<LessonService>(LessonService());

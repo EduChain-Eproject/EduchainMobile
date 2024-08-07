@@ -1,3 +1,6 @@
+import 'package:educhain/core/models/category.dart';
+import 'package:educhain/core/models/course.dart';
+import 'package:educhain/features/student/models/statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,6 +11,8 @@ import 'package:educhain/init_dependency.dart';
 import '../widgets/best_teacher_widget.dart';
 import '../widgets/category_widget.dart';
 import '../widgets/course_widget.dart';
+import '../widgets/header_widget.dart';
+import '../widgets/progress.dart';
 import '../widgets/statistics_widget.dart';
 
 class StudentHomeScreen extends StatefulWidget {
@@ -24,17 +29,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       create: (context) =>
           getIt<StudentHomeBloc>()..add(FetchStudentHomeData()),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('Student Home'),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () {
-                context.read<AuthBloc>().add(LogOutRequested());
-              },
-            ),
-          ],
-        ),
         body: BlocBuilder<StudentHomeBloc, StudentHomeState>(
           builder: (context, state) {
             if (state is StudentHomeLoading) {
@@ -42,11 +36,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             } else if (state is StudentHomeLoaded) {
               return SingleChildScrollView(
                 child: Column(
-                  children: [
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    HeaderWidget(),
+                    ProgressSection(),
                     CategoryWidget(categories: state.categories),
                     CourseWidget(courses: state.courses),
-                    StatisticsWidget(statistics: state.statistics),
                     BestTeacherWidget(teacher: state.bestTeacher),
+                    StatisticsWidget(statistics: state.statistics),
                   ],
                 ),
               );

@@ -1,6 +1,7 @@
 import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/category.dart';
 import 'package:educhain/core/models/course.dart';
+import 'package:educhain/core/models/user_course.dart';
 import 'package:educhain/core/types/api_response.dart';
 import 'package:educhain/core/types/page.dart';
 
@@ -30,6 +31,15 @@ class CourseService extends ApiService {
     return get<Course>(
       'STUDENT/api/course/detail/$courseId',
       (json) => Course.fromJson(json),
+    );
+  }
+
+  // Enroll in a course by course ID
+  ApiResponse<UserCourse> enrollInCourse(int courseId) async {
+    return post<UserCourse>(
+      'STUDENT/api/course/enroll-in-a-course/$courseId',
+      UserCourse.fromJson,
+      null,
     );
   }
 }

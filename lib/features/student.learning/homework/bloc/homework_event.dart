@@ -7,3 +7,16 @@ class FetchHomeworkDetail extends HomeworkEvent {
 
   FetchHomeworkDetail(this.homeworkId);
 }
+
+class AnswerQuestion extends HomeworkEvent {
+  final int homeworkId;
+  final AnswerQuestionRequest request;
+
+  AnswerQuestion(this.homeworkId, this.request);
+}
+
+class SubmitHomework extends HomeworkEvent {
+  final int homeworkId;
+
+  SubmitHomework(this.homeworkId);
+}

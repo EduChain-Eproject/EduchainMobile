@@ -50,15 +50,27 @@ class UserHomework {
     );
   }
 
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'userId': userId,
-  //     'homeworkId': homeworkId,
-  //     'userDto': userDto?.toJson(),
-  //     'homeworkDto': homeworkDto?.toJson(),
-  //     'submissionDate': submissionDate?.toIso8601String(),
-  //     'userAnswerDtos': userAnswerDtos?.map((e) => e.toJson()).toList(),
-  //   };
-  // }
+  UserHomework copyWith({
+    int? id,
+    DateTime? submissionDate,
+    double? progress,
+    double? grade,
+    bool? isSubmitted,
+    Homework? homeworkDto,
+    User? userDto,
+    List<UserAnswer>? userAnswerDtos,
+    Award? userAwardDto,
+  }) {
+    return UserHomework(
+      id: id ?? this.id,
+      submissionDate: submissionDate ?? this.submissionDate,
+      progress: progress ?? this.progress,
+      grade: grade ?? this.grade,
+      isSubmitted: isSubmitted ?? this.isSubmitted,
+      homeworkDto: homeworkDto ?? this.homeworkDto,
+      userDto: userDto ?? this.userDto,
+      userAnswerDtos: userAnswerDtos ?? this.userAnswerDtos,
+      userAwardDto: userAwardDto ?? this.userAwardDto,
+    );
+  }
 }

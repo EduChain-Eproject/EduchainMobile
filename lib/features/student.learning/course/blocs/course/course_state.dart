@@ -4,18 +4,6 @@ abstract class CourseState {}
 
 class CourseInitial extends CourseState {}
 
-class CategoriesLoading extends CourseState {}
-
-class CategoriesLoaded extends CourseState {
-  final List<Category> categories; // Adjust type based on actual data
-  CategoriesLoaded(this.categories);
-}
-
-class CategoriesError extends CourseState {
-  final String message;
-  CategoriesError(this.message);
-}
-
 class CoursesLoading extends CourseState {}
 
 class CoursesLoaded extends CourseState {

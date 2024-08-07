@@ -23,6 +23,7 @@ class Course {
   final int? numberOfEnrolledStudents;
   final UserCourse? currentUserCourse;
   final List<Course>? relatedCourseDtos;
+  final int? numberOfLessons;
 
   Course({
     this.id,
@@ -40,6 +41,7 @@ class Course {
     this.numberOfEnrolledStudents,
     this.currentUserCourse,
     this.relatedCourseDtos,
+    this.numberOfLessons,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -78,6 +80,7 @@ class Course {
       relatedCourseDtos: (json['relatedCourseDtos'] as List<dynamic>?)
           ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
           .toList(),
+      numberOfLessons: json['numberOfLessons'] as int?,
     );
   }
 
@@ -97,6 +100,7 @@ class Course {
     int? numberOfEnrolledStudents,
     UserCourse? currentUserCourse,
     List<Course>? relatedCourseDtos,
+    int? numberOfLessons,
   }) {
     return Course(
       id: id ?? this.id,
@@ -115,6 +119,7 @@ class Course {
           numberOfEnrolledStudents ?? this.numberOfEnrolledStudents,
       currentUserCourse: currentUserCourse ?? this.currentUserCourse,
       relatedCourseDtos: relatedCourseDtos ?? this.relatedCourseDtos,
+      numberOfLessons: numberOfLessons ?? this.numberOfLessons,
     );
   }
 

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:educhain/core/widgets/authenticated_widget.dart';
 import 'package:educhain/init_dependency.dart';
-import '../bloc/course_bloc.dart';
+import '../blocs/course/course_bloc.dart';
 import '../widgets/chapter_section.dart';
 import '../widgets/course_info.dart';
 import '../widgets/related_course_section.dart';
@@ -125,7 +125,8 @@ class _CourseDetailViewState extends State<CourseDetailView> {
         actions: [
           TextButton(
             onPressed: () {
-              // TODO: Navigate to the enrollment page or handle enrollment
+              // TODO: handle enrollment
+              // context.read<CourseBloc>().add(EnrollInCourse(widget.courseId));
               Navigator.of(context).pop();
             },
             child: const Text('Enroll'),

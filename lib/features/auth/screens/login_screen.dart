@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 150),
               Text(
                 message,
-                style: const TextStyle(color: AppPallete.errorColor),
+                style: const TextStyle(color: AppPallete.lightErrorColor),
               ),
               ..._textFields.map<Widget>((field) {
                 return ValidatedTextField(

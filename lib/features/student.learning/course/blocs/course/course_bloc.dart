@@ -76,5 +76,39 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
         onError: (error) => emit(CourseDetailError(error['message'])),
       );
     });
+
+    on<AddToWishlist>((event, emit) async {
+      final response = await courseService.addToWishlist(event.courseId);
+      await response.on(
+        onSuccess: (_) {
+          if (state is CourseDetailLoaded) {
+            final currentCourse = (state as CourseDetailLoaded).courseDetail;
+            final updatedCourse =
+                currentCourse.copyWith(currentUserInterested: true);
+            emit(CourseDetailLoaded(updatedCourse));
+          } else {
+            emit(CourseDetailError('Course detail not loaded'));
+          }
+        },
+        onError: (error) => emit(CourseDetailError(error['message'])),
+      );
+    });
+
+    on<DeleteFromWishlist>((event, emit) async {
+      final response = await courseService.deleteFromWishlist(event.courseId);
+      await response.on(
+        onSuccess: (isSuccess) {
+          if (state is CourseDetailLoaded) {
+            final currentCourse = (state as CourseDetailLoaded).courseDetail;
+            final updatedCourse =
+                currentCourse.copyWith(currentUserInterested: isSuccess);
+            emit(CourseDetailLoaded(updatedCourse));
+          } else {
+            emit(CourseDetailError('Course detail not loaded'));
+          }
+        },
+        onError: (error) => emit(CourseDetailError(error['message'])),
+      );
+    });
   }
 }

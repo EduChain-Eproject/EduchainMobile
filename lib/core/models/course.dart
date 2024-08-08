@@ -18,12 +18,14 @@ class Course {
   final User? teacherDto;
   final List<CourseFeedback>? courseFeedbackDtos;
   final List<Category>? categoryDtos;
-  final List<User>? participatedUserDtos;
+  final List<UserCourse>? participatedUserDtos;
   final List<UserInterests>? userInterestDtos;
   final int? numberOfEnrolledStudents;
   final UserCourse? currentUserCourse;
   final List<Course>? relatedCourseDtos;
   final int? numberOfLessons;
+  final bool? currentUserInterested;
+  final int? lessonIdTolearn;
 
   Course({
     this.id,
@@ -42,6 +44,8 @@ class Course {
     this.currentUserCourse,
     this.relatedCourseDtos,
     this.numberOfLessons,
+    this.currentUserInterested,
+    this.lessonIdTolearn,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -67,7 +71,7 @@ class Course {
           ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
           .toList(),
       participatedUserDtos: (json['participatedUserDtos'] as List<dynamic>?)
-          ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => UserCourse.fromJson(e as Map<String, dynamic>))
           .toList(),
       userInterestDtos: (json['userInterestDtos'] as List<dynamic>?)
           ?.map((e) => UserInterests.fromJson(e as Map<String, dynamic>))
@@ -81,6 +85,8 @@ class Course {
           ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
           .toList(),
       numberOfLessons: json['numberOfLessons'] as int?,
+      currentUserInterested: json['currentUserInterested'] as bool?,
+      lessonIdTolearn: json['lessonIdTolearn'] as int?,
     );
   }
 
@@ -95,12 +101,14 @@ class Course {
     User? teacherDto,
     List<CourseFeedback>? courseFeedbackDtos,
     List<Category>? categoryDtos,
-    List<User>? participatedUserDtos,
+    List<UserCourse>? participatedUserDtos,
     List<UserInterests>? userInterestDtos,
     int? numberOfEnrolledStudents,
     UserCourse? currentUserCourse,
     List<Course>? relatedCourseDtos,
     int? numberOfLessons,
+    int? lessonIdTolearn,
+    bool? currentUserInterested,
   }) {
     return Course(
       id: id ?? this.id,
@@ -120,6 +128,9 @@ class Course {
       currentUserCourse: currentUserCourse ?? this.currentUserCourse,
       relatedCourseDtos: relatedCourseDtos ?? this.relatedCourseDtos,
       numberOfLessons: numberOfLessons ?? this.numberOfLessons,
+      lessonIdTolearn: lessonIdTolearn ?? this.lessonIdTolearn,
+      currentUserInterested:
+          currentUserInterested ?? this.currentUserInterested,
     );
   }
 

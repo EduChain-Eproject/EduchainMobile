@@ -1,5 +1,7 @@
-import 'package:educhain/core/models/course.dart';
 import 'package:flutter/material.dart';
+
+import 'package:educhain/core/models/course.dart';
+import 'course_card.dart';
 
 class RelatedCoursesSection extends StatelessWidget {
   final List<Course> relatedCourses;
@@ -13,13 +15,17 @@ class RelatedCoursesSection extends StatelessWidget {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Related Courses:',
-                  style: Theme.of(context).textTheme.bodyMedium),
-              ...relatedCourses.map((relatedCourse) => ListTile(
-                    title: Text(relatedCourse.title ?? 'No title'),
-                    onTap: () {
-                      // TODO: Navigate to related course detail page
-                    },
+              const SizedBox(height: 20),
+              const Text(
+                'Related Courses:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ...relatedCourses.map((relatedCourse) => CourseCard(
+                    course: relatedCourse,
                   )),
             ],
           )

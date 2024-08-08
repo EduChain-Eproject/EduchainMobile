@@ -20,3 +20,15 @@ class EnrollInCourse extends CourseEvent {
 
   EnrollInCourse(this.courseId);
 }
+
+class AddToWishlist extends CourseEvent {
+  final int courseId;
+
+  AddToWishlist(this.courseId);
+}
+
+class DeleteFromWishlist extends CourseEvent {
+  final int courseId;
+
+  DeleteFromWishlist(this.courseId);
+}

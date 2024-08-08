@@ -1,4 +1,3 @@
-import 'package:educhain/Untitled-1.dart';
 import 'package:educhain/features/profile/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +50,6 @@ class _StudentLayoutState extends State<StudentLayout> {
             StudentHomeScreen(),
             CourseListScreen(selectedCategory: widget.selectedCategory),
             ProfileScreen(),
-            TestPage()
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(

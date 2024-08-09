@@ -9,6 +9,7 @@ class BottomButton extends StatefulWidget {
   final bool isEnrolled;
   final int nextLessonToLearn;
   final int courseId;
+  final void Function() showEnrollmentPrompt;
 
   const BottomButton({
     Key? key,
@@ -16,6 +17,7 @@ class BottomButton extends StatefulWidget {
     required this.isEnrolled,
     required this.nextLessonToLearn,
     required this.courseId,
+    required this.showEnrollmentPrompt,
   }) : super(key: key);
 
   @override
@@ -79,7 +81,7 @@ class _BottomButtonState extends State<BottomButton> {
                     LessonDetailScreen.route(widget.nextLessonToLearn),
                   );
                 } else {
-                  // TODO: handle enroll
+                  widget.showEnrollmentPrompt();
                 }
               },
               style: ElevatedButton.styleFrom(

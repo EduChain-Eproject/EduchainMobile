@@ -9,7 +9,7 @@ class FetchAwardDetail extends AwardEvent {
 }
 
 class ReceiveAward extends AwardEvent {
-  final int homeworkId;
+  final int awardId;
 
-  ReceiveAward(this.homeworkId);
+  ReceiveAward(this.awardId);
 }

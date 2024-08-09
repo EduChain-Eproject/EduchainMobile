@@ -23,7 +23,7 @@ class AwardBloc extends Bloc<AwardEvent, AwardState> {
       AwardLoaded? currentState = _getCurrentState();
 
       emit(AwardReceiving());
-      final response = await _awardService.receiveAward(event.homeworkId);
+      final response = await _awardService.receiveAward(event.awardId);
       response.on(
         onSuccess: (res) {
           if (currentState != null) {

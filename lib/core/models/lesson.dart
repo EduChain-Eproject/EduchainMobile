@@ -34,7 +34,7 @@ class Lesson {
         homeworkDtos: (json['homeworkDtos'] as List<dynamic>?)
             ?.map((e) => Homework.fromJson(e as Map<String, dynamic>))
             .toList(),
-        isCurrentUserFinished: json['isCurrentUserFinished'] as bool?);
+        isCurrentUserFinished: json['currentUserFinished'] as bool?);
   }
 
   Lesson copyWith(

@@ -38,16 +38,21 @@ class HomeworkBloc extends Bloc<HomeworkEvent, HomeworkState> {
       await response.on(
         onSuccess: (res) {
           if (currentState != null) {
-            final updatedState = currentState.userHomework.copyWith(
-                userAnswerDtos:
-                    currentState.userHomework.userAnswerDtos?.map((a) {
-              if (a.id == res.id) {
-                return res;
+            // Update the user answer in the homework questions
+            final updatedQuestions =
+                currentState.homework.questionDtos?.map((q) {
+              if (q.id == event.request.questionId) {
+                return q.copyWith(currentUserAnswerDto: res);
               }
-              return a;
-            }).toList());
+              return q;
+            }).toList();
+
+            // Emit the new state with the updated homework and userHomework
             emit(HomeworkLoaded(
-                currentState.homework, updatedState, currentState.award));
+              currentState.homework.copyWith(questionDtos: updatedQuestions),
+              currentState.userHomework,
+              currentState.award,
+            ));
           } else {
             emit(HomeworkQuestionAnswerError(
                 {"message": "Unable to answer the question"}));

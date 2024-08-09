@@ -10,8 +10,8 @@ class AwardService extends ApiService {
     );
   }
 
-  ApiResponse<Award> receiveAward(int homeworkId) async {
-    return post<Award>('SHARED/api/award/receive/$homeworkId',
+  ApiResponse<Award> receiveAward(int awardId) async {
+    return post<Award>('STUDENT/api/award/receive/$awardId',
         (json) => Award.fromJson(json), null);
   }
 }

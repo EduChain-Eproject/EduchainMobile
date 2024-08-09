@@ -1,4 +1,5 @@
 import 'package:educhain/core/widgets/authenticated_widget.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +35,18 @@ class HomeworkDetailScreen extends StatelessWidget {
               );
             } else if (state is HomeworkError) {
               return Center(child: Text('Error: ${state.message}'));
+            } else if (state is HomeworkQuestionAnswering) {
+              return const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [Text("Answering question..."), Loader()],
+              );
+            } else if (state is HomeworkSubmitting) {
+              return const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [Text("Submitting homework..."), Loader()],
+              );
             } else {
               return const Center(child: Text('Unknown state'));
             }

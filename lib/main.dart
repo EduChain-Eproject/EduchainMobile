@@ -1,6 +1,3 @@
-import 'package:educhain/features/profile/bloc/profile_bloc.dart';
-import 'package:educhain/features/student.learning/course/blocs/category/category_bloc.dart';
-import 'package:educhain/features/student/bloc/student_home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,8 +9,12 @@ import 'features/student.learning/award/bloc/award_bloc.dart';
 import 'features/student.learning/course/blocs/course/course_bloc.dart';
 import 'features/student.learning/homework/bloc/homework_bloc.dart';
 import 'features/student.learning/lesson/bloc/lesson_bloc.dart';
-import 'features/teacher.teaching/course/bloc/teacher_course_bloc.dart';
+import 'features/teacher.teaching/course/blocs/course/teacher_course_bloc.dart';
 import 'features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
+import 'features/profile/bloc/profile_bloc.dart';
+import 'features/student.learning/course/blocs/category/category_bloc.dart';
+import 'features/student/bloc/student_home_bloc.dart';
+import 'features/teacher.teaching/course/blocs/category/teacher_category_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +59,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<TeacherCourseBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<TeacherCategoryBloc>(),
         ),
         BlocProvider(
           create: (context) => getIt<TeacherHomeworkBloc>(),

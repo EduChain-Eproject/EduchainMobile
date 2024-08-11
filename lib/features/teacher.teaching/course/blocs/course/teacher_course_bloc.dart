@@ -5,13 +5,13 @@ import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/models/lesson.dart';
 import 'package:educhain/core/types/page.dart';
 import 'package:educhain/features/teacher.teaching/course/teacher_course_service.dart';
-import '../models/course_search_request.dart';
-import '../models/create_chapter_request.dart';
-import '../models/create_course_request.dart';
-import '../models/create_lesson_request.dart';
-import '../models/update_chapter_request.dart';
-import '../models/update_course_request.dart';
-import '../models/update_lesson_request.dart';
+import '../../models/course_search_request.dart';
+import '../../models/create_chapter_request.dart';
+import '../../models/create_course_request.dart';
+import '../../models/create_lesson_request.dart';
+import '../../models/update_chapter_request.dart';
+import '../../models/update_course_request.dart';
+import '../../models/update_lesson_request.dart';
 
 part 'teacher_course_event.dart';
 part 'teacher_course_state.dart';
@@ -46,7 +46,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
             emit(TeacherCoursesLoaded(newCourses));
           }
         },
-        onError: (error) => emit(TeacherCoursesError(error['message'])),
+        onError: (error) => emit(TeacherCoursesError(error)),
       );
     });
 
@@ -57,7 +57,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
       await response.on(
         onSuccess: (courseDetail) =>
             emit(TeacherCourseDetailLoaded(courseDetail)),
-        onError: (error) => emit(TeacherCourseDetailError(error['message'])),
+        onError: (error) => emit(TeacherCourseDetailError(error)),
       );
     });
 
@@ -78,7 +78,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherCourseSaved(course));
         },
-        onError: (error) => emit(TeacherCourseSaveError(error['message'])),
+        onError: (error) => emit(TeacherCourseSaveError(error)),
       );
     });
 
@@ -103,7 +103,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherCourseSaved(course));
         },
-        onError: (error) => emit(TeacherCourseSaveError(error['message'])),
+        onError: (error) => emit(TeacherCourseSaveError(error)),
       );
     });
 
@@ -128,7 +128,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherCourseSaved(course));
         },
-        onError: (error) => emit(TeacherCourseSaveError(error['message'])),
+        onError: (error) => emit(TeacherCourseSaveError(error)),
       );
     });
 
@@ -146,7 +146,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherChapterSaved(chapter));
         },
-        onError: (error) => emit(TeacherChapterSaveError(error['message'])),
+        onError: (error) => emit(TeacherChapterSaveError(error)),
       );
     });
 
@@ -169,7 +169,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherChapterSaved(chapter));
         },
-        onError: (error) => emit(TeacherChapterSaveError(error['message'])),
+        onError: (error) => emit(TeacherChapterSaveError(error)),
       );
     });
 
@@ -192,7 +192,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherChapterSaved(chapter));
         },
-        onError: (error) => emit(TeacherChapterSaveError(error['message'])),
+        onError: (error) => emit(TeacherChapterSaveError(error)),
       );
     });
 
@@ -217,7 +217,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherLessonSaved(lesson));
         },
-        onError: (error) => emit(TeacherLessonSaveError(error['message'])),
+        onError: (error) => emit(TeacherLessonSaveError(error)),
       );
     });
 
@@ -243,7 +243,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherLessonSaved(lesson));
         },
-        onError: (error) => emit(TeacherLessonSaveError(error['message'])),
+        onError: (error) => emit(TeacherLessonSaveError(error)),
       );
     });
 
@@ -268,7 +268,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           }
           emit(TeacherLessonSaved(lesson));
         },
-        onError: (error) => emit(TeacherLessonSaveError(error['message'])),
+        onError: (error) => emit(TeacherLessonSaveError(error)),
       );
     });
   }

@@ -12,6 +12,7 @@ class Course {
   final String? description;
   final double? price;
   final CourseStatus? status;
+  final String? avatarPath;
 
   final List<Chapter>? chapterDtos;
   final List<Blog>? blogDtos;
@@ -33,6 +34,7 @@ class Course {
     this.status,
     this.title,
     this.description,
+    this.avatarPath,
     this.chapterDtos,
     this.blogDtos,
     this.teacherDto,
@@ -55,6 +57,7 @@ class Course {
       status: CourseStatusFromJson(json['status']),
       title: json['title'] as String?,
       description: json['description'] as String?,
+      avatarPath: json['avatarPath'] as String?,
       chapterDtos: (json['chapterDtos'] as List<dynamic>?)
           ?.map((e) => Chapter.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -94,6 +97,7 @@ class Course {
     int? id,
     String? title,
     String? description,
+    String? avatarPath,
     double? price,
     CourseStatus? status,
     List<Chapter>? chapterDtos,
@@ -114,6 +118,7 @@ class Course {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      avatarPath: avatarPath ?? this.avatarPath,
       price: price ?? this.price,
       status: status ?? this.status,
       chapterDtos: chapterDtos ?? this.chapterDtos,

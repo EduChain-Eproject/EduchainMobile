@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CourseSearchBar extends StatelessWidget {
-  final Function(String, bool?) onSearch;
+  final Function(String) onSearch;
 
   const CourseSearchBar({Key? key, required this.onSearch}) : super(key: key);
 
@@ -14,7 +14,7 @@ class CourseSearchBar extends StatelessWidget {
           labelText: 'Search Courses',
           border: OutlineInputBorder(),
         ),
-        onChanged: (e) => onSearch(e, false),
+        onChanged: (e) => onSearch(e),
       ),
     );
   }

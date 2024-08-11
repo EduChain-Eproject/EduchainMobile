@@ -1,4 +1,5 @@
 import 'package:educhain/core/auth/bloc/auth_bloc.dart';
+import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,7 +56,12 @@ class HeaderWidget extends StatelessWidget {
                             backgroundImage:
                                 NetworkImage(state.user.avatarPath ?? ""),
                           ),
-                        )
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              getIt<AuthBloc>().add(LogOutRequested());
+                            },
+                            child: Text('logout'))
                       ],
                     ),
                   ],

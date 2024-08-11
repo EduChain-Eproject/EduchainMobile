@@ -1,4 +1,3 @@
-import 'package:educhain/features/student.learning/course/blocs/category/category_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,11 +11,13 @@ import 'package:educhain/features/student.learning/award/award_service.dart';
 import 'package:educhain/features/student.learning/award/bloc/award_bloc.dart';
 import 'package:educhain/features/student.learning/course/blocs/course/course_bloc.dart';
 import 'package:educhain/features/student.learning/course/course_service.dart';
+import 'package:educhain/features/student.learning/course/blocs/category/category_bloc.dart';
 import 'package:educhain/features/student.learning/homework/bloc/homework_bloc.dart';
 import 'package:educhain/features/student.learning/homework/homework_service.dart';
 import 'package:educhain/features/student.learning/lesson/bloc/lesson_bloc.dart';
 import 'package:educhain/features/student.learning/lesson/lesson_service.dart';
-import 'package:educhain/features/teacher.teaching/course/bloc/teacher_course_bloc.dart';
+import 'package:educhain/features/teacher.teaching/course/blocs/course/teacher_course_bloc.dart';
+import 'package:educhain/features/teacher.teaching/course/blocs/category/teacher_category_bloc.dart';
 import 'package:educhain/features/teacher.teaching/course/teacher_course_service.dart';
 import 'package:educhain/features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
 import 'package:educhain/features/teacher.teaching/homework/teacher_homework_service.dart';
@@ -56,6 +57,8 @@ Future<void> initDependencies() async {
   getIt.registerFactory<AwardBloc>(() => AwardBloc(getIt<AwardService>()));
 
   getIt.registerSingleton<TeacherCourseService>(TeacherCourseService());
+  getIt.registerFactory<TeacherCategoryBloc>(
+      () => TeacherCategoryBloc(getIt<TeacherCourseService>()));
   getIt.registerFactory<TeacherCourseBloc>(
       () => TeacherCourseBloc(getIt<TeacherCourseService>()));
 

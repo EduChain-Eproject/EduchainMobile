@@ -13,9 +13,9 @@ class TeacherCoursesLoaded extends TeacherCourseState {
 }
 
 class TeacherCoursesError extends TeacherCourseState {
-  final String message;
+  final Map<String, dynamic>? errors;
 
-  TeacherCoursesError(this.message);
+  TeacherCoursesError(this.errors);
 }
 
 class TeacherCourseDetailLoading extends TeacherCourseState {}
@@ -27,9 +27,9 @@ class TeacherCourseDetailLoaded extends TeacherCourseState {
 }
 
 class TeacherCourseDetailError extends TeacherCourseState {
-  final String message;
+  final Map<String, dynamic>? errors;
 
-  TeacherCourseDetailError(this.message);
+  TeacherCourseDetailError(this.errors);
 }
 
 class TeacherCourseSaving extends TeacherCourseState {}

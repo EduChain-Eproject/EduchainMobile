@@ -3,11 +3,12 @@ import 'package:educhain/init_dependency.dart';
 import 'package:http/http.dart' as http;
 import 'types/api_response.dart';
 import 'types/page.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl =
-      'https://e44d-2402-800-63b7-d5cc-e010-731e-5580-5581.ngrok-free.app';
+  final String apiUrl = 'https://83a5-118-69-183-66.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -77,6 +78,40 @@ abstract class ApiService {
         }
       },
     );
+  }
+
+  ApiResponse<List<T>> postList<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? data,
+  ) {
+    // Perform the API call synchronously
+    final response = _performApiCall<List<T>>(
+      (headers) => http.post(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: headers,
+        body: jsonEncode(data),
+      ),
+      (responseData) {
+        if (responseData is List<dynamic>) {
+          // Convert each item in the list to type T
+          return responseData.map((item) {
+            if (item is Map<String, dynamic>) {
+              return fromJson(item);
+            } else {
+              throw FormatException(
+                  'Expected Map<String, dynamic> but got ${item.runtimeType}');
+            }
+          }).toList();
+        } else {
+          throw FormatException(
+              'Expected List<dynamic> but got ${responseData.runtimeType}');
+        }
+      },
+    );
+
+    // Return the result directly (not using Future)
+    return response;
   }
 
   ApiResponse<T> put<T>(
@@ -228,6 +263,49 @@ abstract class ApiService {
       }
     } else {
       return null;
+    }
+  }
+
+  ApiResponse<T> postUploadFile<T>(
+    String endpoint,
+    String filePath,
+    T Function(Map<String, dynamic>) fromJson, {
+    Map<String, String>? fields,
+  }) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$apiUrl/$endpoint'));
+
+    // Add file to the request
+    var mimeType = lookupMimeType(filePath);
+    var file = await http.MultipartFile.fromPath(
+      'file',
+      filePath,
+      contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+    );
+    request.files.add(file);
+
+    // Add additional fields to the request
+    if (fields != null) {
+      request.fields.addAll(fields);
+    }
+
+    // Add headers
+    final headers = await _getHeaders();
+    request.headers.addAll(headers);
+
+    // Send the request
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    // Handle the response
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      if (data is Map<String, dynamic>) {
+        return Response(data: fromJson(data));
+      } else {
+        throw FormatException('Expected map but got ${data.runtimeType}');
+      }
+    } else {
+      return _handleErrorResponse(response);
     }
   }
 }

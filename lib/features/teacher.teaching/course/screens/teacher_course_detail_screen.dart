@@ -1,9 +1,6 @@
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/widgets/authenticated_widget.dart';
-import 'package:educhain/features/teacher.teaching/course/models/create_chapter_request.dart';
-import 'package:educhain/features/teacher.teaching/course/models/update_chapter_request.dart';
-import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

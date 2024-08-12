@@ -11,17 +11,21 @@ class UserBlogVote {
 
   factory UserBlogVote.fromJson(Map<String, dynamic> json) {
     return UserBlogVote(
-      id: json['id'] as int?,
-      userId: json['userId'] as int?,
-      blogId: json['blogId'] as int?,
+      id: json['id'],
+      userId: json['userId'],
+      blogId: json['blogId'],
     );
   }
 
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'userId': userId,
-  //     'blogId': blogId,
-  //   };
-  // }
+  UserBlogVote copyWith({
+    int? id,
+    int? userId,
+    int? blogId,
+  }) {
+    return UserBlogVote(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      blogId: blogId ?? this.blogId,
+    );
+  }
 }

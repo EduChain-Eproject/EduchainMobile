@@ -1,4 +1,4 @@
-import 'user.dart';
+import 'package:educhain/core/models/user.dart';
 
 class BlogComment {
   final int? id;
@@ -23,30 +23,42 @@ class BlogComment {
 
   factory BlogComment.fromJson(Map<String, dynamic> json) {
     return BlogComment(
-      id: json['id'] as int?,
-      createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      text: json['text'] as String?,
-      voteUp: json['voteUp'] as int?,
+      id: json['id'],
+      createdAt: json['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'])
+          : null,
+      text: json['text'],
+      voteUp: json['voteUp'],
       user: json['user'] != null ? User.fromJson(json['user']) : null,
-      blogId: json['blogId'] as int?,
-      parentCommentId: json['parentCommentId'] as int?,
-      replies: (json['replies'] as List<dynamic>?)
-          ?.map((e) => BlogComment.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      blogId: json['blogId'],
+      parentCommentId: json['parentCommentId'],
+      replies: json['replies'] != null
+          ? (json['replies'] as List)
+              .map((item) => BlogComment.fromJson(item))
+              .toList()
+          : null,
     );
   }
 
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'createdAt': createdAt?.toIso8601String(),
-  //     'text': text,
-  //     'voteUp': voteUp,
-  //     'user': user?.toJson(),
-  //     'blogId': blogId,
-  //     'parentCommentId': parentCommentId,
-  //     'replies': replies?.map((e) => e.toJson()).toList(),
-  //   };
-  // }
+  BlogComment copyWith({
+    int? id,
+    DateTime? createdAt,
+    String? text,
+    int? voteUp,
+    User? user,
+    int? blogId,
+    int? parentCommentId,
+    List<BlogComment>? replies,
+  }) {
+    return BlogComment(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      text: text ?? this.text,
+      voteUp: voteUp ?? this.voteUp,
+      user: user ?? this.user,
+      blogId: blogId ?? this.blogId,
+      parentCommentId: parentCommentId ?? this.parentCommentId,
+      replies: replies ?? this.replies,
+    );
+  }
 }

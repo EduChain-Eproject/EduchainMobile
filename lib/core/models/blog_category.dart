@@ -11,18 +11,22 @@ class BlogCategory {
 
   factory BlogCategory.fromJson(Map<String, dynamic> json) {
     return BlogCategory(
-      id: json['id'] as int?,
+      id: json['id'],
       createdAt:
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      categoryName: json['categoryName'] as String?,
+      categoryName: json['categoryName'],
     );
   }
 
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'createdAt': createdAt?.toIso8601String(),
-  //     'categoryName': categoryName,
-  //   };
-  // }
+  BlogCategory copyWith({
+    int? id,
+    DateTime? createdAt,
+    String? categoryName,
+  }) {
+    return BlogCategory(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      categoryName: categoryName ?? this.categoryName,
+    );
+  }
 }

@@ -1,3 +1,5 @@
+import 'package:educhain/features/blog/bloc/blog_bloc.dart';
+import 'package:educhain/features/blog/blog_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,4 +61,7 @@ Future<void> initDependencies() async {
   getIt.registerSingleton<TeacherHomeworkService>(TeacherHomeworkService());
   getIt.registerFactory<TeacherHomeworkBloc>(
       () => TeacherHomeworkBloc(getIt<TeacherHomeworkService>()));
+
+  getIt.registerSingleton<BlogService>(BlogService());
+  getIt.registerFactory<BlogBloc>(() => BlogBloc(getIt<BlogService>()));
 }

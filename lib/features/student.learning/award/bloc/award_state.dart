@@ -13,7 +13,21 @@ class AwardLoaded extends AwardState {
 }
 
 class AwardError extends AwardState {
-  final String message;
+  final Map<String, dynamic> message;
 
   AwardError(this.message);
+}
+
+class AwardReceiving extends AwardState {}
+
+class AwardReceived extends AwardState {
+  final Award award;
+
+  AwardReceived(this.award);
+}
+
+class AwardReceiveError extends AwardState {
+  final Map<String, dynamic> message;
+
+  AwardReceiveError(this.message);
 }

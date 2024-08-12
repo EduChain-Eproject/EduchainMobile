@@ -6,10 +6,10 @@ class Question {
   final int? id;
   final String? questionText;
   final int? homeworkId;
-  final int? correctAnswerId;
   final Homework? homeworkDto;
   final List<Answer>? answerDtos;
   final List<UserAnswer>? userAnswerDtos;
+  final int? correctAnswerId;
   final Answer? correctAnswerDto;
   final UserAnswer? currentUserAnswerDto;
 

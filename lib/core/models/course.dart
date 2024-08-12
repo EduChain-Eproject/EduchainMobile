@@ -12,17 +12,21 @@ class Course {
   final String? description;
   final double? price;
   final CourseStatus? status;
+  final String? avatarPath;
 
   final List<Chapter>? chapterDtos;
   final List<Blog>? blogDtos;
   final User? teacherDto;
   final List<CourseFeedback>? courseFeedbackDtos;
   final List<Category>? categoryDtos;
-  final List<User>? participatedUserDtos;
+  final List<UserCourse>? participatedUserDtos;
   final List<UserInterests>? userInterestDtos;
   final int? numberOfEnrolledStudents;
   final UserCourse? currentUserCourse;
   final List<Course>? relatedCourseDtos;
+  final int? numberOfLessons;
+  final bool? currentUserInterested;
+  final int? lessonIdTolearn;
 
   Course({
     this.id,
@@ -30,6 +34,7 @@ class Course {
     this.status,
     this.title,
     this.description,
+    this.avatarPath,
     this.chapterDtos,
     this.blogDtos,
     this.teacherDto,
@@ -40,6 +45,9 @@ class Course {
     this.numberOfEnrolledStudents,
     this.currentUserCourse,
     this.relatedCourseDtos,
+    this.numberOfLessons,
+    this.currentUserInterested,
+    this.lessonIdTolearn,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -49,6 +57,7 @@ class Course {
       status: CourseStatusFromJson(json['status']),
       title: json['title'] as String?,
       description: json['description'] as String?,
+      avatarPath: json['avatarPath'] as String?,
       chapterDtos: (json['chapterDtos'] as List<dynamic>?)
           ?.map((e) => Chapter.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -65,7 +74,7 @@ class Course {
           ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
           .toList(),
       participatedUserDtos: (json['participatedUserDtos'] as List<dynamic>?)
-          ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => UserCourse.fromJson(e as Map<String, dynamic>))
           .toList(),
       userInterestDtos: (json['userInterestDtos'] as List<dynamic>?)
           ?.map((e) => UserInterests.fromJson(e as Map<String, dynamic>))
@@ -78,6 +87,9 @@ class Course {
       relatedCourseDtos: (json['relatedCourseDtos'] as List<dynamic>?)
           ?.map((e) => Course.fromJson(e as Map<String, dynamic>))
           .toList(),
+      numberOfLessons: json['numberOfLessons'] as int?,
+      currentUserInterested: json['currentUserInterested'] as bool?,
+      lessonIdTolearn: json['lessonIdTolearn'] as int?,
     );
   }
 
@@ -85,6 +97,7 @@ class Course {
     int? id,
     String? title,
     String? description,
+    String? avatarPath,
     double? price,
     CourseStatus? status,
     List<Chapter>? chapterDtos,
@@ -92,16 +105,20 @@ class Course {
     User? teacherDto,
     List<CourseFeedback>? courseFeedbackDtos,
     List<Category>? categoryDtos,
-    List<User>? participatedUserDtos,
+    List<UserCourse>? participatedUserDtos,
     List<UserInterests>? userInterestDtos,
     int? numberOfEnrolledStudents,
     UserCourse? currentUserCourse,
     List<Course>? relatedCourseDtos,
+    int? numberOfLessons,
+    int? lessonIdTolearn,
+    bool? currentUserInterested,
   }) {
     return Course(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      avatarPath: avatarPath ?? this.avatarPath,
       price: price ?? this.price,
       status: status ?? this.status,
       chapterDtos: chapterDtos ?? this.chapterDtos,
@@ -115,6 +132,10 @@ class Course {
           numberOfEnrolledStudents ?? this.numberOfEnrolledStudents,
       currentUserCourse: currentUserCourse ?? this.currentUserCourse,
       relatedCourseDtos: relatedCourseDtos ?? this.relatedCourseDtos,
+      numberOfLessons: numberOfLessons ?? this.numberOfLessons,
+      lessonIdTolearn: lessonIdTolearn ?? this.lessonIdTolearn,
+      currentUserInterested:
+          currentUserInterested ?? this.currentUserInterested,
     );
   }
 

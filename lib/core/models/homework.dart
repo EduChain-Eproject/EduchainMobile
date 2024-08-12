@@ -15,7 +15,7 @@ class Homework {
   final List<Question>? questionDtos;
   final List<UserHomework>? userHomeworkDtos;
   final List<Award>? userAwardDtos;
-  final bool isLoadingDetail; // New field to indicate loading state
+  final bool isLoadingDetail;
 
   Homework({
     this.id,

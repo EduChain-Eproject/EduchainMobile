@@ -1,4 +1,4 @@
-import 'package:educhain/features/blog/screens/list_blogs_screen.dart';
+import 'package:educhain/features/profile/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:educhain/features/student.learning/course/screens/list_courses_screen.dart';
@@ -7,19 +7,34 @@ import 'package:educhain/features/student/screens/student_home_screen.dart';
 import '../authenticated_widget.dart';
 
 class StudentLayout extends StatefulWidget {
-  static route() => MaterialPageRoute(
-        builder: (context) => const AuthenticatedWidget(child: StudentLayout()),
+  final int initialPage;
+  final int? selectedCategory;
+
+  static route({int initialPage = 0, int? selectedCategory}) =>
+      MaterialPageRoute(
+        builder: (context) => AuthenticatedWidget(
+            child: StudentLayout(
+                initialPage: initialPage, selectedCategory: selectedCategory)),
       );
 
-  const StudentLayout({Key? key}) : super(key: key);
+  const StudentLayout(
+      {Key? key, required this.initialPage, this.selectedCategory})
+      : super(key: key);
 
   @override
   _StudentLayoutState createState() => _StudentLayoutState();
 }
 
 class _StudentLayoutState extends State<StudentLayout> {
-  final PageController _pageController = PageController();
+  late PageController _pageController;
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialPage);
+    _currentIndex = widget.initialPage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +46,10 @@ class _StudentLayoutState extends State<StudentLayout> {
               _currentIndex = index;
             });
           },
-          children: const [
+          children: [
             StudentHomeScreen(),
-            CourseListScreen(),
-            BlogListScreen(),
-            // ProfileScreen(),
+            CourseListScreen(selectedCategory: widget.selectedCategory),
+            ProfileScreen(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -58,13 +72,13 @@ class _StudentLayoutState extends State<StudentLayout> {
               label: 'Courses',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.book),
-              label: 'Blog',
+              icon: Icon(Icons.person),
+              label: 'Profile',
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.person),
-            //   label: 'Profile',
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.telegram),
+              label: 'test',
+            ),
           ],
         ));
   }

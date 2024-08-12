@@ -1,4 +1,5 @@
 import 'package:educhain/core/api_service.dart';
+import 'package:educhain/core/models/category.dart';
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/models/lesson.dart';
@@ -14,6 +15,13 @@ import 'models/update_course_request.dart';
 import 'models/update_lesson_request.dart';
 
 class TeacherCourseService extends ApiService {
+  ApiResponse<List<Category>> fetchCategories() async {
+    return getList<Category>(
+      'COMMON/api/category/list',
+      (json) => Category.fromJson(json),
+    );
+  }
+
   ApiResponse<Page<Course>> fetchTeacherCourses(
       CourseSearchRequest searchRequest) async {
     return post<Page<Course>>(
@@ -31,11 +39,11 @@ class TeacherCourseService extends ApiService {
   }
 
   ApiResponse<Course> createCourse(CreateCourseRequest request) async {
-    return post<Course>(
-      'TEACHER/api/course/create',
-      (json) => Course.fromJson(json),
-      request.toJson(),
-    );
+    return postMultipart<Course>(
+        'TEACHER/api/course/create',
+        (json) => Course.fromJson(json),
+        request.toFormFields(),
+        request.file());
   }
 
   ApiResponse<Course> updateCourse(

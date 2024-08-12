@@ -12,9 +12,9 @@ class AuthService extends ApiService {
   ApiResponse<User> getUser(String token) async {
     final response =
         await get<User>('COMMON/getUser', (json) => User.fromJson(json));
-    if (!response.isSuccess) {
-      removeTokens();
-    }
+    // if (!response.isSuccess) {
+    //   removeTokens();
+    // }
     return response;
   }
 

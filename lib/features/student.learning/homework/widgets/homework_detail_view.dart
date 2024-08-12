@@ -1,9 +1,12 @@
 import 'package:educhain/core/models/award.dart';
 import 'package:educhain/core/models/user_homework.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/features/student.learning/award/screens/award_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:educhain/core/models/homework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/homework_bloc.dart';
 import 'question_tile.dart';
 import 'user_homework_status.dart';
 
@@ -31,54 +34,74 @@ class HomeworkDetailView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          Text(
-            homework.title ?? 'No Title',
-            style: Theme.of(context).textTheme.headlineMedium,
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            margin: const EdgeInsets.only(bottom: 16.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    homework.title ?? 'No Title',
+                    style: const TextStyle(
+                        fontSize: 24, color: AppPallete.lightPrimaryColor),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    homework.description ?? 'No Description',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 8.0),
-          Text(
-            homework.description ?? 'No Description',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 16.0),
-
-          // Display user's homework status
           if (userHomework != null) ...[
-            Text('Your Homework Status:',
-                style: Theme.of(context).textTheme.titleMedium),
             UserHomeworkStatus(userHomework: userHomework!),
+            const Divider(height: 32.0),
           ],
-
-          // Display award status if it exists
           if (award != null) ...[
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                     context, AwardDetailScreen.route(award!.id ?? 0));
               },
-              child: const Text('View your award detail'),
+              child: const Text('View your award'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
             ),
             const SizedBox(height: 16.0),
           ],
-
-          // Display list of questions with answers
           if (homework.questionDtos != null &&
               homework.questionDtos!.isNotEmpty) ...[
-            Text('Questions:', style: Theme.of(context).textTheme.titleMedium),
+            const Text('Questions:',
+                style: TextStyle(
+                    color: AppPallete.lightPrimaryColor, fontSize: 20)),
             ...homework.questionDtos!.map((question) => QuestionTile(
-                question: question, showCorrectAnswers: isHomeworkCompleted)),
+                homeworkId: homework.id ?? 0,
+                question: question,
+                showCorrectAnswers: isHomeworkCompleted)),
           ],
-
-          // Display submit button if homework is not completed
           if (!isHomeworkCompleted) ...[
             if (allQuestionsAnswered) ...[
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
-                  // Handle homework submission
                   _submitHomework(context);
                 },
                 child: const Text('Submit Homework'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
               ),
             ] else ...[
               const SizedBox(height: 16.0),
@@ -109,8 +132,6 @@ class HomeworkDetailView extends StatelessWidget {
   }
 
   void _submitHomework(BuildContext context) {
-    // TODO: Call the HomeworkBloc or equivalent to submit the homework
-    // This might look like:
-    // context.read<HomeworkBloc>().add(SubmitHomework(homework.id));
+    context.read<HomeworkBloc>().add(SubmitHomework(homework.id ?? 0));
   }
 }

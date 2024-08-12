@@ -15,7 +15,35 @@ class HomeworkLoaded extends HomeworkState {
 }
 
 class HomeworkError extends HomeworkState {
-  final String message;
+  final Map<String, dynamic> message;
 
   HomeworkError(this.message);
+}
+
+class HomeworkQuestionAnswering extends HomeworkState {}
+
+class HomeworkQuestionAnswered extends HomeworkState {
+  final UserAnswer userAnswer;
+
+  HomeworkQuestionAnswered(this.userAnswer);
+}
+
+class HomeworkQuestionAnswerError extends HomeworkState {
+  final Map<String, dynamic> message;
+
+  HomeworkQuestionAnswerError(this.message);
+}
+
+class HomeworkSubmitting extends HomeworkState {}
+
+class HomeworkSubmited extends HomeworkState {
+  final SubmissionResponse response;
+
+  HomeworkSubmited(this.response);
+}
+
+class HomeworkSubmitError extends HomeworkState {
+  final Map<String, dynamic> message;
+
+  HomeworkSubmitError(this.message);
 }

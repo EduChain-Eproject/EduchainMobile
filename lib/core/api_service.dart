@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'package:educhain/init_dependency.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:mime/mime.dart';
 import 'types/api_response.dart';
 import 'types/page.dart';
-import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl = 'https://83a5-118-69-183-66.ngrok-free.app';
+  final String apiUrl =
+      'https://c4d9-2402-800-63f0-8566-5cc7-6f56-15c5-6779.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -80,38 +83,50 @@ abstract class ApiService {
     );
   }
 
-  ApiResponse<List<T>> postList<T>(
+  ApiResponse<T> postMultipart<T>(
     String endpoint,
-    T Function(Map<String, dynamic>) fromJson,
-    Map<String, dynamic>? data,
-  ) {
-    // Perform the API call synchronously
-    final response = _performApiCall<List<T>>(
-      (headers) => http.post(
-        Uri.parse('$apiUrl/$endpoint'),
-        headers: headers,
-        body: jsonEncode(data),
-      ),
-      (responseData) {
-        if (responseData is List<dynamic>) {
-          // Convert each item in the list to type T
-          return responseData.map((item) {
-            if (item is Map<String, dynamic>) {
-              return fromJson(item);
-            } else {
-              throw FormatException(
-                  'Expected Map<String, dynamic> but got ${item.runtimeType}');
-            }
-          }).toList();
+    T Function(Map<String, dynamic>)? fromJson,
+    Map<String, String> fields,
+    XFile? file,
+  ) async {
+    String? mimeType = lookupMimeType(file!.path);
+    final mediaType = mimeType != null
+        ? MediaType.parse(mimeType)
+        : MediaType('application', 'octet-stream');
+
+    return _performApiCall<T>(
+      setMediaType: false,
+      (headers) async {
+        final uri = Uri.parse('$apiUrl/$endpoint');
+        final request = http.MultipartRequest('POST', uri);
+
+        fields.forEach((key, value) {
+          request.fields[key] = value;
+        });
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'avatarCourse',
+            await file.readAsBytes(),
+            filename: file.name,
+            contentType: mediaType,
+          ),
+        );
+
+        request.headers.addAll(headers);
+
+        final streamedResponse = await request.send();
+        final response = http.Response.fromStream(streamedResponse);
+        return response;
+      },
+      (data) {
+        if (data is Map<String, dynamic> && fromJson != null) {
+          return fromJson(data);
         } else {
-          throw FormatException(
-              'Expected List<dynamic> but got ${responseData.runtimeType}');
+          throw FormatException('Expected list but got ${data.runtimeType}');
         }
       },
     );
-
-    // Return the result directly (not using Future)
-    return response;
   }
 
   ApiResponse<T> put<T>(
@@ -153,12 +168,12 @@ abstract class ApiService {
     );
   }
 
-  Future<Response<T>> _performApiCall<T>(
-    Future<http.Response> Function(Map<String, String> headers) apiCall,
-    T Function(dynamic data)? fromJson,
-  ) async {
+  ApiResponse<T> _performApiCall<T>(
+      Future<http.Response> Function(Map<String, String> headers) apiCall,
+      T Function(dynamic data)? fromJson,
+      {bool? setMediaType}) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(setMediaType: setMediaType ?? true);
       var response = await apiCall(headers);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -211,13 +226,21 @@ abstract class ApiService {
     }
   }
 
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> _getHeaders({bool setMediaType = true}) async {
     final prefs = getIt<SharedPreferences>();
     final token = prefs.getString('accessToken');
-    return {
-      'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
+
+    final headers = <String, String>{};
+
+    if (setMediaType) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    return headers;
   }
 
   Response<T> _handleErrorResponse<T>(http.Response response) {
@@ -266,46 +289,25 @@ abstract class ApiService {
     }
   }
 
-  ApiResponse<T> postUploadFile<T>(
-    String endpoint,
-    String filePath,
-    T Function(Map<String, dynamic>) fromJson, {
-    Map<String, String>? fields,
-  }) async {
-    var request = http.MultipartRequest('POST', Uri.parse('$apiUrl/$endpoint'));
+  MediaType getMediaType(XFile file) {
+    String? extension = path.extension(file.path).toLowerCase();
 
-    // Add file to the request
-    var mimeType = lookupMimeType(filePath);
-    var file = await http.MultipartFile.fromPath(
-      'file',
-      filePath,
-      contentType: mimeType != null ? MediaType.parse(mimeType) : null,
-    );
-    request.files.add(file);
-
-    // Add additional fields to the request
-    if (fields != null) {
-      request.fields.addAll(fields);
-    }
-
-    // Add headers
-    final headers = await _getHeaders();
-    request.headers.addAll(headers);
-
-    // Send the request
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
-    // Handle the response
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      if (data is Map<String, dynamic>) {
-        return Response(data: fromJson(data));
-      } else {
-        throw FormatException('Expected map but got ${data.runtimeType}');
-      }
-    } else {
-      return _handleErrorResponse(response);
+    switch (extension) {
+      case '.jpg':
+      case '.jpeg':
+        return MediaType('image', 'jpeg');
+      case '.png':
+        return MediaType('image', 'png');
+      case '.gif':
+        return MediaType('image', 'gif');
+      case '.mp4':
+        return MediaType('video', 'mp4');
+      case '.mov':
+        return MediaType('video', 'quicktime');
+      case '.avi':
+        return MediaType('video', 'x-msvideo');
+      default:
+        return MediaType('application', 'octet-stream');
     }
   }
 }

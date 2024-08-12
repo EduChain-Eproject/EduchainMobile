@@ -1,3 +1,4 @@
+import 'package:educhain/features/profile/screens/profile_screen.dart';
 import 'package:educhain/features/teacher.teaching/course/screens/teacher_list_courses_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -34,8 +35,8 @@ class _TeacherLayoutState extends State<TeacherLayout> {
           },
           children: const [
             TeacherHomeScreen(),
-            TeacherCourseListScreen()
-            // ProfileScreen(),
+            TeacherCourseListScreen(),
+            ProfileScreen(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -57,10 +58,10 @@ class _TeacherLayoutState extends State<TeacherLayout> {
               icon: Icon(Icons.cast_for_education),
               label: 'Your Courses',
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.person),
-            //   label: 'Profile',
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
           ],
         ));
   }

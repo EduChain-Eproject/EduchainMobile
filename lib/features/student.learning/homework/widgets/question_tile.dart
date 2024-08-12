@@ -1,44 +1,69 @@
 import 'package:educhain/core/models/answer.dart';
 import 'package:educhain/core/models/user_answer.dart';
+import 'package:educhain/features/student.learning/homework/models/answer_question_request.dart';
 import 'package:flutter/material.dart';
 import 'package:educhain/core/models/question.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/homework_bloc.dart';
 
 class QuestionTile extends StatelessWidget {
   final Question question;
+  final int homeworkId;
   final bool showCorrectAnswers;
 
-  const QuestionTile(
-      {Key? key, required this.question, this.showCorrectAnswers = false})
-      : super(key: key);
+  const QuestionTile({
+    Key? key,
+    required this.question,
+    this.showCorrectAnswers = false,
+    required this.homeworkId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final currentUserAnswer = question.currentUserAnswerDto;
     final answers = question.answerDtos ?? [];
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: ExpansionTile(
-        title: Text(question.questionText ?? 'No Question Text'),
-        children: [
-          if (answers.isNotEmpty) ...[
-            for (var answer in answers)
-              ListTile(
-                title: Text(answer.answerText ?? 'No Answer Text'),
-                leading: Icon(
-                  _getIconForAnswer(answer, currentUserAnswer),
-                  color: _getColorForAnswer(answer, currentUserAnswer),
+    return BlocBuilder<HomeworkBloc, HomeworkState>(
+      builder: (context, state) {
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Text(
+                question.questionText ?? 'Untitled',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
-                onTap: () {
-                  // TODO: Handle answer selection if necessary
-                },
               ),
-          ] else
-            const ListTile(
-              title: Text('No answers available'),
-            ),
-        ],
-      ),
+              if (answers.isNotEmpty)
+                ...answers.map((answer) => ListTile(
+                      title: Text(answer.answerText ?? 'No Answer Text'),
+                      leading: Icon(
+                        _getIconForAnswer(answer, currentUserAnswer),
+                        color: _getColorForAnswer(answer, currentUserAnswer),
+                      ),
+                      onTap: showCorrectAnswers
+                          ? null
+                          : () {
+                              context.read<HomeworkBloc>().add(AnswerQuestion(
+                                  homeworkId,
+                                  AnswerQuestionRequest(
+                                      answerId: answer.id ?? 0,
+                                      questionId: question.id ?? 0)));
+                            },
+                    )),
+              if (answers.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text("No answers available for this question."),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -76,6 +101,6 @@ class QuestionTile extends StatelessWidget {
   }
 
   bool answerIsCorrect(Answer answer) {
-    return question.correctAnswerId == answer.id;
+    return question.correctAnswerDto?.id == answer.id;
   }
 }

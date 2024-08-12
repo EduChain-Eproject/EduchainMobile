@@ -9,4 +9,9 @@ class AwardService extends ApiService {
       (json) => Award.fromJson(json),
     );
   }
+
+  ApiResponse<Award> receiveAward(int awardId) async {
+    return post<Award>('STUDENT/api/award/receive/$awardId',
+        (json) => Award.fromJson(json), null);
+  }
 }

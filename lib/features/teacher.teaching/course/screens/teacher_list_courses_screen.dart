@@ -2,7 +2,7 @@ import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/teacher_course_bloc.dart';
+import '../blocs/course/teacher_course_bloc.dart';
 import '../models/course_search_request.dart';
 import '../widgets/course_list.dart';
 import '../widgets/course_search_bar.dart';
@@ -39,56 +39,18 @@ class _TeacherCourseListScreenState extends State<TeacherCourseListScreen> {
       value: _courseBloc,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('My TeacherCourses'),
+          title: const Text('My Teacher Courses'),
           actions: [
-            PopupMenuButton<String>(
-              onSelected: _onSortOptionSelected,
-              itemBuilder: (BuildContext context) {
-                return [
-                  const PopupMenuItem(
-                      value: 'title', child: Text('Sort by Title')),
-                  const PopupMenuItem(
-                      value: 'price', child: Text('Sort by Price')),
-                ];
-              },
-              icon: const Icon(Icons.sort),
-            ),
+            _buildSortMenu(),
           ],
         ),
         body: Column(
           children: [
-            CourseSearchBar(onSearch: _searchCourses),
+            CourseSearchBar(onSearch: _onSearchChanged),
             Expanded(
               child: BlocConsumer<TeacherCourseBloc, TeacherCourseState>(
-                listener: (context, state) {
-                  if (state is TeacherCoursesLoaded) {
-                    // Update the page number for pagination
-                    setState(() {
-                      _currentPage = state.courses.number;
-                    });
-                  }
-                },
-                builder: (context, state) {
-                  if (state is TeacherCoursesLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is TeacherCoursesError) {
-                    return Center(child: Text('Error: ${state.message}'));
-                  } else if (state is TeacherCoursesLoaded) {
-                    final courses = state.courses.content;
-                    return Column(
-                      children: [
-                        Expanded(child: CourseList(courses: courses)),
-                        if (state.courses.number < state.courses.totalPages - 1)
-                          TextButton(
-                            onPressed: _loadMoreCourses,
-                            child: const Text('Load More'),
-                          ),
-                      ],
-                    );
-                  } else {
-                    return const Center(child: Text('No courses available'));
-                  }
-                },
+                listener: _blocListener,
+                builder: _blocBuilder,
               ),
             ),
           ],
@@ -101,27 +63,75 @@ class _TeacherCourseListScreenState extends State<TeacherCourseListScreen> {
     );
   }
 
-  void _searchCourses([String? searchQuery, bool? isLoadingMore]) {
-    setState(() {
-      if (searchQuery != null) _searchQuery = searchQuery;
-    });
+  Widget _buildSortMenu() {
+    return PopupMenuButton<String>(
+      onSelected: _onSortOptionSelected,
+      itemBuilder: (BuildContext context) {
+        return const [
+          PopupMenuItem(value: 'title', child: Text('Sort by Title')),
+          PopupMenuItem(value: 'price', child: Text('Sort by Price')),
+        ];
+      },
+      icon: const Icon(Icons.sort),
+    );
+  }
+
+  void _onSearchChanged(String searchQuery) {
+    _searchCourses(searchQuery: searchQuery);
+  }
+
+  void _blocListener(BuildContext context, TeacherCourseState state) {
+    if (state is TeacherCoursesLoaded) {
+      setState(() {
+        _currentPage = state.courses.number;
+      });
+    }
+  }
+
+  Widget _blocBuilder(BuildContext context, TeacherCourseState state) {
+    if (state is TeacherCoursesLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (state is TeacherCoursesError) {
+      return Center(child: Text('Error: ${state.errors?['message']}'));
+    } else if (state is TeacherCoursesLoaded) {
+      final courses = state.courses.content;
+      return Column(
+        children: [
+          Expanded(child: CourseList(courses: courses)),
+          if (_hasMorePages(state)) _buildLoadMoreButton(),
+        ],
+      );
+    } else {
+      return const Center(child: Text('No courses available'));
+    }
+  }
+
+  bool _hasMorePages(TeacherCoursesLoaded state) {
+    return state.courses.number < state.courses.totalPages - 1;
+  }
+
+  Widget _buildLoadMoreButton() {
+    return TextButton(
+      onPressed: _loadMoreCourses,
+      child: const Text('Load More'),
+    );
+  }
+
+  void _searchCourses({String? searchQuery, bool isLoadingMore = false}) {
+    _searchQuery = searchQuery ?? _searchQuery;
 
     final searchRequest = CourseSearchRequest(
       search: _searchQuery,
-      page: _currentPage,
+      page: isLoadingMore ? _currentPage + 1 : 0,
       sortBy: _sortBy,
-      categoryIds: [],
     );
 
-    _courseBloc.add(FetchTeacherCourses(searchRequest,
-        isLoadingMore: isLoadingMore != null));
+    _courseBloc
+        .add(FetchTeacherCourses(searchRequest, isLoadingMore: isLoadingMore));
   }
 
   void _loadMoreCourses() {
-    setState(() {
-      _currentPage++;
-    });
-    _searchCourses('', true);
+    _searchCourses(isLoadingMore: true);
   }
 
   void _onSortOptionSelected(String sortOption) {

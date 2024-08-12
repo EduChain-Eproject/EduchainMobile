@@ -18,5 +18,29 @@ class AwardBloc extends Bloc<AwardEvent, AwardState> {
         onError: (error) => emit(AwardError(error['message'])),
       );
     });
+
+    on<ReceiveAward>((event, emit) async {
+      AwardLoaded? currentState = _getCurrentState();
+
+      emit(AwardReceiving());
+      final response = await _awardService.receiveAward(event.awardId);
+      response.on(
+        onSuccess: (res) {
+          if (currentState != null) {
+            emit(AwardLoaded(res));
+          } else {
+            emit(AwardReceiveError({"message": "Unable to receive the award"}));
+          }
+        },
+        onError: (error) => emit(AwardReceiveError(error['message'])),
+      );
+    });
+  }
+
+  AwardLoaded? _getCurrentState() {
+    if (state is AwardLoaded) {
+      return state as AwardLoaded;
+    }
+    return null;
   }
 }

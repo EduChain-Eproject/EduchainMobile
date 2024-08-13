@@ -1,6 +1,5 @@
 import 'package:educhain/core/models/blog_category.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
-import 'package:educhain/features/blog/screens/create_blog_screen.dart';
 import 'package:educhain/features/blog/widgets/blog_filter_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,7 +89,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 if (state is BlogsLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is BlogsError) {
-                  return Center(child: Text('Error: ${state.message}'));
+                  return Center(child: Text('Error: ${state.errors}'));
                 } else if (state is BlogsLoaded) {
                   return BlogList(blogs: state.blogs);
                 } else {
@@ -101,17 +100,6 @@ class _BlogListScreenState extends State<BlogListScreen> {
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.of(context).push(
-      //       MaterialPageRoute(
-      //         builder: (context) => const CreateBlogScreen(),
-      //       ),
-      //     );
-      //   },
-      //   child: const Icon(Icons.add),
-      //   tooltip: 'Create Blog',
-      // ),
     );
   }
 }

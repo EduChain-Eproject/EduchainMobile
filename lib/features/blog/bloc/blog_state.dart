@@ -12,8 +12,9 @@ class BlogCategoriesLoaded extends BlogState {
 }
 
 class BlogCategoriesError extends BlogState {
-  final String message;
-  BlogCategoriesError(this.message);
+  final Map<String, dynamic>? errors;
+
+  BlogCategoriesError(this.errors);
 }
 
 class BlogsLoading extends BlogState {}
@@ -24,8 +25,9 @@ class BlogsLoaded extends BlogState {
 }
 
 class BlogsError extends BlogState {
-  final String message;
-  BlogsError(this.message);
+  final Map<String, dynamic>? errors;
+
+  BlogsError(this.errors);
 }
 
 class BlogDetailLoading extends BlogState {}
@@ -36,36 +38,20 @@ class BlogDetailLoaded extends BlogState {
 }
 
 class BlogDetailError extends BlogState {
-  final String message;
-  BlogDetailError(this.message);
+  final Map<String, dynamic>? errors;
+
+  BlogDetailError(this.errors);
 }
 
-class BlogCommentlLoading extends BlogState {}
+class BlogCommentsLoading extends BlogState {}
 
-class BlogCommentLoaded extends BlogState {
-  final List<BlogComment> blogComment;
-  BlogCommentLoaded(this.blogComment);
+class BlogCommentsLoaded extends BlogState {
+  final List<BlogComment> blogComments;
+  BlogCommentsLoaded(this.blogComments);
 }
 
-class BlogCommentError extends BlogState {
-  final String message;
-  BlogCommentError(this.message);
+class BlogCommentsError extends BlogState {
+  final Map<String, dynamic>? errors;
+
+  BlogCommentsError(this.errors);
 }
-
-// class BlogCreating extends BlogState {}
-
-// class BlogCreated extends BlogState {
-//   final Blog blog;
-
-//   BlogCreated(this.blog);
-
-//   List<Object> get props => [blog];
-// }
-
-// class BlogCreateError extends BlogState {
-//   final String message;
-
-//   BlogCreateError(this.message);
-
-//   List<Object> get props => [message];
-// }

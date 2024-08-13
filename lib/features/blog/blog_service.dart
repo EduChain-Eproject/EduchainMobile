@@ -4,7 +4,6 @@ import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/blog.dart';
 import 'package:educhain/core/models/blog_category.dart';
 import 'package:educhain/core/types/api_response.dart';
-import 'package:educhain/features/blog/models/create_blog_request.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
 
 class BlogService extends ApiService {
@@ -35,18 +34,6 @@ class BlogService extends ApiService {
     return getList<BlogCategory>(
       'api/blog_category',
       (json) => BlogCategory.fromJson(json),
-    );
-  }
-
-  ApiResponse<Blog> createBlog(
-    String filePath,
-    CreateBlogRequest request,
-  ) {
-    return postUploadFile<Blog>(
-      'api/blog/create',
-      filePath,
-      Blog.fromJson,
-      fields: Map<String, String>.from(request.toJson()),
     );
   }
 }

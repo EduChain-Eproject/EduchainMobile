@@ -12,8 +12,9 @@ class BlogCategory {
   factory BlogCategory.fromJson(Map<String, dynamic> json) {
     return BlogCategory(
       id: json['id'],
-      createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'])
+          : null,
       categoryName: json['categoryName'],
     );
   }

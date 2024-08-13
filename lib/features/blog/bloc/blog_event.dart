@@ -17,12 +17,3 @@ class FilterBlogs extends BlogEvent {
 }
 
 class FetchBlogCategories extends BlogEvent {}
-
-// class CreateBlog extends BlogEvent {
-//   final String filePath;
-//   final CreateBlogRequest blogCreateRequest;
-
-//   CreateBlog(this.filePath, this.blogCreateRequest);
-
-//   List<Object> get props => [filePath, blogCreateRequest];
-// }

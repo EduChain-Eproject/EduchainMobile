@@ -1,3 +1,4 @@
+import 'package:educhain/features/blog/screens/list_blogs_screen.dart';
 import 'package:educhain/features/profile/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -49,6 +50,7 @@ class _StudentLayoutState extends State<StudentLayout> {
           children: [
             StudentHomeScreen(),
             CourseListScreen(selectedCategory: widget.selectedCategory),
+            BlogListScreen(),
             ProfileScreen(),
           ],
         ),
@@ -70,6 +72,10 @@ class _StudentLayoutState extends State<StudentLayout> {
             BottomNavigationBarItem(
               icon: Icon(Icons.list),
               label: 'Courses',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book),
+              label: 'Blog',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

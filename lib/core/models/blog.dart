@@ -30,28 +30,30 @@ class Blog {
 
   factory Blog.fromJson(Map<String, dynamic> json) {
     return Blog(
-      id: json['id'],
+      id: json['id'] as int?,
       createdAt: json['createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'])
+          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int)
           : null,
-      title: json['title'],
-      blogText: json['blogText'],
-      voteUp: json['voteUp'],
-      photo: json['photo'],
-      user: json['user'] != null ? User.fromJson(json['user']) : null,
+      title: json['title'] as String?,
+      blogText: json['blogText'] as String?,
+      voteUp: json['voteUp'] as int?,
+      photo: json['photo'] as String?,
+      user: json['user'] != null
+          ? User.fromJson(json['user'] as Map<String, dynamic>)
+          : null,
       blogCategory: json['blogCategory'] != null
-          ? BlogCategory.fromJson(json['blogCategory'])
+          ? BlogCategory.fromJson(json['blogCategory'] as Map<String, dynamic>)
           : null,
-      blogComments: json['blogComments'] != null
-          ? (json['blogComments'] as List)
-              .map((item) => BlogComment.fromJson(item))
-              .toList()
-          : [],
-      userBlogVotes: json['userBlogVotes'] != null
-          ? (json['userBlogVotes'] as List)
-              .map((item) => UserBlogVote.fromJson(item))
-              .toList()
-          : [],
+      blogComments: (json['blogComments'] as List<dynamic>?)
+              ?.map(
+                  (item) => BlogComment.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [],
+      userBlogVotes: (json['userBlogVotes'] as List<dynamic>?)
+              ?.map(
+                  (item) => UserBlogVote.fromJson(item as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 

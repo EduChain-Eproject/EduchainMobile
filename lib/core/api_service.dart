@@ -10,8 +10,7 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl =
-      'https://c4d9-2402-800-63f0-8566-5cc7-6f56-15c5-6779.ngrok-free.app';
+  final String apiUrl = 'https://58bd-118-69-183-66.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -309,5 +308,39 @@ abstract class ApiService {
       default:
         return MediaType('application', 'octet-stream');
     }
+  }
+
+  ApiResponse<List<T>> postList<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? data,
+  ) {
+    // Perform the API call synchronously
+    final response = _performApiCall<List<T>>(
+      (headers) => http.post(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: headers,
+        body: jsonEncode(data),
+      ),
+      (responseData) {
+        if (responseData is List<dynamic>) {
+          // Convert each item in the list to type T
+          return responseData.map((item) {
+            if (item is Map<String, dynamic>) {
+              return fromJson(item);
+            } else {
+              throw FormatException(
+                  'Expected Map<String, dynamic> but got ${item.runtimeType}');
+            }
+          }).toList();
+        } else {
+          throw FormatException(
+              'Expected List<dynamic> but got ${responseData.runtimeType}');
+        }
+      },
+    );
+
+    // Return the result directly (not using Future)
+    return response;
   }
 }

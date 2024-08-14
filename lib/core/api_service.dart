@@ -10,7 +10,8 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl = 'https://58bd-118-69-183-66.ngrok-free.app';
+  final String apiUrl =
+      'https://67d3-2402-800-63a7-ef99-58bf-38e4-b9a2-f00a.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -87,6 +88,7 @@ abstract class ApiService {
     T Function(Map<String, dynamic>)? fromJson,
     Map<String, String> fields,
     XFile? file,
+    String? fileFieldName, // Thêm tham số này
   ) async {
     String? mimeType = lookupMimeType(file!.path);
     final mediaType = mimeType != null
@@ -105,7 +107,7 @@ abstract class ApiService {
 
         request.files.add(
           http.MultipartFile.fromBytes(
-            'avatarCourse',
+            fileFieldName!, // Sử dụng tên truyền vào ở đây
             await file.readAsBytes(),
             filename: file.name,
             contentType: mediaType,

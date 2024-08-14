@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class BlogSearchFilterBar extends StatefulWidget {
   final Function(String, List<int>, String) onFilterChanged;
   final List<String> sortOptions;
-  final List<BlogCategory> categories;
+  final List<BlogCategory>? categories; // Make categories nullable
   final String initialSortOption;
 
   const BlogSearchFilterBar({
     Key? key,
     required this.onFilterChanged,
     required this.sortOptions,
-    required this.categories,
+    this.categories,
     this.initialSortOption = 'Relevance',
   }) : super(key: key);
 
@@ -34,10 +34,10 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
 
   Map<String, String> _sortOptionLabels = {
     'Relevance': 'Relevance',
-    'mostLike': 'Most Like',
-    'mostComment': 'Most Commented',
-    'ascTime': 'Oldest',
-    'descTime': 'Newest',
+    'MOST_LIKE': 'Most Like',
+    'MOST_COMMENT': 'Most Commented',
+    'DATE_ASC': 'Oldest',
+    'DATE_DESC': 'Newest',
   };
 
   @override
@@ -67,7 +67,11 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
             items: widget.sortOptions.map((option) {
               return DropdownMenuItem(
                 value: option,
-                child: Text(_sortOptionLabels[option] ?? option),
+                child: Text(
+                  _sortOptionLabels[option] ?? option,
+                  style: TextStyle(
+                      color: Colors.black), // Set the desired text color here
+                ),
               );
             }).toList(),
             onChanged: (value) {
@@ -76,26 +80,29 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
               });
               _applyFilters();
             },
+            style: TextStyle(
+                color: Colors.blue), // Set the desired text color here
           ),
-          Wrap(
-            spacing: 8.0,
-            children: widget.categories.map((category) {
-              return ChoiceChip(
-                label: Text(category.categoryName!),
-                selected: _selectedCategoryIds.contains(category.id),
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      _selectedCategoryIds.add(category.id!);
-                    } else {
-                      _selectedCategoryIds.remove(category.id);
-                    }
-                  });
-                  _applyFilters();
-                },
-              );
-            }).toList(),
-          ),
+          if (widget.categories != null) // Check if categories is not null
+            Wrap(
+              spacing: 8.0,
+              children: widget.categories!.map((category) {
+                return ChoiceChip(
+                  label: Text(category.categoryName!),
+                  selected: _selectedCategoryIds.contains(category.id),
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedCategoryIds.add(category.id!);
+                      } else {
+                        _selectedCategoryIds.remove(category.id);
+                      }
+                    });
+                    _applyFilters();
+                  },
+                );
+              }).toList(),
+            ),
         ],
       ),
     );

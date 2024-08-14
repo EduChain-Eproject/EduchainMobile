@@ -1,11 +1,12 @@
 import 'package:educhain/core/models/blog_category.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
+import 'package:educhain/features/blog/screens/create_blog_screen.dart';
+import 'package:educhain/features/blog/widgets/blog_card.dart'; // Import BlogCard
 import 'package:educhain/features/blog/widgets/blog_filter_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/blog_bloc.dart';
-import '../widgets/blog_list.dart';
 
 class BlogListScreen extends StatefulWidget {
   const BlogListScreen({Key? key}) : super(key: key);
@@ -17,14 +18,14 @@ class BlogListScreen extends StatefulWidget {
 class _BlogListScreenState extends State<BlogListScreen> {
   late BlogBloc _blogBloc;
   String _searchKeyword = '';
-  List<int> _selectedCategories = [];
+  List<int>? _selectedCategories = [];
   String _sortOption = 'Relevance';
   List<String> _sortOptions = [
     'Relevance',
-    'mostLike',
-    'mostComment',
-    'descTime',
-    'ascTime'
+    'MOST_LIKE',
+    'MOST_COMMENT',
+    'DATE_ASC',
+    'DATE_DESC'
   ];
   List<BlogCategory> _categories = [];
 
@@ -39,29 +40,40 @@ class _BlogListScreenState extends State<BlogListScreen> {
   void _fetchCategories() async {
     try {
       final response = await _blogBloc.blogService.fetchBlogCategories();
-      await response.on(
-        onSuccess: (categories) {
-          setState(() {
-            _categories = categories;
-          });
-        },
-        onError: (error) {
-          print('Error fetching categories: $error');
-        },
+      if (response.isSuccess) {
+        setState(() {
+          _categories = response.data!;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error fetching categories: ${response.error}')),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching categories: $error')),
       );
-    } catch (e) {
-      print('Exception fetching categories: $e');
     }
   }
 
   void _searchBlogs() {
     final filterRequest = BlogFilterRequest(
+      page: 0,
       sortStrategy: _sortOption,
       keyword: _searchKeyword,
-      categoryIdArray: _selectedCategories,
+      categoryIds: _selectedCategories ?? [],
     );
 
     _blogBloc.add(FilterBlogs(filterRequest));
+  }
+
+  void _createNewBlog() {
+    // Navigate to the blog creation screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateBlogScreen()),
+    );
   }
 
   @override
@@ -74,7 +86,8 @@ class _BlogListScreenState extends State<BlogListScreen> {
             onFilterChanged: (keyword, selectedCategories, sortOption) {
               setState(() {
                 _searchKeyword = keyword;
-                _selectedCategories = selectedCategories;
+                _selectedCategories =
+                    selectedCategories.isEmpty ? null : selectedCategories;
                 _sortOption = sortOption;
               });
               _searchBlogs();
@@ -89,9 +102,14 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 if (state is BlogsLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is BlogsError) {
-                  return Center(child: Text('Error: ${state.errors}'));
+                  return Center(child: Text('Error: ${state.message}'));
                 } else if (state is BlogsLoaded) {
-                  return BlogList(blogs: state.blogs);
+                  return ListView.builder(
+                    itemCount: state.blogs.content.length,
+                    itemBuilder: (context, index) {
+                      return BlogCard(blog: state.blogs.content[index]);
+                    },
+                  );
                 } else {
                   return const Center(child: Text('No blogs available'));
                 }
@@ -99,6 +117,11 @@ class _BlogListScreenState extends State<BlogListScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _createNewBlog,
+        child: const Icon(Icons.add),
+        tooltip: 'Create New Blog',
       ),
     );
   }

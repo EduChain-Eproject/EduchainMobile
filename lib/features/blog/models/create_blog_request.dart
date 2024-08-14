@@ -1,16 +1,18 @@
+import 'package:image_picker/image_picker.dart';
+
 class CreateBlogRequest {
   final String title;
   final int userId;
   final int blogCategoryId;
   final String blogText;
-  final String? photo;
+  final XFile? photo;
 
   CreateBlogRequest({
     required this.title,
     required this.userId,
     required this.blogCategoryId,
     required this.blogText,
-    this.photo,
+    required this.photo,
   });
 
   Map<String, dynamic> toJson() => {
@@ -18,6 +20,24 @@ class CreateBlogRequest {
         'userId': userId,
         'blogCategoryId': blogCategoryId,
         'blogText': blogText,
-        'photo': photo,
       };
+
+  Map<String, String> toFormFields() {
+    final jsonData = toJson();
+    final fields = <String, String>{};
+
+    jsonData.forEach((key, value) {
+      if (value is List<int>) {
+        for (int i = 0; i < value.length; i++) {
+          fields['${key}[$i]'] = value[i].toString();
+        }
+      } else {
+        fields[key] = value.toString();
+      }
+    });
+
+    return fields;
+  }
+
+  XFile? file() => photo;
 }

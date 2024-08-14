@@ -7,7 +7,7 @@ class BlogInitial extends BlogState {}
 class BlogCategoriesLoading extends BlogState {}
 
 class BlogCategoriesLoaded extends BlogState {
-  final List<BlogCategory> categories; // Adjust type based on actual data
+  final List<BlogCategory> categories;
   BlogCategoriesLoaded(this.categories);
 }
 
@@ -20,14 +20,13 @@ class BlogCategoriesError extends BlogState {
 class BlogsLoading extends BlogState {}
 
 class BlogsLoaded extends BlogState {
-  final List<Blog> blogs;
+  final Page<Blog> blogs;
   BlogsLoaded(this.blogs);
 }
 
 class BlogsError extends BlogState {
-  final Map<String, dynamic>? errors;
-
-  BlogsError(this.errors);
+  final String message;
+  BlogsError(this.message);
 }
 
 class BlogDetailLoading extends BlogState {}
@@ -54,4 +53,32 @@ class BlogCommentsError extends BlogState {
   final Map<String, dynamic>? errors;
 
   BlogCommentsError(this.errors);
+}
+
+class BlogSaving extends BlogState {}
+
+class BlogSaved extends BlogState {
+  final Blog blog;
+
+  BlogSaved(this.blog);
+}
+
+class BlogSaveError extends BlogState {
+  final Map<String, dynamic>? errors;
+
+  BlogSaveError(this.errors);
+}
+
+class BlogDeleting extends BlogState {}
+
+class BlogDeleted extends BlogState {
+  final Blog blog;
+
+  BlogDeleted(this.blog);
+}
+
+class BlogDeleteError extends BlogState {
+  final String message;
+
+  BlogDeleteError(this.message);
 }

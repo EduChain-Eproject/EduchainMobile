@@ -43,7 +43,8 @@ class TeacherCourseService extends ApiService {
         'TEACHER/api/course/create',
         (json) => Course.fromJson(json),
         request.toFormFields(),
-        request.file());
+        request.file(),
+        'avatarCourse');
   }
 
   ApiResponse<Course> updateCourse(

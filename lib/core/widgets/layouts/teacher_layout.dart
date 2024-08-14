@@ -7,21 +7,34 @@ import 'package:educhain/features/teacher/screens/teacher_home_screen.dart';
 import '../authenticated_widget.dart';
 
 class TeacherLayout extends StatefulWidget {
-  static route() => MaterialPageRoute(
-        builder: (context) => const AuthenticatedWidget(
-          child: TeacherLayout(),
-        ),
+  final int initialPage;
+  final int? selectedCategory;
+
+  static route({int initialPage = 0, int? selectedCategory}) =>
+      MaterialPageRoute(
+        builder: (context) => AuthenticatedWidget(
+            child: TeacherLayout(
+                initialPage: initialPage, selectedCategory: selectedCategory)),
       );
 
-  const TeacherLayout({Key? key}) : super(key: key);
+  const TeacherLayout(
+      {Key? key, required this.initialPage, this.selectedCategory})
+      : super(key: key);
 
   @override
   _TeacherLayoutState createState() => _TeacherLayoutState();
 }
 
 class _TeacherLayoutState extends State<TeacherLayout> {
-  final PageController _pageController = PageController();
+  late PageController _pageController;
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialPage);
+    _currentIndex = widget.initialPage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +46,7 @@ class _TeacherLayoutState extends State<TeacherLayout> {
               _currentIndex = index;
             });
           },
-          children: const [
+          children: [
             TeacherHomeScreen(),
             TeacherCourseListScreen(),
             ProfileScreen(),
@@ -55,12 +68,16 @@ class _TeacherLayoutState extends State<TeacherLayout> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.cast_for_education),
-              label: 'Your Courses',
+              icon: Icon(Icons.list),
+              label: 'Courses',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.telegram),
+              label: 'test',
             ),
           ],
         ));

@@ -82,6 +82,9 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   Widget _buildCourseHeader() {
     return Column(
       children: [
+        CircleAvatar(
+          backgroundImage: NetworkImage(_course.avatarPath ?? ""),
+        ),
         Text(
           _course.title ?? '',
           style: const TextStyle(

@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'package:educhain/core/theme/app_pallete.dart';
+import 'package:educhain/core/widgets/layouts/student_layout.dart';
+import 'package:educhain/core/widgets/layouts/teacher_layout.dart';
+import 'package:educhain/features/teacher.teaching/course/screens/teacher_course_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,22 +36,30 @@ class TeacherCourseFormScreen extends StatefulWidget {
 
 class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  late bool isUpdating;
+
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
   late List<Chapter> _chapters;
   XFile? _selectedAvatar;
-  List<int> _selectedCategoryIds = []; // To hold selected category IDs
+  late List<int> _selectedCategoryIds;
+
+  Map<String, dynamic> _errors = {};
 
   @override
   void initState() {
     super.initState();
+    isUpdating = widget.course != null ? true : false;
+
     _titleController = TextEditingController(text: widget.course?.title);
     _descriptionController =
         TextEditingController(text: widget.course?.description);
     _priceController =
         TextEditingController(text: widget.course?.price?.toString());
     _chapters = widget.course?.chapterDtos ?? [];
+    _selectedCategoryIds =
+        widget.course?.categoryDtos?.map((c) => c.id ?? 0).toList() ?? [];
   }
 
   @override
@@ -58,7 +70,13 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Course saved successfully!')),
           );
-          Navigator.pop(context);
+          if (isUpdating) {
+            Navigator.pushReplacement(
+                context, TeacherCourseDetailScreen.route(state.course.id ?? 0));
+          } else {
+            Navigator.pushReplacement(
+                context, TeacherCourseFormScreen.route(state.course));
+          }
         } else if (state is TeacherCourseSaveError) {
           _handleErrors(state.errors);
         } else if (state is TeacherChapterSaved) {
@@ -143,14 +161,38 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
                         fit: BoxFit.cover,
                       ),
                     ),
+                  if (_selectedAvatar == null &&
+                      widget.course?.avatarPath != null)
+                    CircleAvatar(
+                      backgroundImage:
+                          NetworkImage(widget.course?.avatarPath ?? ""),
+                    ),
+                  if (_errors['avt'] != null)
+                    Text(
+                      _errors['avt'],
+                      style: const TextStyle(color: AppPallete.lightErrorColor),
+                    ),
                   const SizedBox(height: 16.0),
                   CategorySelector(
                     selectedCategoryIds: _selectedCategoryIds,
                     onCategorySelected: (ids) {
                       setState(() {
                         _selectedCategoryIds = ids;
+                        if (ids.length != 0) {
+                          _errors['categories'] = null;
+                        }
                       });
                     },
+                  ),
+                  if (_errors['categories'] != null)
+                    Text(
+                      _errors['categories'],
+                      style: const TextStyle(color: AppPallete.lightErrorColor),
+                    ),
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: _saveCourse,
+                    child: const Text('Save Course'),
                   ),
                   const SizedBox(height: 16.0),
                   ..._chapters.map((chapter) {
@@ -166,12 +208,8 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
                       trailing: const Icon(Icons.add),
                       tileColor:
                           widget.course?.id == null ? Colors.grey[300] : null,
+                      onTap: () => _addChapter(context),
                     ),
-                  const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: _saveCourse,
-                    child: const Text('Save Course'),
-                  ),
                 ],
               ),
             ),
@@ -187,6 +225,7 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
     if (pickedFile != null) {
       setState(() {
         _selectedAvatar = pickedFile;
+        _errors['avt'] = null;
       });
     }
   }
@@ -217,16 +256,30 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
 
   void _saveCourse() {
     if (_formKey.currentState?.validate() ?? false) {
+      if (!isUpdating && _selectedAvatar == null) {
+        setState(() {
+          _errors['avt'] = 'Avatar file is required!';
+        });
+        return;
+      }
+      if (_selectedCategoryIds.isEmpty) {
+        setState(() {
+          _errors['categories'] =
+              'Please choose at least one category for the course!';
+        });
+        return;
+      }
       final courseId = widget.course?.id;
       final courseRequest = courseId == null
           ? CreateCourseRequest(
-              categoryIds: _selectedCategoryIds, // Include selected categories
+              categoryIds: _selectedCategoryIds,
               title: _titleController.text,
               description: _descriptionController.text,
               price: double.parse(_priceController.text),
               avatarCourse: _selectedAvatar,
             )
           : UpdateCourseRequest(
+              categoryIds: _selectedCategoryIds,
               title: _titleController.text,
               description: _descriptionController.text,
               price: double.parse(_priceController.text),
@@ -245,17 +298,18 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
 
   void _handleErrors(Map<String, dynamic>? errors) {
     if (errors != null) {
-      final message = errors['message'];
-      if (message != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
-      } else {
-        errors.forEach((field, error) {
+      errors.forEach((field, error) {
+        if (field != 'message') {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('$field: $error')),
           );
-        });
+        }
+      });
+      final message = errors['message'];
+      if (message != null && errors.length == 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
       }
     }
   }

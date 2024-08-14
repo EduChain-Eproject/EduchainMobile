@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
   final String apiUrl =
-      'https://c4d9-2402-800-63f0-8566-5cc7-6f56-15c5-6779.ngrok-free.app';
+      'https://e455-2402-800-63b7-9a4e-bd3c-2713-2599-b22d.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -84,12 +84,13 @@ abstract class ApiService {
   }
 
   ApiResponse<T> postMultipart<T>(
-    String endpoint,
-    T Function(Map<String, dynamic>)? fromJson,
-    Map<String, String> fields,
-    XFile? file,
-  ) async {
-    String? mimeType = lookupMimeType(file!.path);
+      String endpoint,
+      T Function(Map<String, dynamic>)? fromJson,
+      Map<String, String> fields,
+      XFile? file,
+      String? fileField,
+      {String? method}) async {
+    String? mimeType = file != null ? lookupMimeType(file.path) : null;
     final mediaType = mimeType != null
         ? MediaType.parse(mimeType)
         : MediaType('application', 'octet-stream');
@@ -98,20 +99,22 @@ abstract class ApiService {
       setMediaType: false,
       (headers) async {
         final uri = Uri.parse('$apiUrl/$endpoint');
-        final request = http.MultipartRequest('POST', uri);
+        final request = http.MultipartRequest(method ?? 'POST', uri);
 
         fields.forEach((key, value) {
           request.fields[key] = value;
         });
 
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'avatarCourse',
-            await file.readAsBytes(),
-            filename: file.name,
-            contentType: mediaType,
-          ),
-        );
+        if (file != null) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              fileField ?? 'file',
+              await file.readAsBytes(),
+              filename: file.name,
+              contentType: mediaType,
+            ),
+          );
+        }
 
         request.headers.addAll(headers);
 

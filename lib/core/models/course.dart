@@ -54,7 +54,8 @@ class Course {
     return Course(
       id: json['id'] as int?,
       price: json['price'] as double?,
-      status: CourseStatusFromJson(json['status']),
+      status:
+          json['status'] != null ? CourseStatusFromJson(json['status']) : null,
       title: json['title'] as String?,
       description: json['description'] as String?,
       avatarPath: json['avatarPath'] as String?,

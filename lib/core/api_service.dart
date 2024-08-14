@@ -84,13 +84,13 @@ abstract class ApiService {
   }
 
   ApiResponse<T> postMultipart<T>(
-    String endpoint,
-    T Function(Map<String, dynamic>)? fromJson,
-    Map<String, String> fields,
-    XFile? file,
-    String? fileFieldName, // Thêm tham số này
-  ) async {
-    String? mimeType = lookupMimeType(file!.path);
+      String endpoint,
+      T Function(Map<String, dynamic>)? fromJson,
+      Map<String, String> fields,
+      XFile? file,
+      String? fileField,
+      {String? method}) async {
+    String? mimeType = file != null ? lookupMimeType(file.path) : null;
     final mediaType = mimeType != null
         ? MediaType.parse(mimeType)
         : MediaType('application', 'octet-stream');
@@ -99,20 +99,22 @@ abstract class ApiService {
       setMediaType: false,
       (headers) async {
         final uri = Uri.parse('$apiUrl/$endpoint');
-        final request = http.MultipartRequest('POST', uri);
+        final request = http.MultipartRequest(method ?? 'POST', uri);
 
         fields.forEach((key, value) {
           request.fields[key] = value;
         });
 
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            fileFieldName!, // Sử dụng tên truyền vào ở đây
-            await file.readAsBytes(),
-            filename: file.name,
-            contentType: mediaType,
-          ),
-        );
+        if (file != null) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              fileField ?? 'file',
+              await file.readAsBytes(),
+              filename: file.name,
+              contentType: mediaType,
+            ),
+          );
+        }
 
         request.headers.addAll(headers);
 

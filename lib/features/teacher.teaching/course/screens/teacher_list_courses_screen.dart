@@ -9,10 +9,6 @@ import '../widgets/course_search_bar.dart';
 import 'teacher_course_form_screen.dart';
 
 class TeacherCourseListScreen extends StatefulWidget {
-  static Route route() => MaterialPageRoute(
-        builder: (context) => const TeacherCourseListScreen(),
-      );
-
   const TeacherCourseListScreen({super.key});
 
   @override

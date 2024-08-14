@@ -40,19 +40,23 @@ class TeacherCourseService extends ApiService {
 
   ApiResponse<Course> createCourse(CreateCourseRequest request) async {
     return postMultipart<Course>(
-        'TEACHER/api/course/create',
-        (json) => Course.fromJson(json),
-        request.toFormFields(),
-        request.file(),
-        'avatarCourse');
+      'TEACHER/api/course/create',
+      (json) => Course.fromJson(json),
+      request.toFormFields(),
+      request.file(),
+      "avatarCourse",
+    );
   }
 
   ApiResponse<Course> updateCourse(
       int courseId, UpdateCourseRequest request) async {
-    return put<Course>(
+    return postMultipart<Course>(
       'TEACHER/api/course/update/$courseId',
       (json) => Course.fromJson(json),
-      request.toJson(),
+      request.toFormFields(),
+      request.file(),
+      "avatarCourse",
+      method: "PUT",
     );
   }
 

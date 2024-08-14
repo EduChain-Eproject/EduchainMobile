@@ -66,16 +66,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
       final response = await teacherCourseService.createCourse(event.request);
       await response.on(
         onSuccess: (course) {
-          if (state is TeacherCoursesLoaded) {
-            final currentState = state as TeacherCoursesLoaded;
-            final updatedCourses = Page<Course>(
-              number: currentState.courses.number,
-              totalElements: currentState.courses.totalElements + 1,
-              totalPages: currentState.courses.totalPages,
-              content: [course, ...currentState.courses.content],
-            );
-            emit(TeacherCoursesLoaded(updatedCourses));
-          }
           emit(TeacherCourseSaved(course));
         },
         onError: (error) => emit(TeacherCourseSaveError(error)),
@@ -88,19 +78,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           event.courseId, event.request);
       await response.on(
         onSuccess: (course) {
-          if (state is TeacherCoursesLoaded) {
-            final currentState = state as TeacherCoursesLoaded;
-            final updatedCourses = currentState.courses.content.map((c) {
-              return c.id == course.id ? course : c;
-            }).toList();
-            final updatedPage = Page<Course>(
-              number: currentState.courses.number,
-              totalElements: currentState.courses.totalElements,
-              totalPages: currentState.courses.totalPages,
-              content: updatedCourses,
-            );
-            emit(TeacherCoursesLoaded(updatedPage));
-          }
           emit(TeacherCourseSaved(course));
         },
         onError: (error) => emit(TeacherCourseSaveError(error)),
@@ -113,19 +90,6 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           await teacherCourseService.deactivateCourse(event.courseId);
       await response.on(
         onSuccess: (course) {
-          if (state is TeacherCoursesLoaded) {
-            final currentState = state as TeacherCoursesLoaded;
-            final updatedCourses = currentState.courses.content.map((c) {
-              return c.id == course.id ? course : c;
-            }).toList();
-            final updatedPage = Page<Course>(
-              number: currentState.courses.number,
-              totalElements: currentState.courses.totalElements,
-              totalPages: currentState.courses.totalPages,
-              content: updatedCourses,
-            );
-            emit(TeacherCoursesLoaded(updatedPage));
-          }
           emit(TeacherCourseSaved(course));
         },
         onError: (error) => emit(TeacherCourseSaveError(error)),

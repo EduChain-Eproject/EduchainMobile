@@ -7,8 +7,8 @@ class UpdateCourseRequest {
   final String? title;
   final String? description;
   final double? price;
-  final CourseStatus? status;
   final XFile? avatarCourse;
+  final CourseStatus? status;
 
   UpdateCourseRequest({
     this.categoryIds,
@@ -25,6 +25,24 @@ class UpdateCourseRequest {
         'description': description,
         'price': price,
         'status': status?.toString().split('.').last,
-        'avatarCourse': avatarCourse
       };
+
+  Map<String, String> toFormFields() {
+    final jsonData = toJson();
+    final fields = <String, String>{};
+
+    jsonData.forEach((key, value) {
+      if (value is List<int>) {
+        for (int i = 0; i < value.length; i++) {
+          fields['${key}[$i]'] = value[i].toString();
+        }
+      } else {
+        fields[key] = value.toString();
+      }
+    });
+
+    return fields;
+  }
+
+  XFile? file() => avatarCourse;
 }

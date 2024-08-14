@@ -21,7 +21,6 @@ class CreateCourseRequest {
         'price': price,
       };
 
-  // Convert to form fields for MultipartRequest
   Map<String, String> toFormFields() {
     final jsonData = toJson();
     final fields = <String, String>{};

@@ -8,6 +8,7 @@ import 'package:educhain/core/types/page.dart';
 import 'package:educhain/features/blog/models/create_blog_request.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
 import 'package:educhain/features/blog/models/get_list_blogs_request.dart';
+import 'package:educhain/features/blog/models/update_blog_request.dart';
 
 class BlogService extends ApiService {
   ApiResponse<Page<Blog>> fetchBlogs(ListBlogRequest rq) async {
@@ -53,5 +54,16 @@ class BlogService extends ApiService {
   ApiResponse<Blog> deleteBlog(int chapterId) async {
     return delete<Blog>(
         'api/blog/$chapterId', (json) => Blog.fromJson(json), null);
+  }
+
+  ApiResponse<Blog> updateBlog(int blogId, UpdateBlogRequest request) async {
+    return postMultipart<Blog>(
+      'api/blog/$blogId',
+      (json) => Blog.fromJson(json),
+      request.toFormFields(),
+      request.file(),
+      "photo",
+      method: "PUT",
+    );
   }
 }

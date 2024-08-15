@@ -7,6 +7,7 @@ import 'package:educhain/features/blog/blog_service.dart';
 import 'package:educhain/features/blog/models/create_blog_request.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
 import 'package:educhain/features/blog/models/get_list_blogs_request.dart';
+import 'package:educhain/features/blog/models/update_blog_request.dart';
 
 part 'blog_event.dart';
 part 'blog_state.dart';
@@ -42,7 +43,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
             emit(BlogsLoaded(newBlogs));
           }
         },
-        onError: (error) => emit(BlogsError(error['message'])),
+        onError: (error) => emit(BlogsError(error)),
       );
     });
 
@@ -72,16 +73,6 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
       final response = await blogService.createBlog(event.request);
       await response.on(
         onSuccess: (blog) {
-          if (state is BlogsLoaded) {
-            final currentState = state as BlogsLoaded;
-            final updatedBlogs = Page<Blog>(
-              number: currentState.blogs.number,
-              totalElements: currentState.blogs.totalElements + 1,
-              totalPages: currentState.blogs.totalPages,
-              content: [blog, ...currentState.blogs.content],
-            );
-            emit(BlogsLoaded(updatedBlogs));
-          }
           emit(BlogSaved(blog));
         },
         onError: (error) => emit(BlogSaveError(error)),
@@ -90,27 +81,25 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
 
     on<DeleteBlog>((event, emit) async {
       emit(BlogDeleting());
-
       final response = await blogService.deleteBlog(event.blogId);
+
       await response.on(
         onSuccess: (deletedBlog) {
-          if (state is BlogsLoaded) {
-            final currentState = state as BlogsLoaded;
-
-            final updatedBlogs = Page<Blog>(
-              number: currentState.blogs.number,
-              totalElements: currentState.blogs.totalElements - 1,
-              totalPages: currentState.blogs.totalPages,
-              content: currentState.blogs.content
-                  .where((blog) => blog.id != event.blogId)
-                  .toList(),
-            );
-
-            emit(BlogsLoaded(updatedBlogs));
-          }
           emit(BlogDeleted(deletedBlog));
         },
         onError: (error) => emit(BlogDeleteError(error['message'])),
+      );
+    });
+
+    on<UpdateBlog>((event, emit) async {
+      emit(BlogUpdating());
+      final response =
+          await blogService.updateBlog(event.blogId, event.request);
+      await response.on(
+        onSuccess: (blog) {
+          emit(BlogUpdated(blog));
+        },
+        onError: (error) => emit(BlogUpdateError(error)),
       );
     });
   }

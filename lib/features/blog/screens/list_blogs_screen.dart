@@ -102,7 +102,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 if (state is BlogsLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is BlogsError) {
-                  return Center(child: Text('Error: ${state.message}'));
+                  return Center(child: Text('Error: ${state.errors}'));
                 } else if (state is BlogsLoaded) {
                   return ListView.builder(
                     itemCount: state.blogs.content.length,

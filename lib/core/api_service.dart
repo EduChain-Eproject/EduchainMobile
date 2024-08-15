@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
   final String apiUrl =
-      'https://67d3-2402-800-63a7-ef99-58bf-38e4-b9a2-f00a.ngrok-free.app';
+      'https://dfac-2402-800-63a7-ef99-244d-6cff-cc49-da9c.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,

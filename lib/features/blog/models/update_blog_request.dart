@@ -1,12 +1,12 @@
 import 'package:image_picker/image_picker.dart';
 
-class CreateBlogRequest {
+class UpdateBlogRequest {
   final String title;
   final int blogCategoryId;
   final String blogText;
   final XFile? photo;
 
-  CreateBlogRequest({
+  UpdateBlogRequest({
     required this.title,
     required this.blogCategoryId,
     required this.blogText,

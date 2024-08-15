@@ -29,6 +29,13 @@ class CreateBlog extends BlogEvent {
   CreateBlog(this.request);
 }
 
+class UpdateBlog extends BlogEvent {
+  final int blogId;
+  final UpdateBlogRequest request;
+
+  UpdateBlog(this.blogId, this.request);
+}
+
 class DeleteBlog extends BlogEvent {
   final int blogId;
 

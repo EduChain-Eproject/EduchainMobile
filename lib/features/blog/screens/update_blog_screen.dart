@@ -1,19 +1,22 @@
 import 'dart:io';
-
+import 'package:educhain/core/models/blog.dart';
 import 'package:educhain/core/models/blog_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../bloc/blog_bloc.dart';
-import '../models/create_blog_request.dart';
+import '../models/update_blog_request.dart';
 
-class CreateBlogScreen extends StatefulWidget {
+class UpdateBlogScreen extends StatefulWidget {
+  final Blog blog;
+
+  const UpdateBlogScreen({Key? key, required this.blog}) : super(key: key);
+
   @override
-  _CreateBlogScreenState createState() => _CreateBlogScreenState();
+  _UpdateBlogScreenState createState() => _UpdateBlogScreenState();
 }
 
-class _CreateBlogScreenState extends State<CreateBlogScreen> {
+class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _textController = TextEditingController();
@@ -26,6 +29,9 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
   void initState() {
     super.initState();
     _blogBloc = BlocProvider.of<BlogBloc>(context);
+    _titleController.text = widget.blog.title ?? '';
+    _textController.text = widget.blog.blogText ?? '';
+    _selectedCategory = widget.blog.blogCategory;
     _fetchCategories();
   }
 
@@ -59,36 +65,41 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (_photo == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please select a photo')),
-        );
-        return;
-      }
-
-      final request = CreateBlogRequest(
+      final request = UpdateBlogRequest(
         title: _titleController.text,
         blogCategoryId: _selectedCategory!.id!,
         blogText: _textController.text,
         photo: _photo,
       );
 
-      _blogBloc.add(CreateBlog(request));
+      _blogBloc.add(UpdateBlog(widget.blog.id!, request));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Blog')),
+      appBar: AppBar(title: Text('Update Blog')),
       body: SingleChildScrollView(
-        // <--- Wrap with SingleChildScrollView
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Display the old image if it exists
+              if (widget.blog.photo != null && _photo == null)
+                Column(
+                  children: [
+                    Image.network(
+                      'http://127.0.0.1:8080/uploads/${widget.blog.photo!}',
+                      fit: BoxFit.cover,
+                      height: 200,
+                      width: double.infinity,
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                ),
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(labelText: 'Title'),
@@ -100,15 +111,16 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
                 },
               ),
               DropdownButtonFormField<BlogCategory>(
-                value: _selectedCategory,
+                value: _categories.isNotEmpty
+                    ? _categories.firstWhere(
+                        (category) => category.id == _selectedCategory?.id,
+                        orElse: () => _categories.first)
+                    : null,
                 decoration: InputDecoration(labelText: 'Category'),
                 items: _categories.map((category) {
                   return DropdownMenuItem(
                     value: category,
-                    child: Text(
-                      category.categoryName ?? '',
-                      style: TextStyle(color: Colors.black),
-                    ),
+                    child: Text(category.categoryName ?? ''),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -137,7 +149,7 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Upload Photo'),
+                child: Text('Upload New Photo'),
               ),
               if (_photo != null) ...[
                 SizedBox(height: 16),
@@ -146,16 +158,16 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Create Blog'),
+                child: Text('Update Blog'),
               ),
               BlocListener<BlogBloc, BlogState>(
                 listener: (context, state) {
-                  if (state is BlogSaved) {
+                  if (state is BlogUpdated) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Blog created successfully')),
+                      SnackBar(content: Text('Blog updated successfully')),
                     );
                     Navigator.pop(context);
-                  } else if (state is BlogSaveError) {
+                  } else if (state is BlogUpdateError) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: ${state.errors}')),
                     );

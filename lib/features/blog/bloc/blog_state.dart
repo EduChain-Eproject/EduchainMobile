@@ -25,8 +25,9 @@ class BlogsLoaded extends BlogState {
 }
 
 class BlogsError extends BlogState {
-  final String message;
-  BlogsError(this.message);
+  final Map<String, dynamic>? errors;
+
+  BlogsError(this.errors);
 }
 
 class BlogDetailLoading extends BlogState {}
@@ -81,4 +82,18 @@ class BlogDeleteError extends BlogState {
   final String message;
 
   BlogDeleteError(this.message);
+}
+
+class BlogUpdating extends BlogState {}
+
+class BlogUpdated extends BlogState {
+  final Blog blog;
+
+  BlogUpdated(this.blog);
+}
+
+class BlogUpdateError extends BlogState {
+  final Map<String, dynamic>? errors;
+
+  BlogUpdateError(this.errors);
 }

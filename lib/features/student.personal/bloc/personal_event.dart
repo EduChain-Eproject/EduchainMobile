@@ -18,6 +18,13 @@ class FetchUserHomeworks extends PersonalEvent {
   FetchUserHomeworks(this.request, {this.isLoadingMore = false});
 }
 
+// class FetchUserAwards extends PersonalEvent {
+
+//   final UserAwardsRequest request;
+
+//   FetchUserAwards(this.request, {this.isLoadingMore = false});
+// }
+
 class FetchUserInterests extends PersonalEvent {
   final bool isLoadingMore;
 

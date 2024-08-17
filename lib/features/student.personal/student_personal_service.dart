@@ -28,6 +28,15 @@ class StudentPersonalService extends ApiService {
     );
   }
 
+  // ApiResponse<Page<Award>> getUserAwards(
+  //     UserAwardsRequest request) async {
+  //   return post<Page<Award>>(
+  //     'STUDENT/list-homework',
+  //     (json) => Page.fromJson(json, (item) => Award.fromJson(item)),
+  //     request.toJson(),
+  //   );
+  // }
+
   ApiResponse<Page<UserInterests>> getUserInterests(
       UserInterestsRequest request) async {
     return post<Page<UserInterests>>(

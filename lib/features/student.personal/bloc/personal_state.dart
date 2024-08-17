@@ -32,6 +32,20 @@ class UserHomeworksError extends PersonalState {
   UserHomeworksError(this.errors);
 }
 
+// class UserAwardsLoading extends PersonalState {}
+
+// class UserAwardsLoaded extends PersonalState {
+//   final Page<Award> awards;
+
+//   UserAwardsLoaded(this.awards);
+// }
+
+// class UserAwardsError extends PersonalState {
+//   final Map<String, dynamic>? errors;
+
+//   UserAwardsError(this.errors);
+// }
+
 class UserInterestsLoading extends PersonalState {}
 
 class UserInterestsLoaded extends PersonalState {
@@ -46,32 +60,17 @@ class UserInterestsError extends PersonalState {
   UserInterestsError(this.errors);
 }
 
-class UserInterestAdding extends PersonalState {}
+class UserInterestSaving extends PersonalState {}
 
-class UserInterestAdded extends PersonalState {
-  final int userId;
-  final int courseId;
+class UserInterestSaved extends PersonalState {
+  final UserInterests userInterest;
+  final String? status;
 
-  UserInterestAdded(this.userId, this.courseId);
+  UserInterestSaved(this.userInterest, {this.status});
 }
 
-class UserInterestAddError extends PersonalState {
+class UserInterestSaveError extends PersonalState {
   final Map<String, dynamic>? errors;
 
-  UserInterestAddError(this.errors);
-}
-
-class UserInterestRemoving extends PersonalState {}
-
-class UserInterestRemoved extends PersonalState {
-  final int userId;
-  final int courseId;
-
-  UserInterestRemoved(this.userId, this.courseId);
-}
-
-class UserInterestRemoveError extends PersonalState {
-  final Map<String, dynamic>? errors;
-
-  UserInterestRemoveError(this.errors);
+  UserInterestSaveError(this.errors);
 }

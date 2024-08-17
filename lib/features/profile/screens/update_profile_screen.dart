@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:educhain/core/models/user.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/widgets/authenticated_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../bloc/profile_bloc.dart';
 import '../update_user_request.dart';
@@ -21,16 +25,19 @@ class UpdateProfileScreen extends StatefulWidget {
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  late String email;
   late String firstName;
   late String lastName;
   late String phone;
   late String address;
 
+  final ImagePicker _picker = ImagePicker();
+  XFile? _avatarFile;
+
+  Map<String, dynamic>? _errors;
+
   @override
   void initState() {
     super.initState();
-    email = widget.user.email!;
     firstName = widget.user.firstName!;
     lastName = widget.user.lastName!;
     phone = widget.user.phone ?? '';
@@ -40,7 +47,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Update Profile')),
+      appBar: AppBar(title: const Text('Update Profile')),
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdated) {
@@ -58,41 +65,34 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             child: Column(
               children: [
                 TextFormField(
-                  initialValue: email,
-                  decoration: InputDecoration(labelText: 'Email'),
-                  onChanged: (value) => email = value,
-                  validator: (value) => value!.isEmpty ? 'Enter email' : null,
-                ),
-                TextFormField(
                   initialValue: firstName,
-                  decoration: InputDecoration(labelText: 'First Name'),
+                  decoration: const InputDecoration(labelText: 'First Name'),
                   onChanged: (value) => firstName = value,
                   validator: (value) =>
                       value!.isEmpty ? 'Enter first name' : null,
                 ),
                 TextFormField(
                   initialValue: lastName,
-                  decoration: InputDecoration(labelText: 'Last Name'),
+                  decoration: const InputDecoration(labelText: 'Last Name'),
                   onChanged: (value) => lastName = value,
                   validator: (value) =>
                       value!.isEmpty ? 'Enter last name' : null,
                 ),
                 TextFormField(
                   initialValue: phone,
-                  decoration: InputDecoration(labelText: 'Phone'),
+                  decoration: const InputDecoration(labelText: 'Phone'),
                   onChanged: (value) => phone = value,
                 ),
                 TextFormField(
                   initialValue: address,
-                  decoration: InputDecoration(labelText: 'Address'),
+                  decoration: const InputDecoration(labelText: 'Address'),
                   onChanged: (value) => address = value,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       final request = UpdateUserRequest(
-                        email: email,
                         firstName: firstName,
                         lastName: lastName,
                         phone: phone,
@@ -101,13 +101,55 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       context.read<ProfileBloc>().add(UpdateProfile(request));
                     }
                   },
-                  child: Text('Update Profile'),
+                  child: const Text('Update Profile'),
                 ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _pickAvatar,
+                  child: const Text('Select Avatar'),
+                ),
+                if (_avatarFile != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Image.file(
+                      File(_avatarFile!.path),
+                      height: 100,
+                      width: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                if (_avatarFile == null && widget.user.avatarPath != null)
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.user.avatarPath ?? ""),
+                  ),
+                if (_errors?['avatarFile'] != null)
+                  Text(
+                    _errors?['avatarFile'],
+                    style: const TextStyle(color: AppPallete.lightErrorColor),
+                  ),
+                const SizedBox(height: 16.0),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _pickAvatar() async {
+    try {
+      final XFile? avatar =
+          await _picker.pickImage(source: ImageSource.gallery);
+      if (avatar != null) {
+        setState(() {
+          _avatarFile = avatar;
+          _errors?.remove('avatarFile');
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errors = {'avatarFile': 'Failed to pick Avatar: $e'};
+      });
+    }
   }
 }

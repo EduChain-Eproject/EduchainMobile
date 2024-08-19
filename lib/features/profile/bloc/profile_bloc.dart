@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:educhain/core/auth/bloc/auth_bloc.dart';
 import 'package:educhain/core/models/user.dart';
 import '../profile_service.dart';
-import '../update_user_request.dart';
+import '../models/update_user_request.dart';
 
 part 'profile_event.dart';
 part 'profile_state.dart';

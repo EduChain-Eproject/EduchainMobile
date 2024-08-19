@@ -10,7 +10,7 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl = 'https://9448-118-69-183-66.ngrok-free.app';
+  final String apiUrl = 'https://12bc-118-69-183-66.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -158,8 +158,14 @@ abstract class ApiService {
     Map<String, dynamic>? data,
   ) async {
     return _performApiCall<T>(
-      (headers) => http.delete(Uri.parse('$apiUrl/$endpoint'),
-          headers: headers, body: data),
+      (headers) => http.delete(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        body: data != null ? jsonEncode(data) : null,
+      ),
       (data) {
         if (data is Map<String, dynamic> && fromJson != null) {
           return fromJson(data);

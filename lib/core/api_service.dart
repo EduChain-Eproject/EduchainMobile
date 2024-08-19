@@ -72,13 +72,16 @@ abstract class ApiService {
         headers: headers,
         body: jsonEncode(data),
       ),
-      (data) {
-        if (data is Map<String, dynamic> && fromJson != null) {
-          return fromJson(data);
-        } else {
-          throw FormatException('Expected list but got ${data.runtimeType}');
-        }
-      },
+      fromJson != null
+          ? (data) {
+              if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                    'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
     );
   }
 
@@ -158,21 +161,18 @@ abstract class ApiService {
     Map<String, dynamic>? data,
   ) async {
     return _performApiCall<T>(
-      (headers) => http.delete(
-        Uri.parse('$apiUrl/$endpoint'),
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
-        },
-        body: data != null ? jsonEncode(data) : null,
-      ),
-      (data) {
-        if (data is Map<String, dynamic> && fromJson != null) {
-          return fromJson(data);
-        } else {
-          throw FormatException('Expected list but got ${data.runtimeType}');
-        }
-      },
+      (headers) => http.delete(Uri.parse('$apiUrl/$endpoint'),
+          headers: headers, body: data),
+      fromJson != null
+          ? (data) {
+              if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                    'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
     );
   }
 
@@ -185,22 +185,17 @@ abstract class ApiService {
       var response = await apiCall(headers);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-
         if (fromJson != null) {
-          // Check if responseData is a Map or List
+          final responseData = jsonDecode(response.body);
           if (responseData is List) {
-            // Handle List responses
             return Response(data: fromJson(responseData));
           } else if (responseData is Map) {
-            // Handle Map responses
             return Response(data: fromJson(responseData));
           } else {
-            // Unexpected format
             return Response(error: {'message': 'Unexpected data format'});
           }
         } else {
-          return Response(data: responseData as T);
+          return Response(data: response.body as T);
         }
       } else if (response.statusCode == 403) {
         final newAccessToken = await _refreshToken();

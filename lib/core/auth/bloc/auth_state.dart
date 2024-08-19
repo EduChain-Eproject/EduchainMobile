@@ -22,4 +22,36 @@ class AuthError extends AuthState {
 
 class AuthLoginSuccess extends AuthState {}
 
-class AuthRegisterSuccess extends AuthState {}
+class AuthRegisterSuccess extends AuthState {
+  final String email;
+
+  AuthRegisterSuccess(this.email);
+}
+
+class AuthVerifyCodeSuccess extends AuthState {
+  AuthVerifyCodeSuccess();
+}
+
+class AuthSendResetCodeSuccess extends AuthState {
+  final String email;
+
+  AuthSendResetCodeSuccess(this.email);
+}
+
+class AuthResetSuccess extends AuthState {
+  AuthResetSuccess();
+}
+
+class AuthRegisterError extends AuthState {
+  final Map<String, dynamic>? errors;
+  final String? type;
+
+  AuthRegisterError(this.errors, {this.type});
+}
+
+class AuthResetPasswordError extends AuthState {
+  final Map<String, dynamic>? errors;
+  final String? type;
+
+  AuthResetPasswordError(this.errors, {this.type});
+}

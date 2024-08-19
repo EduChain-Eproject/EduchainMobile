@@ -1,10 +1,10 @@
 class UpdateQuestionRequest {
   final String questionText;
-  final int? correctAnswerId;
+  final int correctAnswerId;
 
   UpdateQuestionRequest({
     required this.questionText,
-    this.correctAnswerId,
+    required this.correctAnswerId,
   });
 
   Map<String, dynamic> toJson() {

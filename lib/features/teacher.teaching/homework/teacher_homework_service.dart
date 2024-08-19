@@ -43,9 +43,8 @@ class TeacherHomeworkService extends ApiService {
     );
   }
 
-  ApiResponse<Homework> deleteHomework(int homeworkId) {
-    return delete<Homework>(
-        'TEACHER/api/homework/delete/$homeworkId', Homework.fromJson, null);
+  ApiResponse<int> deleteHomework(int homeworkId) {
+    return delete<int>('TEACHER/api/homework/delete/$homeworkId', null, null);
   }
 
   ApiResponse<Question> createQuestion(CreateQuestionRequest request) {
@@ -65,9 +64,8 @@ class TeacherHomeworkService extends ApiService {
     );
   }
 
-  ApiResponse<Question> deleteQuestion(int questionId) {
-    return delete<Question>(
-        'TEACHER/api/question/delete/$questionId', Question.fromJson, null);
+  ApiResponse<int> deleteQuestion(int questionId) {
+    return delete<int>('TEACHER/api/question/delete/$questionId', null, null);
   }
 
   ApiResponse<Answer> updateAnswer(int answerId, UpdateAnswerRequest request) {

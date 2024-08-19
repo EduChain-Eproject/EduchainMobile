@@ -16,6 +16,24 @@ class RegisterRequested extends AuthEvent {
   RegisterRequested(this.request);
 }
 
+class VerifyRegisterCode extends AuthEvent {
+  final VerifyRegisterCodeRequest request;
+
+  VerifyRegisterCode(this.request);
+}
+
+class SendResetPasswordCode extends AuthEvent {
+  final SendCodeRequest request;
+
+  SendResetPasswordCode(this.request);
+}
+
+class ResetPassword extends AuthEvent {
+  final ResetPasswordRequest request;
+
+  ResetPassword(this.request);
+}
+
 class LogOutRequested extends AuthEvent {}
 
 class UserUpdated extends AuthEvent {

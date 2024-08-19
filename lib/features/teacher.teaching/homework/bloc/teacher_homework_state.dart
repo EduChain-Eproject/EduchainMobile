@@ -22,11 +22,24 @@ class TeacherHomeworkDetailLoading extends TeacherHomeworkState {
   TeacherHomeworkDetailLoading(this.homeworkId);
 }
 
+class TeacherHomeworkDetailLoaded extends TeacherHomeworkState {
+  final Homework homework;
+  TeacherHomeworkDetailLoaded(this.homework);
+}
+
+class TeacherHomeworkDetailError extends TeacherHomeworkState {
+  final Map<String, dynamic>? errors;
+
+  TeacherHomeworkDetailError(this.errors);
+}
+
 class TeacherHomeworkSaving extends TeacherHomeworkState {}
 
 class TeacherHomeworkSaved extends TeacherHomeworkState {
   final Homework homework;
-  TeacherHomeworkSaved(this.homework);
+  final String? status;
+
+  TeacherHomeworkSaved(this.homework, {this.status});
 }
 
 class TeacherHomeworkSaveError extends TeacherHomeworkState {
@@ -35,41 +48,19 @@ class TeacherHomeworkSaveError extends TeacherHomeworkState {
   TeacherHomeworkSaveError(this.errors);
 }
 
-class TeacherHomeworkDeleting extends TeacherHomeworkState {}
-
-class TeacherHomeworkDeleted extends TeacherHomeworkState {
-  final int homeworkId;
-  TeacherHomeworkDeleted(this.homeworkId);
-}
-
-class TeacherHomeworkDeleteError extends TeacherHomeworkState {
-  final Map<String, dynamic>? errors;
-  TeacherHomeworkDeleteError(this.errors);
-}
-
 class TeacherQuestionSaving extends TeacherHomeworkState {}
 
 class TeacherQuestionSaved extends TeacherHomeworkState {
   final Question question;
-  TeacherQuestionSaved(this.question);
+  final String? status;
+
+  TeacherQuestionSaved(this.question, {this.status});
 }
 
 class TeacherQuestionSaveError extends TeacherHomeworkState {
   final Map<String, dynamic>? errors;
 
   TeacherQuestionSaveError(this.errors);
-}
-
-class TeacherQuestionDeleting extends TeacherHomeworkState {}
-
-class TeacherQuestionDeleted extends TeacherHomeworkState {
-  final int questionId;
-  TeacherQuestionDeleted(this.questionId);
-}
-
-class TeacherQuestionDeleteError extends TeacherHomeworkState {
-  final Map<String, dynamic>? errors;
-  TeacherQuestionDeleteError(this.errors);
 }
 
 class TeacherAnswerSaving extends TeacherHomeworkState {}

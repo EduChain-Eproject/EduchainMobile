@@ -29,22 +29,19 @@ class TeacherDeleteHomework extends TeacherHomeworkEvent {
 }
 
 class TeacherCreateQuestion extends TeacherHomeworkEvent {
-  final int homeworkId;
   final CreateQuestionRequest request;
-  TeacherCreateQuestion(this.request, this.homeworkId);
+  TeacherCreateQuestion(this.request);
 }
 
 class TeacherUpdateQuestion extends TeacherHomeworkEvent {
-  final int homeworkId;
   final int questionId;
   final UpdateQuestionRequest request;
-  TeacherUpdateQuestion(this.questionId, this.request, this.homeworkId);
+  TeacherUpdateQuestion(this.questionId, this.request);
 }
 
 class TeacherDeleteQuestion extends TeacherHomeworkEvent {
-  final int homeworkId;
   final int questionId;
-  TeacherDeleteQuestion(this.questionId, this.homeworkId);
+  TeacherDeleteQuestion(this.questionId);
 }
 
 class TeacherUpdateAnswer extends TeacherHomeworkEvent {

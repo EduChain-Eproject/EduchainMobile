@@ -28,7 +28,7 @@ class ValidatedTextField extends StatelessWidget {
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
-      onChanged: onChanged, // Handle onChanged callback
+      onChanged: onChanged,
     );
   }
 }

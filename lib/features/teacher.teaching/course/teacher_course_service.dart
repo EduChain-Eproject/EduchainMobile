@@ -82,30 +82,33 @@ class TeacherCourseService extends ApiService {
     );
   }
 
-  ApiResponse<Chapter> deleteChapter(int chapterId) async {
-    return delete<Chapter>('TEACHER/api/chapter/delete/$chapterId',
-        (json) => Chapter.fromJson(json), null);
+  ApiResponse<int> deleteChapter(int chapterId) async {
+    return delete<int>('TEACHER/api/chapter/delete/$chapterId', null, null);
   }
 
   ApiResponse<Lesson> createLesson(CreateLessonRequest request) async {
-    return post<Lesson>(
+    return postMultipart<Lesson>(
       'TEACHER/api/lesson/create',
       (json) => Lesson.fromJson(json),
-      request.toJson(),
+      request.toFormFields(),
+      request.file(),
+      "videoFile",
     );
   }
 
   ApiResponse<Lesson> updateLesson(
       int lessonId, UpdateLessonRequest request) async {
-    return put<Lesson>(
+    return postMultipart<Lesson>(
       'TEACHER/api/lesson/update/$lessonId',
       (json) => Lesson.fromJson(json),
-      request.toJson(),
+      request.toFormFields(),
+      request.file(),
+      "videoFile",
+      method: "PUT",
     );
   }
 
-  ApiResponse<Lesson> deleteLesson(int lessonId) async {
-    return delete<Lesson>('TEACHER/api/lesson/delete/$lessonId',
-        (json) => Lesson.fromJson(json), null);
+  ApiResponse<int> deleteLesson(int lessonId) async {
+    return delete<int>('TEACHER/api/lesson/delete/$lessonId', null, null);
   }
 }

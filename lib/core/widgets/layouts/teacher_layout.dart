@@ -75,10 +75,6 @@ class _TeacherLayoutState extends State<TeacherLayout> {
               icon: Icon(Icons.person),
               label: 'Profile',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.telegram),
-              label: 'test',
-            ),
           ],
         ));
   }

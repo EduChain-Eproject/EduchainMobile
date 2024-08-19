@@ -1,8 +1,11 @@
+import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/lesson.dart';
+import 'package:educhain/features/student.learning/lesson/widgets/video_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 import '../blocs/course/teacher_course_bloc.dart';
 import '../models/create_lesson_request.dart';
@@ -24,9 +27,13 @@ class LessonDialog extends StatefulWidget {
 
 class _LessonDialogState extends State<LessonDialog> {
   final _formKey = GlobalKey<FormState>();
+  late bool isUpdating;
+
+  late VideoPlayerController _controller;
+  String? _videoError;
+
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  late TextEditingController _videoUrlController;
   Map<String, dynamic>? _errors;
 
   final ImagePicker _picker = ImagePicker();
@@ -35,12 +42,31 @@ class _LessonDialogState extends State<LessonDialog> {
   @override
   void initState() {
     super.initState();
+    isUpdating = widget.initialLesson != null ? true : false;
+    if (widget.initialLesson?.videoURL != null) {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(
+          "${ApiService.apiUrl}/uploadsVideo/${widget.initialLesson!.videoURL}"))
+        ..initialize().then((_) {
+          setState(() {});
+        }).catchError((error) {
+          setState(() {
+            _videoError = 'Error initializing video player: $error';
+          });
+          print('Error initializing video player: $error');
+        });
+    } else {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(""));
+    }
     _titleController =
         TextEditingController(text: widget.initialLesson?.lessonTitle);
     _descriptionController =
         TextEditingController(text: widget.initialLesson?.description);
-    _videoUrlController =
-        TextEditingController(text: widget.initialLesson?.videoURL);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -60,6 +86,23 @@ class _LessonDialogState extends State<LessonDialog> {
                   style: const TextStyle(color: Colors.red),
                 ),
               ),
+            if (_videoError != null)
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                color: Colors.redAccent,
+                child: Text(
+                  _videoError!,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            _controller.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
+                  )
+                : Container(),
+            if (_controller.value.isInitialized)
+              VideoControls(controller: _controller),
             TextFormField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -86,17 +129,15 @@ class _LessonDialogState extends State<LessonDialog> {
             SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    _videoFile == null
-                        ? 'No video selected'
-                        : 'Video selected: ${_videoFile!.name}',
-                    style: const TextStyle(fontSize: 16),
+                if (_videoFile != null)
+                  const Text(
+                    'Video selected!',
+                    style: TextStyle(fontSize: 16),
                   ),
-                ),
                 ElevatedButton(
                   onPressed: _pickVideo,
-                  child: const Text('Pick Video'),
+                  child: Text(
+                      'Pick ${(_videoFile != null) ? "Another" : "Video"}'),
                 ),
               ],
             ),
@@ -126,34 +167,29 @@ class _LessonDialogState extends State<LessonDialog> {
 
   void _saveLesson() {
     if (_formKey.currentState?.validate() ?? false) {
-      final lesson = Lesson(
-        id: widget.initialLesson?.id,
-        lessonTitle: _titleController.text,
-        description: _descriptionController.text,
-        videoURL: _videoUrlController.text,
-      );
-
-      // Dispatch save event
+      if (!isUpdating && _videoFile == null) {
+        setState(() {
+          _errors = {'videoFile': 'Video file is required! '};
+        });
+        return;
+      }
       context.read<TeacherCourseBloc>().add(
             widget.initialLesson == null
                 ? TeacherCreateLesson(
                     CreateLessonRequest(
                       chapterId: widget.chapter.id!,
-                      lessonTitle: lesson.lessonTitle!,
-                      description: lesson.description!,
-                      videoTitle: lesson.videoTitle!,
-                      videoURL: lesson.videoURL!,
+                      lessonTitle: _titleController.text,
+                      description: _descriptionController.text,
                       videoFile: _videoFile,
                     ),
                   )
                 : TeacherUpdateLesson(
-                    lesson.id!,
+                    widget.initialLesson?.id ?? 0,
                     UpdateLessonRequest(
                       chapterId: widget.chapter.id!,
-                      lessonTitle: lesson.lessonTitle!,
-                      description: lesson.description!,
-                      videoTitle: lesson.videoTitle!,
-                      videoURL: lesson.videoURL!,
+                      lessonTitle: _titleController.text,
+                      description: _descriptionController.text,
+                      videoFile: _videoFile,
                     ),
                   ),
           );
@@ -177,7 +213,7 @@ class _LessonDialogState extends State<LessonDialog> {
       if (video != null) {
         setState(() {
           _videoFile = video;
-          _errors?.remove('videoFile'); // Clear any previous video error
+          _errors?.remove('videoFile');
         });
       }
     } catch (e) {

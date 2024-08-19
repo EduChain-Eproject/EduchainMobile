@@ -45,7 +45,7 @@ class _TeacherCourseFormScreenState extends State<TeacherCourseFormScreen> {
   XFile? _selectedAvatar;
   late List<int> _selectedCategoryIds;
 
-  Map<String, dynamic> _errors = {};
+  final Map<String, dynamic> _errors = {};
 
   @override
   void initState() {

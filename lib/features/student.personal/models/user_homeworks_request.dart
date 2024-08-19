@@ -1,10 +1,10 @@
 class UserHomeworksRequest {
   final bool isSubmitted;
-  final int page;
+  final int? page;
 
   UserHomeworksRequest({
     required this.isSubmitted,
-    required this.page,
+    this.page,
   });
 
   Map<String, dynamic> toJson() {

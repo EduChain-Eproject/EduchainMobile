@@ -5,7 +5,7 @@ class UserCourse {
   final int? id;
   final User? userDto;
   final Course? courseDto;
-  // final DateTime? enrollmentDate;
+  final DateTime? createdAt;
   final CompletionStatus? completionStatus;
   final double? progress;
 
@@ -13,7 +13,7 @@ class UserCourse {
     this.id,
     this.userDto,
     this.courseDto,
-    // this.enrollmentDate,
+    this.createdAt,
     this.completionStatus,
     this.progress,
   });
@@ -27,13 +27,31 @@ class UserCourse {
       courseDto: json['courseDto'] != null
           ? Course.fromJson(json['courseDto'] as Map<String, dynamic>)
           : null,
-      // enrollmentDate: json['enrollmentDate'] != null
-      //     ? DateTime.tryParse(json['enrollmentDate'] as String)
-      //     : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int)
+          : null,
       completionStatus: json['completionStatus'] != null
           ? completionStatusFromJson(json['completionStatus'] as String)
           : null,
       progress: (json['progress'] as num?)?.toDouble(),
+    );
+  }
+
+  UserCourse copyWith({
+    int? id,
+    User? userDto,
+    Course? courseDto,
+    DateTime? createdAt,
+    CompletionStatus? completionStatus,
+    double? progress,
+  }) {
+    return UserCourse(
+      id: id ?? this.id,
+      userDto: userDto ?? this.userDto,
+      courseDto: courseDto ?? this.courseDto,
+      createdAt: createdAt ?? this.createdAt,
+      completionStatus: completionStatus ?? this.completionStatus,
+      progress: progress ?? this.progress,
     );
   }
 }

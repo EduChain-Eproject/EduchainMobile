@@ -1,5 +1,7 @@
 import 'package:educhain/features/blog/bloc/blog_bloc.dart';
 import 'package:educhain/features/blog/blog_service.dart';
+import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
+import 'package:educhain/features/student.personal/student_personal_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,6 +44,10 @@ Future<void> initDependencies() async {
   getIt.registerSingleton<StudentHomeService>(StudentHomeService());
   getIt.registerFactory<StudentHomeBloc>(
       () => StudentHomeBloc(getIt<StudentHomeService>()));
+
+  getIt.registerSingleton<StudentPersonalService>(StudentPersonalService());
+  getIt.registerFactory<PersonalBloc>(
+      () => PersonalBloc(getIt<StudentPersonalService>()));
 
   getIt.registerSingleton<CourseService>(CourseService());
   getIt.registerFactory<CategoriesBloc>(

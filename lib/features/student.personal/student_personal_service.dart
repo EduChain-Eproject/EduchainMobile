@@ -53,6 +53,10 @@ class StudentPersonalService extends ApiService {
 
   ApiResponse<bool> removeUserInterest(
       AddOrDeleteInterestRequest request) async {
-    return delete('STUDENT/delete-wishlist', null, request.toJson());
+    return delete<bool>(
+      'STUDENT/delete-wishlist',
+      (data) => data['success'] ?? false,
+      request.toJson(),
+    );
   }
 }

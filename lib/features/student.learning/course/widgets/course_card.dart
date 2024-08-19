@@ -62,7 +62,7 @@ class CourseCard extends StatelessWidget {
                 children: [
                   if (course.currentUserCourse != null)
                     Text(
-                      'Completed ${(course.currentUserCourse!.progress! * 100).toStringAsFixed(1)}%',
+                      'Completed ${(course.currentUserCourse?.progress ?? 0 * 100).toStringAsFixed(1)}%',
                       style: const TextStyle(fontSize: 12),
                     ),
                   Text(

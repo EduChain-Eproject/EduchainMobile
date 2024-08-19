@@ -1,3 +1,4 @@
+import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -23,8 +24,8 @@ class _LessonDetailContentState extends State<LessonDetailContent> {
   void initState() {
     super.initState();
     if (widget.lesson.videoURL != null) {
-      _controller = VideoPlayerController.networkUrl(
-          Uri.parse(widget.lesson.videoURL ?? ""))
+      _controller = VideoPlayerController.networkUrl(Uri.parse(
+          '${ApiService.apiUrl}/uploadsVideo/${widget.lesson.videoURL}'))
         ..initialize().then((_) {
           setState(() {});
         }).catchError((error) {

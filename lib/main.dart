@@ -1,3 +1,4 @@
+import 'package:educhain/features/blog/bloc/blog_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => getIt<TeacherHomeworkBloc>(),
         ),
+        BlocProvider(create: (context) => getIt<BlogBloc>())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

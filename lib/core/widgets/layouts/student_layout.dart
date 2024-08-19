@@ -1,3 +1,4 @@
+import 'package:educhain/features/blog/screens/list_blogs_screen.dart';
 import 'package:educhain/features/profile/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -47,9 +48,10 @@ class _StudentLayoutState extends State<StudentLayout> {
             });
           },
           children: [
-            const StudentHomeScreen(),
+            StudentHomeScreen(),
             CourseListScreen(selectedCategory: widget.selectedCategory),
-            const ProfileScreen(),
+            BlogListScreen(),
+            ProfileScreen(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -70,6 +72,10 @@ class _StudentLayoutState extends State<StudentLayout> {
             BottomNavigationBarItem(
               icon: Icon(Icons.list),
               label: 'Courses',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book),
+              label: 'Blog',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

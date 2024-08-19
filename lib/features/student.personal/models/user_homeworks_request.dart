@@ -1,9 +1,9 @@
 class UserHomeworksRequest {
-  final bool? isSubmitted;
+  final bool isSubmitted;
   final int page;
 
   UserHomeworksRequest({
-    this.isSubmitted,
+    required this.isSubmitted,
     required this.page,
   });
 

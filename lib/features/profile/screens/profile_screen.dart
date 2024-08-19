@@ -1,4 +1,5 @@
 import 'package:educhain/core/models/user.dart';
+import 'package:educhain/core/widgets/layouts/teacher_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,12 +45,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   title: Text('Address'),
                   subtitle: Text(user.address ?? 'N/A'),
                 ),
-                // Display different content based on user role
+
                 if (user.role == 'STUDENT') ...[
+                  ListTile(
+                    title: Text('My Courses'),
+                    onTap: () {
+                      // Navigate to user's course screen
+                    },
+                  ),
+                  ListTile(
+                    title: Text('My Wishlist'),
+                    onTap: () {
+                      // Navigate to user's interest screen
+                    },
+                  ),
                   ListTile(
                     title: Text('My Homeworks'),
                     onTap: () {
                       // Navigate to user's homework screen
+                    },
+                  ),
+                  ListTile(
+                    title: Text('My Awards'),
+                    onTap: () {
+                      // Navigate to user's award screen
                     },
                   ),
                   // Add other student-specific links
@@ -57,7 +76,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ListTile(
                     title: Text('My Courses'),
                     onTap: () {
-                      // Navigate to teacher's courses screen
+                      Navigator.push(
+                          context, TeacherLayout.route(initialPage: 1));
                     },
                   ),
                   // Add other teacher-specific links

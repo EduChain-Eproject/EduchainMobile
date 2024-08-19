@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/blog.dart';
 import 'package:educhain/core/models/blog_category.dart';
+import 'package:educhain/core/models/blog_comment.dart';
 import 'package:educhain/core/types/api_response.dart';
 import 'package:educhain/core/types/page.dart';
+import 'package:educhain/features/blog/models/blogComment/create_comment_request.dart';
 import 'package:educhain/features/blog/models/create_blog_request.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
 import 'package:educhain/features/blog/models/get_list_blogs_request.dart';
@@ -64,6 +66,15 @@ class BlogService extends ApiService {
       request.file(),
       "photo",
       method: "PUT",
+    );
+  }
+
+  ApiResponse<BlogComment> createComment(
+      CreateBlogCommentRequest request) async {
+    return post<BlogComment>(
+      'api/blog_comment/create',
+      (json) => BlogComment.fromJson(json),
+      request.toJson(),
     );
   }
 }

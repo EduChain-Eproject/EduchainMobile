@@ -4,6 +4,7 @@ import 'package:educhain/core/models/blog_category.dart';
 import 'package:educhain/core/models/blog_comment.dart';
 import 'package:educhain/core/types/page.dart';
 import 'package:educhain/features/blog/blog_service.dart';
+import 'package:educhain/features/blog/models/blogComment/create_comment_request.dart';
 import 'package:educhain/features/blog/models/create_blog_request.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
 import 'package:educhain/features/blog/models/get_list_blogs_request.dart';
@@ -100,6 +101,52 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
           emit(BlogUpdated(blog));
         },
         onError: (error) => emit(BlogUpdateError(error)),
+      );
+    });
+
+    List<BlogComment> _addCommentToList(
+      List<BlogComment> comments,
+      BlogComment newComment,
+      String? parentCommentId,
+    ) {
+      if (parentCommentId == null) {
+        return [...comments, newComment];
+      } else {
+        return comments.map((comment) {
+          if (comment.id == parentCommentId) {
+            final updatedReplies = [...?comment.replies, newComment];
+            return comment.copyWith(replies: updatedReplies);
+          } else if (comment.replies != null) {
+            final updatedReplies = _addCommentToList(
+                comment.replies!, newComment, parentCommentId);
+            return comment.copyWith(replies: updatedReplies);
+          } else {
+            return comment;
+          }
+        }).toList();
+      }
+    }
+
+    on<CreateBlogComment>((event, emit) async {
+      emit(BlogCommentSaving());
+      final response = await blogService.createComment(event.request);
+      await response.on(
+        onSuccess: (blogComment) {
+          if (state is BlogDetailLoaded) {
+            final currentState = state as BlogDetailLoaded;
+            final updatedComments = _addCommentToList(
+              currentState.blog.blogComments ?? [],
+              blogComment,
+              event.request.parentCommentId,
+            );
+            final updatedBlog = currentState.blog.copyWith(
+              blogComments: updatedComments,
+            );
+            emit(BlogDetailLoaded(updatedBlog));
+          }
+          emit(BlogCommentSaved(blogComment));
+        },
+        onError: (error) => emit(BlogCommentSaveError(error)),
       );
     });
   }

@@ -95,7 +95,7 @@ class BlogDetailScreen extends StatelessWidget {
               ],
               if (blog.blogComments != null &&
                   blog.blogComments!.isNotEmpty) ...[
-                CommentSection(comments: blog.blogComments!),
+                CommentSection(comments: blog.blogComments!, blogId: blog.id!),
               ],
             ],
           ),

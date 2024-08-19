@@ -4,6 +4,8 @@ abstract class BlogState {}
 
 class BlogInitial extends BlogState {}
 
+// BlogCategogry
+
 class BlogCategoriesLoading extends BlogState {}
 
 class BlogCategoriesLoaded extends BlogState {
@@ -16,6 +18,8 @@ class BlogCategoriesError extends BlogState {
 
   BlogCategoriesError(this.errors);
 }
+
+//Blogs
 
 class BlogsLoading extends BlogState {}
 
@@ -41,19 +45,6 @@ class BlogDetailError extends BlogState {
   final Map<String, dynamic>? errors;
 
   BlogDetailError(this.errors);
-}
-
-class BlogCommentsLoading extends BlogState {}
-
-class BlogCommentsLoaded extends BlogState {
-  final List<BlogComment> blogComments;
-  BlogCommentsLoaded(this.blogComments);
-}
-
-class BlogCommentsError extends BlogState {
-  final Map<String, dynamic>? errors;
-
-  BlogCommentsError(this.errors);
 }
 
 class BlogSaving extends BlogState {}
@@ -96,4 +87,20 @@ class BlogUpdateError extends BlogState {
   final Map<String, dynamic>? errors;
 
   BlogUpdateError(this.errors);
+}
+
+// BlogComment
+
+class BlogCommentSaving extends BlogState {}
+
+class BlogCommentSaved extends BlogState {
+  final BlogComment blogComment;
+
+  BlogCommentSaved(this.blogComment);
+}
+
+class BlogCommentSaveError extends BlogState {
+  final Map<String, dynamic>? errors;
+
+  BlogCommentSaveError(this.errors);
 }

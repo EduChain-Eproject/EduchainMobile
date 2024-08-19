@@ -2,6 +2,12 @@ part of 'blog_bloc.dart';
 
 abstract class BlogEvent {}
 
+// BlogCategory
+
+class FetchBlogCategories extends BlogEvent {}
+
+// Blog
+
 class FetchBlogs extends BlogEvent {
   final ListBlogRequest request;
   final bool isLoadingMore;
@@ -21,8 +27,6 @@ class FilterBlogs extends BlogEvent {
   FilterBlogs(this.blogFilterRequest);
 }
 
-class FetchBlogCategories extends BlogEvent {}
-
 class CreateBlog extends BlogEvent {
   final CreateBlogRequest request;
 
@@ -40,4 +44,12 @@ class DeleteBlog extends BlogEvent {
   final int blogId;
 
   DeleteBlog(this.blogId);
+}
+
+// BlogComment
+
+class CreateBlogComment extends BlogEvent {
+  final CreateBlogCommentRequest request;
+
+  CreateBlogComment(this.request);
 }

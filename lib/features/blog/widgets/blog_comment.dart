@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:educhain/core/models/blog_comment.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:educhain/features/blog/bloc/blog_bloc.dart';
+import 'package:educhain/features/blog/models/blogComment/create_comment_request.dart';
 
-class CommentSection extends StatelessWidget {
+class CommentSection extends StatefulWidget {
   final List<BlogComment> comments;
+  final int blogId; // Add this line to define the blogId parameter
 
-  const CommentSection({Key? key, required this.comments}) : super(key: key);
+  const CommentSection({Key? key, required this.comments, required this.blogId})
+      : super(key: key); // Update the constructor
+
+  @override
+  _CommentSectionState createState() => _CommentSectionState();
+}
+
+class _CommentSectionState extends State<CommentSection> {
+  final TextEditingController _commentController = TextEditingController();
+  int? _parentCommentId;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +25,7 @@ class CommentSection extends StatelessWidget {
     final repliesMap = <int, List<BlogComment>>{};
 
     // Separate comments into parent comments and replies
-    for (var comment in comments) {
+    for (var comment in widget.comments) {
       if (comment.parentCommentId == null) {
         parentComments.add(comment);
       } else {
@@ -31,15 +44,16 @@ class CommentSection extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         SizedBox(height: 8.0),
-        // Use a Container with a fixed height to constrain the ListView
         Container(
-          height: 400.0, // Adjust the height as needed
+          height: 400.0,
           child: ListView(
             children: parentComments.map((comment) {
               return _buildComment(comment, repliesMap, context, 0);
             }).toList(),
           ),
         ),
+        SizedBox(height: 16.0),
+        _buildCommentInputSection(context),
       ],
     );
   }
@@ -54,21 +68,16 @@ class CommentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Comment user info
           Text(
             comment.user?.firstName ?? 'Unknown User',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           SizedBox(height: 4.0),
-
-          // Comment text
           Text(
             comment.text ?? 'No Content',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           SizedBox(height: 4.0),
-
-          // Display replies if they exist
           if (repliesMap.containsKey(comment.id)) ...[
             Padding(
               padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
@@ -80,8 +89,60 @@ class CommentSection extends StatelessWidget {
               ),
             ),
           ],
+          SizedBox(height: 8.0),
+          _buildReplyButton(comment.id!),
         ],
       ),
     );
+  }
+
+  Widget _buildReplyButton(int commentId) {
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          _parentCommentId = commentId;
+        });
+      },
+      child: Text('Reply'),
+    );
+  }
+
+  Widget _buildCommentInputSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _commentController,
+          decoration: InputDecoration(
+            labelText: 'Add a comment...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        SizedBox(height: 8.0),
+        ElevatedButton(
+          onPressed: () {
+            _submitComment(context);
+          },
+          child: Text('Post Comment'),
+        ),
+      ],
+    );
+  }
+
+  void _submitComment(BuildContext context) {
+    if (_commentController.text.isNotEmpty) {
+      final request = CreateBlogCommentRequest(
+        text: _commentController.text,
+        parentCommentId: _parentCommentId?.toString(),
+        blogId: widget.blogId,
+      );
+
+      context.read<BlogBloc>().add(CreateBlogComment(request));
+
+      _commentController.clear();
+      setState(() {
+        _parentCommentId = null;
+      });
+    }
   }
 }

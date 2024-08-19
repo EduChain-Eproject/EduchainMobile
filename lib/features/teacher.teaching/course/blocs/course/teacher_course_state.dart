@@ -50,8 +50,9 @@ class TeacherChapterSaving extends TeacherCourseState {}
 
 class TeacherChapterSaved extends TeacherCourseState {
   final Chapter chapter;
+  final String? status;
 
-  TeacherChapterSaved(this.chapter);
+  TeacherChapterSaved(this.chapter, {this.status});
 }
 
 class TeacherChapterSaveError extends TeacherCourseState {
@@ -64,8 +65,9 @@ class TeacherLessonSaving extends TeacherCourseState {}
 
 class TeacherLessonSaved extends TeacherCourseState {
   final Lesson lesson;
+  final String? status;
 
-  TeacherLessonSaved(this.lesson);
+  TeacherLessonSaved(this.lesson, {this.status});
 }
 
 class TeacherLessonSaveError extends TeacherCourseState {

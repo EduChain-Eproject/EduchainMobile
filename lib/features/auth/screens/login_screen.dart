@@ -4,32 +4,55 @@ import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/types/text_field_model.dart';
 import 'package:educhain/core/widgets/unauthenticated_widget.dart';
 import 'package:educhain/features/auth/screens/register_screen.dart';
+import 'package:educhain/features/auth/screens/reset_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/widgets/validated_text_field.dart';
-
 class LoginScreen extends StatefulWidget {
-  static route() => MaterialPageRoute(
-        builder: (context) => const UnauthenticatedWidget(child: LoginScreen()),
+  static MaterialPageRoute route({String? email}) => MaterialPageRoute(
+        builder: (context) =>
+            UnauthenticatedWidget(child: LoginScreen(email: email)),
       );
-  const LoginScreen({super.key});
+
+  final String? email;
+
+  const LoginScreen({super.key, this.email});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final List<TextFieldModel> _textFields = [
-    'Email',
-    'Password',
-  ]
-      .map((label) => label == 'Password'
-          ? TextFieldModel(label: label, obscureText: true)
-          : TextFieldModel(label: label))
-      .toList();
-
+  late final List<TextFieldModel> _textFields;
   String message = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _textFields = [
+      TextFieldModel(
+        label: 'Email',
+      ),
+      TextFieldModel(label: 'Password', obscureText: true),
+    ];
+    if (widget.email != null) {
+      _textFields[0].controller.text = widget.email!;
+    }
+  }
+
+  void _clearError(TextFieldModel field) {
+    setState(() {
+      field.errorText = null;
+    });
+  }
+
+  void _onLoginPressed() {
+    final loginRequest = LoginRequest(
+      email: _textFields[0].controller.text,
+      password: _textFields[1].controller.text,
+    );
+    context.read<AuthBloc>().add(LoginRequested(loginRequest));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +61,11 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is AuthError) {
             setState(() {
-              message = state.errors?['message'];
+              // message = state.errors?['message'] ?? 'An error occurred';
               for (var field in _textFields) {
                 field.errorText = state.errors?[field.camelLabel];
               }
             });
-          } else if (state is AuthLoginSuccess) {
-            // Handle successful login if needed
           }
         },
         builder: (context, state) {
@@ -53,49 +74,34 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           return Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(children: [
-              const SizedBox(height: 150),
-              Text(
-                message,
-                style: const TextStyle(color: AppPallete.lightErrorColor),
-              ),
-              ..._textFields.map<Widget>((field) {
-                return ValidatedTextField(
-                  controller: field.controller,
-                  label: field.label,
-                  errorText: field.errorText,
-                  obscureText: field.obscureText,
-                  keyboardType: field.keyboardType,
-                  onChanged: (value) {
-                    setState(() {
-                      field.errorText = null;
-                    });
-                  },
-                );
-              }).toList()
-                ..add(const SizedBox(height: 20))
-                ..add(
-                  ElevatedButton(
-                    onPressed: () {
-                      final loginRequest = LoginRequest(
-                        email: _textFields[0].controller.text, // Email
-                        password: _textFields[1].controller.text, // Password
-                      );
-                      context
-                          .read<AuthBloc>()
-                          .add(LoginRequested(loginRequest));
-                    },
-                    child: const Text('Login'),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (message.isNotEmpty)
+                  Text(
+                    message,
+                    style: const TextStyle(color: AppPallete.lightErrorColor),
                   ),
-                )
-                ..add(
-                  ElevatedButton(
-                    onPressed: () =>
-                        Navigator.push(context, RegisterScreen.route()),
-                    child: const Text("or register"),
-                  ),
+                ..._textFields.map((field) {
+                  return field.generateTextField((_) => _clearError(field));
+                }).toList(),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _onLoginPressed,
+                  child: const Text('Login'),
                 ),
-            ]),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.push(context, RegisterScreen.route()),
+                  child: const Text("or register"),
+                ),
+                ElevatedButton(
+                  onPressed: () =>
+                      Navigator.push(context, ResetPasswordScreen.route()),
+                  child: const Text("Forgot password?"),
+                ),
+              ],
+            ),
           );
         },
       ),

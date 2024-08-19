@@ -10,8 +10,7 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl =
-      'https://e455-2402-800-63b7-9a4e-bd3c-2713-2599-b22d.ngrok-free.app';
+  static const apiUrl = 'https://45d7-118-69-183-66.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -73,13 +72,16 @@ abstract class ApiService {
         headers: headers,
         body: jsonEncode(data),
       ),
-      (data) {
-        if (data is Map<String, dynamic> && fromJson != null) {
-          return fromJson(data);
-        } else {
-          throw FormatException('Expected list but got ${data.runtimeType}');
-        }
-      },
+      fromJson != null
+          ? (data) {
+              if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                    'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
     );
   }
 
@@ -161,13 +163,16 @@ abstract class ApiService {
     return _performApiCall<T>(
       (headers) => http.delete(Uri.parse('$apiUrl/$endpoint'),
           headers: headers, body: data),
-      (data) {
-        if (data is Map<String, dynamic> && fromJson != null) {
-          return fromJson(data);
-        } else {
-          throw FormatException('Expected list but got ${data.runtimeType}');
-        }
-      },
+      fromJson != null
+          ? (data) {
+              if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                    'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
     );
   }
 
@@ -180,22 +185,17 @@ abstract class ApiService {
       var response = await apiCall(headers);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-
         if (fromJson != null) {
-          // Check if responseData is a Map or List
+          final responseData = jsonDecode(response.body);
           if (responseData is List) {
-            // Handle List responses
             return Response(data: fromJson(responseData));
           } else if (responseData is Map) {
-            // Handle Map responses
             return Response(data: fromJson(responseData));
           } else {
-            // Unexpected format
             return Response(error: {'message': 'Unexpected data format'});
           }
         } else {
-          return Response(data: responseData as T);
+          return Response(data: response.body as T);
         }
       } else if (response.statusCode == 403) {
         final newAccessToken = await _refreshToken();

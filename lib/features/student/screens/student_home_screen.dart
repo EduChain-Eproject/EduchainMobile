@@ -38,7 +38,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    HeaderWidget(),
+                    const HeaderWidget(),
                     ProgressSection(),
                     CategoryWidget(categories: state.categories),
                     CourseWidget(courses: state.courses),

@@ -86,7 +86,6 @@ class _ChapterDialogState extends State<ChapterDialog> {
         chapterTitle: _titleController.text,
       );
 
-      // Dispatch save event
       context.read<TeacherCourseBloc>().add(
             widget.initialChapter == null
                 ? TeacherCreateChapter(
@@ -103,7 +102,6 @@ class _ChapterDialogState extends State<ChapterDialog> {
                   ),
           );
 
-      // Listen to the bloc state for errors
       context.read<TeacherCourseBloc>().stream.listen((state) {
         if (state is TeacherChapterSaveError) {
           setState(() {

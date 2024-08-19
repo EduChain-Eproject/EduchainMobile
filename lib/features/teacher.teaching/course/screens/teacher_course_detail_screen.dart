@@ -30,7 +30,7 @@ class TeacherCourseDetailScreen extends StatefulWidget {
 }
 
 class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
-  late Course _course;
+  Course? _course;
 
   @override
   void initState() {
@@ -44,18 +44,55 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
       appBar: AppBar(
         title: const Text('Course Detail'),
       ),
-      body: BlocBuilder<TeacherCourseBloc, TeacherCourseState>(
-        builder: (context, state) {
-          if (state is TeacherCourseDetailLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is TeacherCourseDetailError) {
-            return Center(child: Text('Error: ${state.errors?['message']}'));
+      body: BlocConsumer<TeacherCourseBloc, TeacherCourseState>(
+        listener: (context, state) {
+          if (state is TeacherCourseSaved) {
+            setState(() {
+              _course = state.course;
+            });
           } else if (state is TeacherCourseDetailLoaded) {
-            _course = state.courseDetail;
-            return _buildCourseDetail();
-          } else {
-            return const Center(child: Text('No course details available'));
+            setState(() {
+              _course = state.courseDetail;
+            });
+          } else if (state is TeacherChapterSaved) {
+            switch (state.status) {
+              case 'created':
+                _course = _course?.copyWith(
+                  chapterDtos: [...?_course?.chapterDtos, state.chapter],
+                );
+                break;
+              case 'updated':
+                _course = _course?.copyWith(
+                  chapterDtos: _course?.chapterDtos?.map((c) {
+                    return c.id == state.chapter.id ? state.chapter : c;
+                  }).toList(),
+                );
+                break;
+              case 'deleted':
+                _course = _course?.copyWith(
+                  chapterDtos: _course?.chapterDtos?.where((c) {
+                    return c.id != state.chapter.id;
+                  }).toList(),
+                );
+                break;
+            }
           }
+        },
+        builder: (context, state) {
+          return BlocBuilder<TeacherCourseBloc, TeacherCourseState>(
+            builder: (context, state) {
+              if (state is TeacherCourseDetailLoading ||
+                  state is TeacherCourseSaving ||
+                  _course == null) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is TeacherCourseDetailError) {
+                return Center(
+                    child: Text('Error: ${state.errors?['message']}'));
+              } else {
+                return _buildCourseDetail();
+              }
+            },
+          );
         },
       ),
     );
@@ -83,15 +120,15 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
     return Column(
       children: [
         CircleAvatar(
-          backgroundImage: NetworkImage(_course.avatarPath ?? ""),
+          backgroundImage: NetworkImage(_course?.avatarPath ?? ""),
         ),
         Text(
-          _course.title ?? '',
+          _course?.title ?? '',
           style: const TextStyle(
               fontSize: 15, color: AppPallete.lightPrimaryColor),
         ),
         Text(
-          _course.status?.name ?? '',
+          _course?.status?.name ?? '',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         Row(
@@ -101,10 +138,11 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
               child: const Text('Update'),
             ),
             const SizedBox(width: 2),
-            ElevatedButton(
-              onPressed: _deactivateCourse,
-              child: const Text('Deactivate'),
-            ),
+            if (_course?.status == CourseStatus.APPROVED)
+              ElevatedButton(
+                onPressed: _deactivateCourse,
+                child: const Text('Deactivate'),
+              ),
           ],
         )
       ],
@@ -112,14 +150,17 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   }
 
   Widget _buildCourseDescription() {
-    return Text(
-      _course.description ?? '',
-      style: const TextStyle(color: AppPallete.lightGreyColor, fontSize: 12),
-    );
+    return Column(children: [
+      Text(_course?.status?.name ?? ""),
+      Text(
+        _course?.description ?? '',
+        style: const TextStyle(color: AppPallete.lightGreyColor, fontSize: 12),
+      ),
+    ]);
   }
 
   List<Widget> _buildChapterTiles() {
-    return _course.chapterDtos?.map((chapter) {
+    return _course?.chapterDtos?.map((chapter) {
           return ChapterTile(
             chapter: chapter,
             onEditChapter: () => _editChapter(context, chapter),
@@ -146,11 +187,8 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
 
   void _deactivateCourse() {
     context.read<TeacherCourseBloc>().add(
-          TeacherDeactivateCourse(_course.id!),
+          TeacherDeactivateCourse(_course?.id ?? 0),
         );
-    setState(() {
-      _course = _course.copyWith(status: CourseStatus.DEACTIVATED);
-    });
   }
 
   void _editChapter(BuildContext context, Chapter chapter) {
@@ -160,11 +198,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
         initialChapter: chapter,
         course: _course,
       ),
-    ).then((updatedChapter) {
-      if (updatedChapter != null) {
-        _onChapterUpdated(updatedChapter);
-      }
-    });
+    );
   }
 
   void _addChapter(BuildContext context) {
@@ -173,32 +207,12 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
       builder: (context) => ChapterDialog(
         course: _course,
       ),
-    ).then((newChapter) {
-      if (newChapter != null) {
-        setState(() {
-          _course.chapterDtos?.add(newChapter);
-        });
-      }
-    });
+    );
   }
 
   void _deleteChapter(Chapter chapter) {
     context.read<TeacherCourseBloc>().add(
           TeacherDeleteChapter(chapter.id!),
         );
-    setState(() {
-      _course.chapterDtos?.removeWhere((c) => c.id == chapter.id);
-    });
-  }
-
-  void _onChapterUpdated(Chapter updatedChapter) {
-    setState(() {
-      final index = _course.chapterDtos
-              ?.indexWhere((chapter) => chapter.id == updatedChapter.id) ??
-          -1;
-      if (index != -1) {
-        _course.chapterDtos?[index] = updatedChapter;
-      }
-    });
   }
 }

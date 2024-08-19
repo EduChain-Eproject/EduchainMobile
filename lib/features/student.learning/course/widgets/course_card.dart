@@ -1,3 +1,4 @@
+import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/course.dart';
 import 'package:flutter/material.dart';
 
@@ -25,9 +26,11 @@ class CourseCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              Image.network(
+                '${course.avatarPath}',
                 height: 100,
-                color: Colors.grey[200],
+                width: 300,
+                fit: BoxFit.cover,
               ),
               const SizedBox(height: 16),
               Text(
@@ -46,20 +49,22 @@ class CourseCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: course.currentUserCourse?.progress ?? 0,
-                minHeight: 8,
-                backgroundColor: Colors.grey[300],
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-              ),
+              if (course.currentUserCourse != null)
+                LinearProgressIndicator(
+                  value: course.currentUserCourse?.progress ?? 0,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Completed ${course.currentUserCourse != null ? (course.currentUserCourse!.progress! * 100).toStringAsFixed(1) : 0}%',
-                    style: const TextStyle(fontSize: 12),
-                  ),
+                  if (course.currentUserCourse != null)
+                    Text(
+                      'Completed ${(course.currentUserCourse!.progress! * 100).toStringAsFixed(1)}%',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   Text(
                     '$lessonCount Lessons',
                     style: TextStyle(fontSize: 12),

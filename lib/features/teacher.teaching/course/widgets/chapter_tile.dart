@@ -57,50 +57,74 @@ class _ChapterTileState extends State<ChapterTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: Text(widget.chapter.chapterTitle ?? ''),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+    return BlocListener<TeacherCourseBloc, TeacherCourseState>(
+      listener: (context, state) {
+        if (state is TeacherLessonSaved) {
+          switch (state.status) {
+            case 'created':
+              _lessons = [..._lessons, state.lesson];
+
+              break;
+            case 'updated':
+              _lessons = _lessons.map((l) {
+                return l.id == state.lesson.id ? state.lesson : l;
+              }).toList();
+
+              break;
+            case 'deleted':
+              _lessons = _lessons.where((l) {
+                return l.id != state.lesson.id;
+              }).toList();
+
+              break;
+          }
+        }
+      },
+      child: ExpansionTile(
+        title: Text(widget.chapter.chapterTitle ?? ''),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: widget.onEditChapter,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: widget.onDeleteChapter,
+            ),
+          ],
+        ),
         children: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: widget.onEditChapter,
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: widget.onDeleteChapter,
+          ..._lessons.map((lesson) {
+            return ListTile(
+              title: Text(lesson.lessonTitle ?? ''),
+              onTap: () => Navigator.push(
+                context,
+                TeacherListHomeworksByLessonScreen.route(lesson.id ?? 0),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () => _editLesson(context, lesson),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _deleteLesson(lesson),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          ListTile(
+            title: const Text('Add Lesson'),
+            trailing: const Icon(Icons.add),
+            onTap: () => _addLesson(context),
           ),
         ],
       ),
-      children: [
-        ..._lessons.map((lesson) {
-          return ListTile(
-            title: Text(lesson.lessonTitle ?? ''),
-            onTap: () => Navigator.push(
-              context,
-              TeacherListHomeworksByLessonScreen.route(lesson.id ?? 0),
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _editLesson(context, lesson),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () => _deleteLesson(lesson),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-        ListTile(
-          title: const Text('Add Lesson'),
-          trailing: const Icon(Icons.add),
-          onTap: () => _addLesson(context),
-        ),
-      ],
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:educhain/core/auth/models/reset_password_request.dart';
+import 'package:educhain/core/auth/models/send_code_request.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,6 +9,7 @@ import '../types/api_response.dart';
 import '../types/jwt_response.dart';
 import 'models/login_request.dart';
 import 'models/register_request.dart';
+import 'models/verify_register_code_request.dart';
 
 class AuthService extends ApiService {
   ApiResponse<User> getUser(String token) async {
@@ -35,6 +38,18 @@ class AuthService extends ApiService {
     );
 
     return response;
+  }
+
+  ApiResponse<dynamic> verifyCode(VerifyRegisterCodeRequest request) async {
+    return await post('Auth/verify', null, request.toJson());
+  }
+
+  ApiResponse<dynamic> sendResetPasswordCode(SendCodeRequest request) async {
+    return await post("Auth/send_mail", null, request.toJson());
+  }
+
+  ApiResponse<dynamic> resetPassword(ResetPasswordRequest request) async {
+    return await post("Auth/reset_password", null, request.toJson());
   }
 
   ApiResponse<String> logout() async {

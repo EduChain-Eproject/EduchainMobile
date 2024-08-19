@@ -60,11 +60,7 @@ class _HomeworkTileState extends State<HomeworkTile> {
                   state.homeworkId == widget.homework.id) {
                 return const Loader();
               }
-              if (state is TeacherHomeworksLoaded &&
-                  state.lesson.homeworkDtos!
-                      .any((hw) => hw.id == widget.homework.id)) {
-                final detailedHomework = state.lesson.homeworkDtos!
-                    .firstWhere((hw) => hw.id == widget.homework.id);
+              if (state is TeacherHomeworkDetailLoaded) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -72,7 +68,7 @@ class _HomeworkTileState extends State<HomeworkTile> {
                     children: [
                       Text(widget.homework.description ?? 'No description'),
                       const SizedBox(height: 8),
-                      ...?detailedHomework.questionDtos?.map((question) {
+                      ...?widget.homework.questionDtos?.map((question) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Column(
@@ -80,7 +76,8 @@ class _HomeworkTileState extends State<HomeworkTile> {
                             children: [
                               Text(
                                 question.questionText ?? 'No question text',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 4),
                               ...?question.answerDtos?.map((answer) {

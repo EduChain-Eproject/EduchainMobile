@@ -101,14 +101,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
       final response = await teacherCourseService.createChapter(event.request);
       await response.on(
         onSuccess: (chapter) {
-          if (state is TeacherCourseDetailLoaded) {
-            final currentState = state as TeacherCourseDetailLoaded;
-            final updatedCourse = currentState.courseDetail.copyWith(
-              chapterDtos: [...?currentState.courseDetail.chapterDtos, chapter],
-            );
-            emit(TeacherCourseDetailLoaded(updatedCourse));
-          }
-          emit(TeacherChapterSaved(chapter));
+          emit(TeacherChapterSaved(chapter, status: "created"));
         },
         onError: (error) => emit(TeacherChapterSaveError(error)),
       );
@@ -120,18 +113,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           event.chapterId, event.request);
       await response.on(
         onSuccess: (chapter) {
-          if (state is TeacherCourseDetailLoaded) {
-            final currentState = state as TeacherCourseDetailLoaded;
-            final updatedChapters =
-                currentState.courseDetail.chapterDtos?.map((c) {
-              return c.id == chapter.id ? chapter : c;
-            }).toList();
-            final updatedCourse = currentState.courseDetail.copyWith(
-              chapterDtos: updatedChapters,
-            );
-            emit(TeacherCourseDetailLoaded(updatedCourse));
-          }
-          emit(TeacherChapterSaved(chapter));
+          emit(TeacherChapterSaved(chapter, status: "updated"));
         },
         onError: (error) => emit(TeacherChapterSaveError(error)),
       );
@@ -142,19 +124,8 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
       final response =
           await teacherCourseService.deleteChapter(event.chapterId);
       await response.on(
-        onSuccess: (chapter) {
-          if (state is TeacherCourseDetailLoaded) {
-            final currentState = state as TeacherCourseDetailLoaded;
-            final updatedChapters =
-                currentState.courseDetail.chapterDtos?.where((c) {
-              return c.id != chapter.id;
-            }).toList();
-            final updatedCourse = currentState.courseDetail.copyWith(
-              chapterDtos: updatedChapters,
-            );
-            emit(TeacherCourseDetailLoaded(updatedCourse));
-          }
-          emit(TeacherChapterSaved(chapter));
+        onSuccess: (chapterId) {
+          emit(TeacherChapterSaved(Chapter(id: chapterId), status: "deleted"));
         },
         onError: (error) => emit(TeacherChapterSaveError(error)),
       );
@@ -165,21 +136,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
       final response = await teacherCourseService.createLesson(event.request);
       await response.on(
         onSuccess: (lesson) {
-          if (state is TeacherCourseDetailLoaded) {
-            final currentState = state as TeacherCourseDetailLoaded;
-            final updatedChapters =
-                currentState.courseDetail.chapterDtos?.map((c) {
-              if (c.id == lesson.chapterDto?.id) {
-                return c.copyWith(lessonDtos: [...?c.lessonDtos, lesson]);
-              }
-              return c;
-            }).toList();
-            final updatedCourse = currentState.courseDetail.copyWith(
-              chapterDtos: updatedChapters,
-            );
-            emit(TeacherCourseDetailLoaded(updatedCourse));
-          }
-          emit(TeacherLessonSaved(lesson));
+          emit(TeacherLessonSaved(lesson, status: "created"));
         },
         onError: (error) => emit(TeacherLessonSaveError(error)),
       );
@@ -191,21 +148,7 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
           event.lessonId, event.request);
       await response.on(
         onSuccess: (lesson) {
-          if (state is TeacherCourseDetailLoaded) {
-            final currentState = state as TeacherCourseDetailLoaded;
-            final updatedChapters =
-                currentState.courseDetail.chapterDtos?.map((c) {
-              final updatedLessons = c.lessonDtos?.map((l) {
-                return l.id == lesson.id ? lesson : l;
-              }).toList();
-              return c.copyWith(lessonDtos: updatedLessons);
-            }).toList();
-            final updatedCourse = currentState.courseDetail.copyWith(
-              chapterDtos: updatedChapters,
-            );
-            emit(TeacherCourseDetailLoaded(updatedCourse));
-          }
-          emit(TeacherLessonSaved(lesson));
+          emit(TeacherLessonSaved(lesson, status: "updated"));
         },
         onError: (error) => emit(TeacherLessonSaveError(error)),
       );
@@ -215,22 +158,8 @@ class TeacherCourseBloc extends Bloc<TeacherCourseEvent, TeacherCourseState> {
       emit(TeacherLessonSaving());
       final response = await teacherCourseService.deleteLesson(event.lessonId);
       await response.on(
-        onSuccess: (lesson) {
-          if (state is TeacherCourseDetailLoaded) {
-            final currentState = state as TeacherCourseDetailLoaded;
-            final updatedChapters =
-                currentState.courseDetail.chapterDtos?.map((c) {
-              final updatedLessons = c.lessonDtos?.where((l) {
-                return l.id != lesson.id;
-              }).toList();
-              return c.copyWith(lessonDtos: updatedLessons);
-            }).toList();
-            final updatedCourse = currentState.courseDetail.copyWith(
-              chapterDtos: updatedChapters,
-            );
-            emit(TeacherCourseDetailLoaded(updatedCourse));
-          }
-          emit(TeacherLessonSaved(lesson));
+        onSuccess: (lessonId) {
+          emit(TeacherLessonSaved(Lesson(id: lessonId), status: 'deleted'));
         },
         onError: (error) => emit(TeacherLessonSaveError(error)),
       );

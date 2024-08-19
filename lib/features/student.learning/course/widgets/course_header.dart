@@ -17,7 +17,12 @@ class CourseHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          Image.asset('assets/images/product_design.png'),
+          Image.network(
+            '${course.avatarPath}',
+            height: 100,
+            width: 300,
+            fit: BoxFit.cover,
+          ),
           const SizedBox(height: 20),
           if (true)
             const Text(

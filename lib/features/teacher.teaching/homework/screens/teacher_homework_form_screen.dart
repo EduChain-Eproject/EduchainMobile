@@ -28,9 +28,8 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  late bool _isUpdate;
+  late bool _isUpdating;
   late List<Question> _questions;
-  bool _homeworkSaved = false;
 
   @override
   void initState() {
@@ -38,125 +37,140 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
     _titleController = TextEditingController(text: widget.homework?.title);
     _descriptionController =
         TextEditingController(text: widget.homework?.description);
-    _isUpdate = widget.homework != null;
+    _isUpdating = widget.homework != null;
     _questions = widget.homework?.questionDtos ?? [];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isUpdate ? 'Edit Homework' : 'Create Homework'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveHomework,
-                child: Text(_isUpdate ? 'Update Homework' : 'Create Homework'),
-              ),
-              if (_homeworkSaved || _isUpdate) ...[
-                const SizedBox(height: 20),
-                Text('Questions',
-                    style: Theme.of(context).textTheme.headlineSmall),
-                ..._questions.map((question) => ListTile(
-                      title: Text(question.questionText ?? 'No question text'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () => _editQuestion(context, question),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _deleteQuestion(question),
-                          ),
-                        ],
-                      ),
-                    )),
-                ListTile(
-                  title: const Text('Add Question'),
-                  trailing: const Icon(Icons.add),
-                  onTap: () => _addQuestion(context),
-                ),
-              ]
-            ],
+    return BlocConsumer<TeacherHomeworkBloc, TeacherHomeworkState>(
+      listener: (context, state) {
+        if (state is TeacherHomeworkSaved && state.status == 'created') {
+          Navigator.pushReplacement(
+              context, TeacherHomeworkFormScreen.route(state.homework));
+        } else if (state is TeacherQuestionSaved) {
+          switch (state.status) {
+            case 'created':
+              _questions = [state.question, ..._questions];
+              break;
+
+            case 'updated':
+              _questions = _questions
+                  .map((q) => q.id == state.question.id ? state.question : q)
+                  .toList();
+              break;
+
+            case 'deleted':
+              _questions =
+                  _questions.where((q) => q.id != state.question.id).toList();
+              break;
+          }
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(_isUpdating ? 'Edit Homework' : 'Create Homework'),
           ),
-        ),
-      ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  TextFormField(
+                    controller: _titleController,
+                    decoration: const InputDecoration(labelText: 'Title'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a title';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    maxLines: 3,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a description';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _saveHomework,
+                    child: Text(
+                        _isUpdating ? 'Update Homework' : 'Create Homework'),
+                  ),
+                  if (_isUpdating) ...[
+                    const SizedBox(height: 20),
+                    Text('Questions',
+                        style: Theme.of(context).textTheme.headlineSmall),
+                    ..._questions.map((question) => ListTile(
+                          title:
+                              Text(question.questionText ?? 'No question text'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () =>
+                                    _editQuestion(context, question),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _deleteQuestion(question),
+                              ),
+                            ],
+                          ),
+                        )),
+                    ListTile(
+                      title: const Text('Add Question'),
+                      trailing: const Icon(Icons.add),
+                      onTap: () => _addQuestion(context),
+                    ),
+                  ]
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   void _saveHomework() {
     if (_formKey.currentState?.validate() ?? false) {
-      if (_isUpdate) {
+      if (_isUpdating) {
         final request = UpdateHomeworkRequest(
           title: _titleController.text,
           description: _descriptionController.text,
         );
-        // TODO
-        // context
-        //     .read<TeacherHomeworkBloc>()
-        //     .add(TeacherUpdateHomework(widget.homework!.id!, request));
+        context
+            .read<TeacherHomeworkBloc>()
+            .add(TeacherUpdateHomework(widget.homework!.id!, request));
+        Navigator.pop(context);
       } else {
         final request = CreateHomeworkRequest(
           lessonId: widget.homework?.lessonId ?? 0,
           title: _titleController.text,
           description: _descriptionController.text,
         );
-        // TODO
-        // context.read<TeacherHomeworkBloc>().add(TeacherCreateHomework(request));
+        context.read<TeacherHomeworkBloc>().add(TeacherCreateHomework(request));
       }
-
-      setState(() {
-        _homeworkSaved = true;
-      });
-
-      Navigator.pop(context);
     }
   }
 
   void _addQuestion(BuildContext context) {
-    if (_homeworkSaved || _isUpdate) {
-      showDialog(
-        context: context,
-        builder: (context) => QuestionDialog(
-          onSave: (newQuestion) {
-            setState(() {
-              // TODO
-
-              _questions.add(newQuestion);
-            });
-          },
-        ),
-      );
-    }
+    showDialog(
+      context: context,
+      builder: (context) => QuestionDialog(
+        homework: widget.homework ?? Homework(),
+      ),
+    );
   }
 
   void _editQuestion(BuildContext context, Question question) {
@@ -164,24 +178,14 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
       context: context,
       builder: (context) => QuestionDialog(
         initialQuestion: question,
-        onSave: (updatedQuestion) {
-          setState(() {
-            // TODO
-            final index =
-                _questions.indexWhere((q) => q.id == updatedQuestion.id);
-            if (index != -1) {
-              _questions[index] = updatedQuestion;
-            }
-          });
-        },
+        homework: widget.homework ?? Homework(),
       ),
     );
   }
 
   void _deleteQuestion(Question question) {
-    // TODO
-    setState(() {
-      _questions.removeWhere((q) => q.id == question.id);
-    });
+    context
+        .read<TeacherHomeworkBloc>()
+        .add(TeacherDeleteQuestion(question.id ?? 0));
   }
 }

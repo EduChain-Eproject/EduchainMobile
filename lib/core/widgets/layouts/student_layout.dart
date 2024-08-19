@@ -47,9 +47,9 @@ class _StudentLayoutState extends State<StudentLayout> {
             });
           },
           children: [
-            StudentHomeScreen(),
+            const StudentHomeScreen(),
             CourseListScreen(selectedCategory: widget.selectedCategory),
-            ProfileScreen(),
+            const ProfileScreen(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -74,10 +74,6 @@ class _StudentLayoutState extends State<StudentLayout> {
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.telegram),
-              label: 'test',
             ),
           ],
         ));

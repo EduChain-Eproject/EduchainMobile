@@ -59,7 +59,7 @@ class HeaderWidget extends StatelessWidget {
                         ),
                         ElevatedButton(
                             onPressed: () {
-                              getIt<AuthBloc>().add(LogOutRequested());
+                              context.read<AuthBloc>().add(LogOutRequested());
                             },
                             child: Text('logout'))
                       ],

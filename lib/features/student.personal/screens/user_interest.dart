@@ -39,6 +39,8 @@ class _UserInterestsPageState extends State<UserInterestsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Interests'),
+        backgroundColor: Colors.blueAccent,
+        elevation: 4,
       ),
       body: BlocListener<PersonalBloc, PersonalState>(
         listener: (context, state) {
@@ -50,7 +52,6 @@ class _UserInterestsPageState extends State<UserInterestsPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(message)),
             );
-            // Optionally, refetch interests to update the list
             if (status == 'removed') {
               _fetchInterests();
             }
@@ -79,29 +80,78 @@ class _UserInterestsPageState extends State<UserInterestsPage> {
                         if (course == null) {
                           return SizedBox.shrink(); // Skip if no course data
                         }
-                        return ListTile(
-                          title: Text(course.title ?? 'No Title'),
-                          subtitle:
-                              Text(course.description ?? 'No Description'),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              _deleteInterest(course.id!);
-                            },
+                        return Card(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
-                          onTap: () {
-                            // Handle interest item tap
-                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: Colors.grey[200],
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.book,
+                                        size: 40,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 16.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        course.title ?? 'No Title',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8.0),
+                                      Text(
+                                        course.description ?? 'No Description',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    _deleteInterest(course.id!);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),
                   ),
-                  _buildPaginationControls(state.interests.totalPages),
                 ],
               );
             } else if (state is UserInterestsError) {
               return Center(
-                child: Text('Error loading interests: ${state.errors}'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Error loading interests: ${state.errors}'),
+                ),
               );
             } else {
               return Center(
@@ -116,58 +166,41 @@ class _UserInterestsPageState extends State<UserInterestsPage> {
 
   Widget _buildSearchAndFilter() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Search by title',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                suffixIcon: Icon(Icons.search),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
               ),
               onChanged: (value) {
                 _searchTitle = value;
               },
+              style: TextStyle(color: Colors.black),
             ),
           ),
-          SizedBox(width: 8),
+          SizedBox(width: 16),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search, color: Colors.black),
             onPressed: _fetchInterests,
+            tooltip: 'Search',
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              padding: EdgeInsets.all(8.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildPaginationControls(int totalPages) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        TextButton(
-          onPressed: _currentPage > 0
-              ? () {
-                  setState(() {
-                    _currentPage--;
-                    _fetchInterests();
-                  });
-                }
-              : null,
-          child: Text('Previous Page'),
-        ),
-        Text('Page ${_currentPage + 1} / $totalPages'),
-        TextButton(
-          onPressed: _currentPage < totalPages - 1
-              ? () {
-                  setState(() {
-                    _currentPage++;
-                    _fetchInterests();
-                  });
-                }
-              : null,
-          child: Text('Next Page'),
-        ),
-      ],
     );
   }
 

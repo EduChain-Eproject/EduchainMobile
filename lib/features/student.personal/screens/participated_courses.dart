@@ -15,7 +15,7 @@ class FetchParticipatedCoursesPage extends StatefulWidget {
 class _FetchParticipatedCoursesPageState
     extends State<FetchParticipatedCoursesPage> {
   late PersonalBloc _personalBloc;
-  int _currentPage = 0;
+  int _currentPage = 1;
   String? _searchTitle;
   CompletionStatus? _selectedStatus;
 
@@ -28,7 +28,7 @@ class _FetchParticipatedCoursesPageState
 
   void _fetchCourses() {
     final request = ParticipatedCoursesRequest(
-      page: _currentPage,
+      page: _currentPage - 1,
       titleSearch: _searchTitle,
       completionStatus: _selectedStatus,
     );
@@ -39,7 +39,9 @@ class _FetchParticipatedCoursesPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sách khóa học đã tham gia'),
+        title: Text('My Courses'),
+        backgroundColor: Colors.blueAccent,
+        elevation: 4,
       ),
       body: BlocBuilder<PersonalBloc, PersonalState>(
         builder: (context, state) {
@@ -56,33 +58,92 @@ class _FetchParticipatedCoursesPageState
                     itemCount: state.courses.content.length,
                     itemBuilder: (context, index) {
                       UserCourse course = state.courses.content[index];
-                      return ListTile(
-                        title: Text(course.courseDto?.title ?? 'No Title'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(course.courseDto?.description ??
-                                'No Description'),
-                            Text('Progress: ${course.progress ?? 0}%'),
-                            Text(
-                                'Enrollment Date: ${course.createdAt?.toLocal().toString().split(' ')[0] ?? 'N/A'}'),
-                            Text(
-                                'Status: ${course.completionStatus?.toString().split('.').last ?? 'N/A'}'),
-                          ],
+                      return Card(
+                        margin: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
-                        onTap: () {
-                          // Handle course tap
-                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.book,
+                                      size: 40,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16.0),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      course.courseDto?.title ?? 'No Title',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8.0),
+                                    Text(
+                                      course.courseDto?.description ??
+                                          'No Description',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    SizedBox(height: 8.0),
+                                    LinearProgressIndicator(
+                                      value: (course.progress ?? 0) / 100,
+                                      backgroundColor: Colors.grey[300],
+                                      color: Colors.blueAccent,
+                                    ),
+                                    SizedBox(height: 8.0),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Enrollment Date: ${course.createdAt?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
+                                          style: TextStyle(
+                                              color: Colors.grey[600]),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   ),
                 ),
-                _buildPaginationControls(state.courses.totalPages),
               ],
             );
           } else if (state is ParticipatedCoursesError) {
             return Center(
-              child: Text('Đã xảy ra lỗi khi tải khóa học: ${state.errors}'),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Đã xảy ra lỗi khi tải khóa học: ${state.errors}',
+                    style: TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
             );
           } else {
             return Center(
@@ -96,28 +157,37 @@ class _FetchParticipatedCoursesPageState
 
   Widget _buildSearchAndFilter() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                labelText: 'Tìm kiếm theo tiêu đề',
-                border: OutlineInputBorder(),
+                labelText: 'Search',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                suffixIcon: Icon(Icons.search),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
               ),
               onChanged: (value) {
                 _searchTitle = value;
               },
+              style: TextStyle(color: Colors.black),
             ),
           ),
-          SizedBox(width: 8),
+          SizedBox(width: 20),
           DropdownButton<CompletionStatus>(
             value: _selectedStatus,
-            hint: Text('Lọc theo trạng thái'),
+            hint: Text('Status'),
             items: CompletionStatus.values.map((status) {
               return DropdownMenuItem(
                 value: status,
-                child: Text(status.toString().split('.').last),
+                child: Text(
+                  status.toString().split('.').last,
+                  style: TextStyle(color: Colors.black),
+                ),
               );
             }).toList(),
             onChanged: (value) {
@@ -125,44 +195,24 @@ class _FetchParticipatedCoursesPageState
                 _selectedStatus = value;
               });
             },
+            style: TextStyle(color: Colors.black),
+            dropdownColor: Colors.white,
           ),
+          SizedBox(width: 16),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search, color: Colors.black),
             onPressed: _fetchCourses,
-          ),
+            tooltip: 'Tìm kiếm',
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              padding: EdgeInsets.all(8.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          )
         ],
       ),
-    );
-  }
-
-  Widget _buildPaginationControls(int totalPages) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        TextButton(
-          onPressed: _currentPage > 1
-              ? () {
-                  setState(() {
-                    _currentPage--;
-                    _fetchCourses();
-                  });
-                }
-              : null,
-          child: Text('Trang trước'),
-        ),
-        Text('Trang $_currentPage / $totalPages'),
-        TextButton(
-          onPressed: _currentPage < totalPages
-              ? () {
-                  setState(() {
-                    _currentPage++;
-                    _fetchCourses();
-                  });
-                }
-              : null,
-          child: Text('Trang sau'),
-        ),
-      ],
     );
   }
 

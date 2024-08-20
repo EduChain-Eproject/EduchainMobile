@@ -61,138 +61,215 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Card(
                     elevation: 5,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(16.0),
-                      leading: CircleAvatar(
-                        radius: 30,
-                        backgroundImage: NetworkImage(user!.avatarPath ??
-                            'https://via.placeholder.com/150'),
-                      ),
-                      title: Text(
-                        '${user!.firstName} ${user!.lastName}',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(user!.email!),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Card(
-                    elevation: 2,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(16.0),
-                      title: Text('Phone',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(user!.phone ?? 'N/A'),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Card(
-                    elevation: 2,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(16.0),
-                      title: Text('Address',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(user!.address ?? 'N/A'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Center(
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(user!.avatarPath ??
+                                'https://via.placeholder.com/150'),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            '${user!.firstName} ${user!.lastName}',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.email,
+                                      color: Colors.blue, size: 24),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(user!.email ?? 'N/A'),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Icon(Icons.phone,
+                                      color: Colors.green, size: 24),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(user!.phone ?? 'N/A'),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Icon(Icons.home, color: Colors.red, size: 24),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(user!.address ?? 'N/A'),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: 16),
                   if (user!.role == 'STUDENT') ...[
-                    Card(
-                      elevation: 2,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16.0),
-                        title: Text('My Courses'),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BlocProvider.value(
-                                value: context.read<PersonalBloc>(),
-                                child: FetchParticipatedCoursesPage(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Card(
-                      elevation: 2,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16.0),
-                        title: Text('My Homeworks'),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BlocProvider.value(
-                                value: context.read<PersonalBloc>(),
-                                child: UserHomeworkPage(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Card(
-                      elevation: 2,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16.0),
-                        title: Text('My Wishlist'),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BlocProvider.value(
-                                value: context.read<PersonalBloc>(),
-                                child: UserInterestsPage(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ] else if (user!.role == 'TEACHER') ...[
-                    Card(
-                      elevation: 2,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16.0),
-                        title: Text('My Courses'),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeacherLayout.route(
-                                initialPage: 1,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                  SizedBox(height: 24),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
+                    _buildActionCard(
+                      context,
+                      icon: Icons.book,
+                      color: Colors.blue,
+                      title: 'My Courses',
+                      onTap: () {
+                        Navigator.push(
+                          context,
                           MaterialPageRoute(
-                            builder: (context) => UpdateProfileScreen(user!),
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: FetchParticipatedCoursesPage(),
+                            ),
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        textStyle: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      child: Text('Update Profile'),
                     ),
-                  ),
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.assignment,
+                      color: Colors.green,
+                      title: 'My Homeworks',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: UserHomeworkPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.favorite,
+                      color: Colors.pink,
+                      title: 'My Wishlist',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: UserInterestsPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.emoji_events,
+                      color: Colors.orange,
+                      title: 'My Awards',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: UserInterestsPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.emoji_events,
+                      color: Colors.blueGrey,
+                      title: 'My Certificates',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: UserInterestsPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.description,
+                      color: Colors.teal,
+                      title: 'Terms & Conditions',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: UserInterestsPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.logout,
+                      color: Colors.red,
+                      title: 'Logout',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: context.read<PersonalBloc>(),
+                              child: UserInterestsPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ] else if (user!.role == 'TEACHER') ...[
+                    _buildActionCard(
+                      context,
+                      icon: Icons.book,
+                      color: Colors.blue,
+                      title: 'My Courses',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeacherLayout.route(
+                              initialPage: 1,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ],
               ),
             );
@@ -202,6 +279,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Center(child: Text('Unknown state'));
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildActionCard(BuildContext context,
+      {required IconData icon,
+      required Color color,
+      required String title,
+      required VoidCallback onTap}) {
+    return Card(
+      elevation: 2,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        leading: Icon(icon, color: color, size: 28),
+        title: Text(title,
+            style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+        onTap: onTap,
       ),
     );
   }

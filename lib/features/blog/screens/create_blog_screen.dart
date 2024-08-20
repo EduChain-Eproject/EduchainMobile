@@ -39,7 +39,8 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Error fetching categories: ${response.error}')),
+            content: Text('Error fetching categories: ${response.error}'),
+          ),
         );
       }
     } catch (error) {
@@ -80,18 +81,23 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Blog')),
+      appBar: AppBar(title: const Text('Create Blog')),
       body: SingleChildScrollView(
-        // <--- Wrap with SingleChildScrollView
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Title Field
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -99,15 +105,24 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
+
+              // Category Dropdown
               DropdownButtonFormField<BlogCategory>(
                 value: _selectedCategory,
-                decoration: InputDecoration(labelText: 'Category'),
+                decoration: InputDecoration(
+                  labelText: 'Category',
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
                 items: _categories.map((category) {
                   return DropdownMenuItem(
                     value: category,
                     child: Text(
                       category.categoryName ?? '',
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(
+                          color: Colors.black), // Set text color to black
                     ),
                   );
                 }).toList(),
@@ -122,10 +137,21 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
                   }
                   return null;
                 },
+                style: TextStyle(
+                    color: Colors.black), // Set dropdown text color to black
               ),
+
+              const SizedBox(height: 16),
+
+              // Blog Text Field
               TextFormField(
                 controller: _textController,
-                decoration: InputDecoration(labelText: 'Text'),
+                decoration: InputDecoration(
+                  labelText: 'Text',
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
                 maxLines: 5,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -134,20 +160,50 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+
+              // Upload Photo Button
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Upload Photo'),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
+                child: const Text('Upload Photo'),
               ),
-              if (_photo != null) ...[
-                SizedBox(height: 16),
-                Image.file(File(_photo!.path)),
-              ],
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+
+              // Photo Preview
+              if (_photo != null)
+                Container(
+                  margin: const EdgeInsets.only(top: 8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.file(
+                      File(_photo!.path),
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
+
+              // Create Blog Button
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Create Blog'),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
+                child: const Text('Create Blog'),
               ),
+
+              // BlocListener to show messages
               BlocListener<BlogBloc, BlogState>(
                 listener: (context, state) {
                   if (state is BlogSaved) {

@@ -47,7 +47,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Update Profile')),
+      appBar: AppBar(
+        title:
+            const Text('Update Profile', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blueAccent, // Custom color instead of primary
+      ),
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) {
           if (state is ProfileUpdated) {
@@ -58,37 +62,44 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             );
           }
         },
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
+                _buildAvatarSection(),
+                const SizedBox(height: 20),
+                _buildReadOnlyField(
+                  label: 'Email',
+                  value: widget.user.email ?? '',
+                ),
+                _buildTextField(
+                  label: 'First Name',
                   initialValue: firstName,
-                  decoration: const InputDecoration(labelText: 'First Name'),
                   onChanged: (value) => firstName = value,
                   validator: (value) =>
                       value!.isEmpty ? 'Enter first name' : null,
                 ),
-                TextFormField(
+                _buildTextField(
+                  label: 'Last Name',
                   initialValue: lastName,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
                   onChanged: (value) => lastName = value,
                   validator: (value) =>
                       value!.isEmpty ? 'Enter last name' : null,
                 ),
-                TextFormField(
+                _buildTextField(
+                  label: 'Phone',
                   initialValue: phone,
-                  decoration: const InputDecoration(labelText: 'Phone'),
                   onChanged: (value) => phone = value,
                 ),
-                TextFormField(
+                _buildTextField(
+                  label: 'Address',
                   initialValue: address,
-                  decoration: const InputDecoration(labelText: 'Address'),
                   onChanged: (value) => address = value,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
@@ -97,41 +108,145 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         lastName: lastName,
                         phone: phone,
                         address: address,
+                        avatarFile: _avatarFile,
                       );
                       context.read<ProfileBloc>().add(UpdateProfile(request));
                     }
                   },
-                  child: const Text('Update Profile'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _pickAvatar,
-                  child: const Text('Select Avatar'),
-                ),
-                if (_avatarFile != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Image.file(
-                      File(_avatarFile!.path),
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightGreen,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                if (_avatarFile == null && widget.user.avatarPath != null)
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(widget.user.avatarPath ?? ""),
+                  child: const Text(
+                    'Update Profile',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
                   ),
-                if (_errors?['avatarFile'] != null)
-                  Text(
-                    _errors?['avatarFile'],
-                    style: const TextStyle(color: AppPallete.lightErrorColor),
-                  ),
-                const SizedBox(height: 16.0),
+                )
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarSection() {
+    return Column(
+      children: [
+        if (_avatarFile == null && widget.user.avatarPath != null)
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(widget.user.avatarPath ?? ""),
+          ),
+        if (_avatarFile != null)
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: FileImage(File(_avatarFile!.path)),
+          ),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: _pickAvatar,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(
+                255, 207, 68, 58), // Custom color for avatar button
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+          child: const Text(
+            'Select Avatar',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        if (_errors?['avatarFile'] != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              _errors?['avatarFile'],
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required String initialValue,
+    required Function(String) onChanged,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        initialValue: initialValue,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.deepPurple),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: Colors.blue,
+              width: 1.5,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: Colors.red,
+              width: 1.5,
+            ),
+          ),
+        ),
+        onChanged: onChanged,
+        validator: validator,
+      ),
+    );
+  }
+
+  Widget _buildReadOnlyField({
+    required String label,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        initialValue: value,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.deepPurple),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: Colors.blue,
+              width: 1.5,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: Colors.red,
+              width: 1.5,
+            ),
+          ),
+        ),
+        readOnly: true, // Prevent editing
       ),
     );
   }

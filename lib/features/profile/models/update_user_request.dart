@@ -29,13 +29,7 @@ class UpdateUserRequest {
     final fields = <String, String>{};
 
     jsonData.forEach((key, value) {
-      if (value is List<int>) {
-        for (int i = 0; i < value.length; i++) {
-          fields['${key}[$i]'] = value[i].toString();
-        }
-      } else {
-        fields[key] = value.toString();
-      }
+      fields[key] = value.toString();
     });
 
     return fields;

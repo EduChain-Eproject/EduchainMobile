@@ -47,12 +47,15 @@ class _BlogListScreenState extends State<BlogListScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Error fetching categories: ${response.error}')),
+            content: Text('Error fetching categories: ${response.error}'),
+          ),
         );
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching categories: $error')),
+        SnackBar(
+          content: Text('Error fetching categories: $error'),
+        ),
       );
     }
   }
@@ -79,7 +82,11 @@ class _BlogListScreenState extends State<BlogListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Blogs')),
+      appBar: AppBar(
+        title: const Text('Blogs'),
+        backgroundColor: Colors.blueAccent, // Match the UserInterestsPage color
+        elevation: 4, // Add elevation for a subtle shadow
+      ),
       body: Column(
         children: [
           BlogSearchFilterBar(
@@ -102,7 +109,18 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 if (state is BlogsLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is BlogsError) {
-                  return Center(child: Text('Error: ${state.errors}'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Error: ${state.errors}',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
                 } else if (state is BlogsLoaded) {
                   return ListView.builder(
                     itemCount: state.blogs.content.length,
@@ -122,6 +140,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
         onPressed: _createNewBlog,
         child: const Icon(Icons.add),
         tooltip: 'Create New Blog',
+        backgroundColor: Colors.blueAccent, // Match the AppBar color
       ),
     );
   }

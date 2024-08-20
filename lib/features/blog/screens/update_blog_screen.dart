@@ -79,7 +79,10 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Update Blog')),
+      appBar: AppBar(
+        title: Text('Update Blog'),
+        backgroundColor: Colors.blueAccent, // AppBar background color
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -87,22 +90,57 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Display the old image if it exists
               if (widget.blog.photo != null && _photo == null)
                 Column(
                   children: [
-                    Image.network(
-                      'http://127.0.0.1:8080/uploads/${widget.blog.photo!}',
-                      fit: BoxFit.cover,
-                      height: 200,
-                      width: double.infinity,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          'http://127.0.0.1:8080/uploads/${widget.blog.photo!}',
+                          fit: BoxFit.cover,
+                          height: 150, // Reduced height
+                          width: double.infinity,
+                        ),
+                      ),
                     ),
                     SizedBox(height: 16),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _pickImage,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text('Upload New Photo'),
+                      ),
+                    ),
                   ],
                 ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  labelStyle: TextStyle(color: Colors.teal),
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal, width: 2.0),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -110,17 +148,23 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               DropdownButtonFormField<BlogCategory>(
                 value: _categories.isNotEmpty
                     ? _categories.firstWhere(
                         (category) => category.id == _selectedCategory?.id,
                         orElse: () => _categories.first)
                     : null,
-                decoration: InputDecoration(labelText: 'Category'),
+                decoration: InputDecoration(
+                  labelText: 'Category',
+                  labelStyle: TextStyle(color: Colors.teal),
+                  border: OutlineInputBorder(),
+                ),
                 items: _categories.map((category) {
                   return DropdownMenuItem(
                     value: category,
-                    child: Text(category.categoryName ?? ''),
+                    child: Text(category.categoryName ?? '',
+                        style: TextStyle(color: Colors.black)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -135,9 +179,17 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _textController,
-                decoration: InputDecoration(labelText: 'Text'),
+                decoration: InputDecoration(
+                  labelText: 'Text',
+                  labelStyle: TextStyle(color: Colors.teal),
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal, width: 2.0),
+                  ),
+                ),
                 maxLines: 5,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -147,18 +199,42 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                 },
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: Text('Upload New Photo'),
-              ),
               if (_photo != null) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(_photo!.path),
+                      height: 150, // Reduced height
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
                 SizedBox(height: 16),
-                Image.file(File(_photo!.path)),
               ],
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Update Blog'),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.greenAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text('Update Blog'),
+                ),
               ),
               BlocListener<BlogBloc, BlogState>(
                 listener: (context, state) {

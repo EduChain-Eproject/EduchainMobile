@@ -44,59 +44,92 @@ class BlogDetailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (blog.photo != null)
-                Image.network(
-                  'http://127.0.0.1:8080/uploads/${blog.photo!}',
-                  fit: BoxFit.cover,
-                  height: 200,
-                  width: double.infinity,
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8.0,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: Image.network(
+                    'http://127.0.0.1:8080/uploads/${blog.photo!}',
+                    fit: BoxFit.cover,
+                    height: 200,
+                    width: double.infinity,
+                  ),
                 ),
               SizedBox(height: 16.0),
-              Text(
-                blog.title ?? 'No Title',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      color: Colors.black, // Set the text color to black
-                    ),
+              Card(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        blog.title ?? 'No Title',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        blog.blogText ?? 'No Content',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Colors.black87,
+                                ),
+                      ),
+                      SizedBox(height: 16.0),
+                      if (blog.user != null) ...[
+                        Text(
+                          'Author: ${blog.user?.firstName ?? 'Unknown'}',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.black54,
+                                  ),
+                        ),
+                        SizedBox(height: 8.0),
+                      ],
+                      if (blog.blogCategory != null) ...[
+                        Text(
+                          'Category: ${blog.blogCategory?.categoryName ?? 'No Category'}',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.black54,
+                                  ),
+                        ),
+                        SizedBox(height: 8.0),
+                      ],
+                      if (blog.voteUp != null) ...[
+                        Text(
+                          'Votes: ${blog.voteUp}',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.black54,
+                                  ),
+                        ),
+                        SizedBox(height: 16.0),
+                      ],
+                      if (blog.blogComments != null &&
+                          blog.blogComments!.isNotEmpty) ...[
+                        CommentSection(
+                            comments: blog.blogComments!, blogId: blog.id!),
+                      ],
+                    ],
+                  ),
+                ),
               ),
-              SizedBox(height: 8.0),
-              Text(
-                blog.blogText ?? 'No Content',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.black87, // Set the text color to dark grey
-                    ),
-              ),
-              SizedBox(height: 16.0),
-              if (blog.user != null) ...[
-                Text(
-                  'Author: ${blog.user?.firstName ?? 'Unknown'}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors
-                            .black54, // Slightly lighter shade for less emphasis
-                      ),
-                ),
-                SizedBox(height: 8.0),
-              ],
-              if (blog.blogCategory != null) ...[
-                Text(
-                  'Category: ${blog.blogCategory?.categoryName ?? 'No Category'}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.black54,
-                      ),
-                ),
-                SizedBox(height: 8.0),
-              ],
-              if (blog.voteUp != null) ...[
-                Text(
-                  'Votes: ${blog.voteUp}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.black54,
-                      ),
-                ),
-                SizedBox(height: 16.0),
-              ],
-              if (blog.blogComments != null &&
-                  blog.blogComments!.isNotEmpty) ...[
-                CommentSection(comments: blog.blogComments!, blogId: blog.id!),
-              ],
             ],
           ),
         ),

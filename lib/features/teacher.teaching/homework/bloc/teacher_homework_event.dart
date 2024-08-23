@@ -45,10 +45,7 @@ class TeacherDeleteQuestion extends TeacherHomeworkEvent {
 }
 
 class TeacherUpdateAnswer extends TeacherHomeworkEvent {
-  final int homeworkId;
-  final int questionId;
   final int answerId;
   final UpdateAnswerRequest request;
-  TeacherUpdateAnswer(
-      this.answerId, this.request, this.homeworkId, this.questionId);
+  TeacherUpdateAnswer(this.answerId, this.request);
 }

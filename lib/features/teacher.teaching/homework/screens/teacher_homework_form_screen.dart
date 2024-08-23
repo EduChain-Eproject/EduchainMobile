@@ -9,15 +9,19 @@ import '../models/update_homework_request.dart';
 import '../widgets/question_dialog.dart';
 
 class TeacherHomeworkFormScreen extends StatefulWidget {
-  static Route route(Homework? homework) => MaterialPageRoute(
+  static Route route(Homework? homework, int lessonId) => MaterialPageRoute(
         builder: (context) => TeacherHomeworkFormScreen(
           homework: homework,
+          lessonId: lessonId,
         ),
       );
 
   final Homework? homework;
+  final int lessonId;
 
-  const TeacherHomeworkFormScreen({Key? key, this.homework}) : super(key: key);
+  const TeacherHomeworkFormScreen(
+      {Key? key, this.homework, required this.lessonId})
+      : super(key: key);
 
   @override
   _TeacherHomeworkFormScreenState createState() =>
@@ -46,8 +50,8 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
     return BlocConsumer<TeacherHomeworkBloc, TeacherHomeworkState>(
       listener: (context, state) {
         if (state is TeacherHomeworkSaved && state.status == 'created') {
-          Navigator.pushReplacement(
-              context, TeacherHomeworkFormScreen.route(state.homework));
+          Navigator.pushReplacement(context,
+              TeacherHomeworkFormScreen.route(state.homework, widget.lessonId));
         } else if (state is TeacherQuestionSaved) {
           switch (state.status) {
             case 'created':
@@ -65,6 +69,16 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
                   _questions.where((q) => q.id != state.question.id).toList();
               break;
           }
+        } else if (state is TeacherAnswerSaved) {
+          _questions = _questions
+              .map((q) => q.id == state.answer.questionId
+                  ? q.copyWith(
+                      answerDtos: q.answerDtos
+                          ?.map(
+                              (a) => a.id == state.answer.id ? state.answer : a)
+                          .toList())
+                  : q)
+              .toList();
         }
       },
       builder: (context, state) {
@@ -155,7 +169,7 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
         Navigator.pop(context);
       } else {
         final request = CreateHomeworkRequest(
-          lessonId: widget.homework?.lessonId ?? 0,
+          lessonId: widget.lessonId,
           title: _titleController.text,
           description: _descriptionController.text,
         );

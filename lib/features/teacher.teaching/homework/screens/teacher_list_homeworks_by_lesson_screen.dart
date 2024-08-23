@@ -1,5 +1,4 @@
 import 'package:educhain/core/models/lesson.dart';
-import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -66,6 +65,8 @@ class _TeacherListHomeworksByLessonScreenState
                         .toList());
                 break;
             }
+          } else if (state is TeacherHomeworksLoaded) {
+            lesson = state.lesson;
           }
         },
         builder: (context, state) {
@@ -76,36 +77,41 @@ class _TeacherListHomeworksByLessonScreenState
           } else {
             final homeworks = lesson?.homeworkDtos;
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        lesson?.lessonTitle ?? 'No Title',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        lesson?.description ?? 'No Description',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: homeworks?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      final homework = homeworks?[index];
-                      return HomeworkTile(homework: homework!);
-                    },
-                  ),
-                ],
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          lesson?.lessonTitle ?? 'No Title',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          lesson?.description ?? 'No Description',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: homeworks?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        final homework = homeworks?[index];
+                        return HomeworkTile(
+                          homework: homework!,
+                          lessonId: widget.lessonId,
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -113,7 +119,8 @@ class _TeacherListHomeworksByLessonScreenState
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, TeacherHomeworkFormScreen.route(null));
+          Navigator.push(
+              context, TeacherHomeworkFormScreen.route(null, widget.lessonId));
         },
         child: const Icon(Icons.add),
       ),

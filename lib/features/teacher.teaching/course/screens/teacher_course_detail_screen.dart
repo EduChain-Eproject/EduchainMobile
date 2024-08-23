@@ -127,10 +127,11 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
           style: const TextStyle(
               fontSize: 15, color: AppPallete.lightPrimaryColor),
         ),
-        Text(
-          _course?.status?.name ?? '',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        if (_course?.status == CourseStatus.DEACTIVATED)
+          Text(
+            'Your course is deactivated!',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         Row(
           children: [
             ElevatedButton(

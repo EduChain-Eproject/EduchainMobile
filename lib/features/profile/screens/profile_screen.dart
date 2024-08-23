@@ -259,12 +259,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.blue,
                       title: 'My Courses',
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => TeacherLayout.route(
-                              initialPage: 1,
-                            ),
+                          TeacherLayout.route(
+                            initialPage: 1,
                           ),
                         );
                       },

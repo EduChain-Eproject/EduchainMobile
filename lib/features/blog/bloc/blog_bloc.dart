@@ -85,8 +85,10 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
       final response = await blogService.deleteBlog(event.blogId);
 
       await response.on(
-        onSuccess: (deletedBlog) {
-          emit(BlogDeleted(deletedBlog));
+        onSuccess: (deleted) {
+          if (deleted) {
+            emit(BlogDeleted(Blog(id: event.blogId)));
+          }
         },
         onError: (error) => emit(BlogDeleteError(error['message'])),
       );

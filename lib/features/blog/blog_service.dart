@@ -53,9 +53,8 @@ class BlogService extends ApiService {
     );
   }
 
-  ApiResponse<Blog> deleteBlog(int chapterId) async {
-    return delete<Blog>(
-        'api/blog/$chapterId', (json) => Blog.fromJson(json), null);
+  ApiResponse<bool> deleteBlog(int chapterId) async {
+    return delete<bool>('api/blog/$chapterId', null, null);
   }
 
   ApiResponse<Blog> updateBlog(int blogId, UpdateBlogRequest request) async {

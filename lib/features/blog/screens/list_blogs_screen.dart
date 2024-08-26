@@ -1,3 +1,4 @@
+import 'package:educhain/core/models/blog.dart';
 import 'package:educhain/core/models/blog_category.dart';
 import 'package:educhain/features/blog/models/filter_blog_request.dart';
 import 'package:educhain/features/blog/screens/create_blog_screen.dart';
@@ -28,6 +29,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
     'DATE_DESC'
   ];
   List<BlogCategory> _categories = [];
+  List<Blog> _blogData = [];
 
   @override
   void initState() {
@@ -104,7 +106,21 @@ class _BlogListScreenState extends State<BlogListScreen> {
             initialSortOption: _sortOption,
           ),
           Expanded(
-            child: BlocBuilder<BlogBloc, BlogState>(
+            child: BlocConsumer<BlogBloc, BlogState>(
+              listener: (BuildContext context, BlogState state) {
+                if (state is BlogsLoaded) {
+                  _blogData = state.blogs.content;
+                } else if (state is BlogSaved) {
+                  _blogData = [state.blog, ..._blogData];
+                } else if (state is BlogUpdated) {
+                  _blogData = _blogData
+                      .map((b) => b.id == state.blog.id ? state.blog : b)
+                      .toList();
+                } else if (state is BlogDeleted) {
+                  _blogData =
+                      _blogData.where((b) => b.id != state.blog.id).toList();
+                }
+              },
               builder: (context, state) {
                 if (state is BlogsLoading) {
                   return const Center(child: CircularProgressIndicator());
@@ -121,15 +137,13 @@ class _BlogListScreenState extends State<BlogListScreen> {
                       ),
                     ),
                   );
-                } else if (state is BlogsLoaded) {
+                } else {
                   return ListView.builder(
-                    itemCount: state.blogs.content.length,
+                    itemCount: _blogData.length,
                     itemBuilder: (context, index) {
-                      return BlogCard(blog: state.blogs.content[index]);
+                      return BlogCard(blog: _blogData[index]);
                     },
                   );
-                } else {
-                  return const Center(child: Text('No blogs available'));
                 }
               },
             ),

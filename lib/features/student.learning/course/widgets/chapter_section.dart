@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 
 class ChaptersSection extends StatelessWidget {
   final List<Chapter> chapters;
+  final bool isEnrolled;
   final void Function(int lessonId) onLessonTap;
 
   const ChaptersSection({
     Key? key,
     required this.chapters,
     required this.onLessonTap,
+    required this.isEnrolled,
   }) : super(key: key);
 
   @override
@@ -31,6 +33,7 @@ class ChaptersSection extends StatelessWidget {
                 ...chapter.lessonDtos?.map((lesson) => _buildLessonTile(
                           context: context,
                           lessonTitle: lesson.lessonTitle ?? '',
+                          description: lesson.description ?? '',
                           lessonId: lesson.id ?? 0,
                           done: lesson.isCurrentUserFinished ?? false,
                         )) ??
@@ -44,39 +47,45 @@ class ChaptersSection extends StatelessWidget {
   Widget _buildLessonTile({
     required BuildContext context,
     required String lessonTitle,
+    required String description,
     required int lessonId,
     required bool done,
   }) {
     return ListTile(
-      onTap: () {
-        Navigator.push(context, LessonDetailScreen.route(lessonId));
-      },
+      onTap: () => onLessonTap(lessonId),
       leading: const Icon(
         Icons.school_outlined,
         color: Colors.green,
         size: 30,
       ),
       title: Text(
-        lessonId.toString(),
+        lessonTitle.length <= 20
+            ? lessonTitle
+            : '${lessonTitle.substring(0, 20)}...',
         style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
       ),
-      trailing: done
-          ? const Icon(
-              Icons.done,
+      trailing: isEnrolled
+          ? done
+              ? const Icon(
+                  Icons.done,
+                  size: 30,
+                )
+              : InkWell(
+                  onTap: () => onLessonTap(lessonId),
+                  child: const Icon(
+                    Icons.play_circle_outline,
+                    size: 30,
+                  ),
+                )
+          : const Icon(
+              Icons.lock,
               size: 30,
-            )
-          : InkWell(
-              onTap: () => onLessonTap(lessonId),
-              child: const Icon(
-                Icons.play_circle_outline,
-                size: 30,
-              ),
             ),
       subtitle: Text(
-        lessonTitle,
+        description,
         style: const TextStyle(
           color: Colors.grey,
           fontSize: 14,

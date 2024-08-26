@@ -47,7 +47,7 @@ class _TeacherLayoutState extends State<TeacherLayout> {
             });
           },
           children: [
-            TeacherHomeScreen(),
+            // TeacherHomeScreen(),
             TeacherCourseListScreen(),
             ProfileScreen(),
           ],
@@ -63,10 +63,10 @@ class _TeacherLayoutState extends State<TeacherLayout> {
             _pageController.jumpToPage(index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.home),
+            //   label: 'Home',
+            // ),
             BottomNavigationBarItem(
               icon: Icon(Icons.list),
               label: 'Courses',

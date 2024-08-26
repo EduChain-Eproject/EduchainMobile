@@ -1,4 +1,6 @@
 import 'package:educhain/core/models/user_homework.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
+import 'package:educhain/features/student.learning/homework/screens/homework_detail_screen.dart';
 import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
 import 'package:educhain/features/student.personal/models/user_homeworks_request.dart';
 import 'package:flutter/material.dart';
@@ -56,34 +58,52 @@ class _UserHomeworkPageState extends State<UserHomeworkPage> {
                     itemCount: state.homeworks.content.length,
                     itemBuilder: (context, index) {
                       UserHomework homework = state.homeworks.content[index];
-                      return Card(
-                        margin: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 16.0),
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.all(16.0),
-                          title: Text(homework.homeworkDto?.title ?? 'No Title',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16.0)),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Submission Status: ${homework.isSubmitted! ? 'Submitted' : 'Not Submitted'}',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              Text(
-                                'Due Date: ${homework.submissionDate != null ? DateFormat('yyyy-MM-dd HH:mm:ss').format(homework.submissionDate!) : 'N/A'}',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ],
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            HomeworkDetailScreen.route(
+                                homework.homeworkDto?.id ?? 0),
+                          );
+                        },
+                        child: Card(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
-                          onTap: () {
-                            // Handle homework tap
-                          },
+                          child: ListTile(
+                            contentPadding: EdgeInsets.all(16.0),
+                            title: Text(
+                                homework.homeworkDto?.title ?? 'No Title',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  'Submission Status: ${homework.isSubmitted! ? 'Submitted' : 'Not Submitted'}',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 8.0),
+                                LinearProgressIndicator(
+                                  value: (homework.progress ?? 0) / 100,
+                                  backgroundColor: Colors.grey[300],
+                                  color: AppPallete.successColor,
+                                ),
+                                const SizedBox(height: 8.0),
+                                if (homework.grade != null &&
+                                    homework.grade != 0)
+                                  Text(
+                                    'Mark: ${homework.grade.toString()}',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },

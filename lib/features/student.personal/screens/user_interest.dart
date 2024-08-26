@@ -1,3 +1,4 @@
+import 'package:educhain/features/student.learning/course/screens/course_detail_screen.dart';
 import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
 import 'package:educhain/features/student.personal/models/user_interests_request.dart';
 import 'package:flutter/material.dart';
@@ -80,64 +81,70 @@ class _UserInterestsPageState extends State<UserInterestsPage> {
                         if (course == null) {
                           return SizedBox.shrink(); // Skip if no course data
                         }
-                        return Card(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
+                        return GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            CourseDetailScreen.route(course.id ?? 0),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    color: Colors.grey[200],
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.book,
-                                        size: 40,
-                                        color: Colors.grey[600],
+                          child: Card(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 16.0),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Container(
+                                      width: 80,
+                                      height: 80,
+                                      color: Colors.grey[200],
+                                      child: Center(
+                                        child: Image.network(
+                                          '${course.avatarPath}',
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 16.0),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        course.title ?? 'No Title',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16.0,
+                                  SizedBox(width: 16.0),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          course.title ?? 'No Title',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.0,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 8.0),
-                                      Text(
-                                        course.description ?? 'No Description',
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: Colors.grey[700],
+                                        SizedBox(height: 8.0),
+                                        Text(
+                                          course.description ??
+                                              'No Description',
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Colors.grey[700],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () {
-                                    _deleteInterest(course.id!);
-                                  },
-                                ),
-                              ],
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      _deleteInterest(course.id!);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );

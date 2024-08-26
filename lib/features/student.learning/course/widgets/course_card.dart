@@ -45,7 +45,8 @@ class CourseCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.person),
                   const SizedBox(width: 8),
-                  Text(course.teacherDto?.firstName ?? ""),
+                  Text(
+                      '${course.teacherDto?.firstName} ${course.teacherDto?.lastName}'),
                 ],
               ),
               const SizedBox(height: 8),

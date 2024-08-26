@@ -1,5 +1,6 @@
 import 'package:educhain/core/models/homework.dart';
 import 'package:educhain/core/models/question.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -116,8 +117,11 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _saveHomework,
-                    child: Text(
-                        _isUpdating ? 'Update Homework' : 'Create Homework'),
+                    child: state is TeacherHomeworkSaving
+                        ? const Loader()
+                        : Text(_isUpdating
+                            ? 'Update Homework'
+                            : 'Create Homework'),
                   ),
                   if (_isUpdating) ...[
                     const SizedBox(height: 20),

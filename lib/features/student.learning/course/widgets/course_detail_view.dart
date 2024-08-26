@@ -48,6 +48,7 @@ class _CourseDetailViewState extends State<CourseDetailView> {
                     if (_contentToShow == 'curriculum')
                       ChaptersSection(
                         chapters: widget.course.chapterDtos ?? [],
+                        isEnrolled: isEnrolled,
                         onLessonTap: (lessonId) {
                           if (isEnrolled) {
                             Navigator.push(
@@ -146,7 +147,10 @@ class _CourseDetailViewState extends State<CourseDetailView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Enrollment Required'),
+        title: const Text(
+          'Enrollment Required',
+          style: TextStyle(color: AppPallete.lightErrorColor),
+        ),
         content: const Text(
             'You need to enroll in this course to view the lesson details.'),
         actions: [
@@ -156,11 +160,17 @@ class _CourseDetailViewState extends State<CourseDetailView> {
               // context.read<CourseBloc>().add(EnrollInCourse(widget.course.courseId));
               Navigator.of(context).pop();
             },
-            child: const Text('Enroll'),
+            child: const Text(
+              'Enroll',
+              style: TextStyle(color: AppPallete.accentColor),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppPallete.warningColor),
+            ),
           ),
         ],
       ),

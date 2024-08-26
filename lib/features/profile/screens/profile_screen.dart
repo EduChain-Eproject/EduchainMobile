@@ -1,3 +1,4 @@
+import 'package:educhain/core/auth/bloc/auth_bloc.dart';
 import 'package:educhain/core/models/user.dart';
 import 'package:educhain/core/widgets/layouts/teacher_layout.dart';
 import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
@@ -234,24 +235,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                       },
                     ),
-                    SizedBox(height: 8),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.logout,
-                      color: Colors.red,
-                      title: 'Logout',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: context.read<PersonalBloc>(),
-                              child: UserInterestsPage(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
                   ] else if (user!.role == 'TEACHER') ...[
                     _buildActionCard(
                       context,
@@ -262,12 +245,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.pushReplacement(
                           context,
                           TeacherLayout.route(
-                            initialPage: 1,
+                            initialPage: 0,
                           ),
                         );
                       },
                     ),
                   ],
+                  ...[
+                    SizedBox(height: 8),
+                    _buildActionCard(
+                      context,
+                      icon: Icons.logout,
+                      color: Colors.red,
+                      title: 'Logout',
+                      onTap: () {
+                        context.read<AuthBloc>().add(LogOutRequested());
+                      },
+                    ),
+                  ]
                 ],
               ),
             );

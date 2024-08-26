@@ -1,4 +1,5 @@
 import 'package:educhain/core/models/user_course.dart';
+import 'package:educhain/features/student.learning/course/screens/course_detail_screen.dart';
 import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
 import 'package:educhain/features/student.personal/models/participated_courses_request.dart';
 import 'package:flutter/material.dart';
@@ -39,14 +40,14 @@ class _FetchParticipatedCoursesPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Courses'),
+        title: const Text('My Courses'),
         backgroundColor: Colors.blueAccent,
         elevation: 4,
       ),
       body: BlocBuilder<PersonalBloc, PersonalState>(
         builder: (context, state) {
           if (state is ParticipatedCoursesLoading) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (state is ParticipatedCoursesLoaded) {
@@ -58,76 +59,82 @@ class _FetchParticipatedCoursesPageState
                     itemCount: state.courses.content.length,
                     itemBuilder: (context, index) {
                       UserCourse course = state.courses.content[index];
-                      return Card(
-                        margin: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 16.0),
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          CourseDetailScreen.route(course.courseDto?.id ?? 0),
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Container(
-                                  width: 80,
-                                  height: 80,
-                                  color: Colors.grey[200],
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.book,
-                                      size: 40,
-                                      color: Colors.grey[600],
+                        child: Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: Colors.grey[200],
+                                    child: Image.network(
+                                      '${course.courseDto?.avatarPath}',
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 16.0),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      course.courseDto?.title ?? 'No Title',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16.0,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8.0),
-                                    Text(
-                                      course.courseDto?.description ??
-                                          'No Description',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    SizedBox(height: 8.0),
-                                    LinearProgressIndicator(
-                                      value: (course.progress ?? 0) / 100,
-                                      backgroundColor: Colors.grey[300],
-                                      color: Colors.blueAccent,
-                                    ),
-                                    SizedBox(height: 8.0),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Enrollment Date: ${course.createdAt?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
-                                          style: TextStyle(
-                                              color: Colors.grey[600]),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        course.courseDto?.title ?? 'No Title',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0,
                                         ),
-                                      ],
-                                    ),
-                                  ],
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Text(
+                                        course.courseDto?.description ??
+                                            'No Description',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      LinearProgressIndicator(
+                                        value: (course.progress ?? 0) / 100,
+                                        backgroundColor: Colors.grey[300],
+                                        color: Colors.blueAccent,
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            course.completionStatus
+                                                .toString()
+                                                .substring(17),
+                                            style: TextStyle(
+                                                color: Colors.grey[600]),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -141,12 +148,12 @@ class _FetchParticipatedCoursesPageState
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text('Đã xảy ra lỗi khi tải khóa học: ${state.errors}',
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.red, fontWeight: FontWeight.bold)),
               ),
             );
           } else {
-            return Center(
+            return const Center(
               child: Text('Không có dữ liệu'),
             );
           }
@@ -167,26 +174,26 @@ class _FetchParticipatedCoursesPageState
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                suffixIcon: Icon(Icons.search),
+                suffixIcon: const Icon(Icons.search),
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
               ),
               onChanged: (value) {
                 _searchTitle = value;
               },
-              style: TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
             ),
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
           DropdownButton<CompletionStatus>(
             value: _selectedStatus,
-            hint: Text('Status'),
+            hint: const Text('Status'),
             items: CompletionStatus.values.map((status) {
               return DropdownMenuItem(
                 value: status,
                 child: Text(
                   status.toString().split('.').last,
-                  style: TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
               );
             }).toList(),
@@ -195,17 +202,17 @@ class _FetchParticipatedCoursesPageState
                 _selectedStatus = value;
               });
             },
-            style: TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
             dropdownColor: Colors.white,
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           IconButton(
-            icon: Icon(Icons.search, color: Colors.black),
+            icon: const Icon(Icons.search, color: Colors.black),
             onPressed: _fetchCourses,
             tooltip: 'Tìm kiếm',
             style: IconButton.styleFrom(
               backgroundColor: Colors.blueAccent,
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),

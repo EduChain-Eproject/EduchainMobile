@@ -141,7 +141,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
             const SizedBox(width: 2),
             if (_course?.status == CourseStatus.APPROVED)
               ElevatedButton(
-                onPressed: _deactivateCourse,
+                onPressed: _showDeactivateConfirmation,
                 child: const Text('Deactivate'),
               ),
           ],
@@ -152,7 +152,6 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
 
   Widget _buildCourseDescription() {
     return Column(children: [
-      Text(_course?.status?.name ?? ""),
       Text(
         _course?.description ?? '',
         style: const TextStyle(color: AppPallete.lightGreyColor, fontSize: 12),
@@ -183,6 +182,40 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
     Navigator.push(
       context,
       TeacherCourseFormScreen.route(_course),
+    );
+  }
+
+  void _showDeactivateConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Deactivation',
+            style: TextStyle(color: AppPallete.lightPrimaryColor),
+          ),
+          content:
+              const Text('Are you sure you want to deactivate this course?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deactivateCourse();
+              },
+              child: const Text(
+                'Confirm',
+                style: TextStyle(color: AppPallete.lightErrorColor),
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 

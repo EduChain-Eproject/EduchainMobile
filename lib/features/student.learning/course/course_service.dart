@@ -42,17 +42,13 @@ class CourseService extends ApiService {
 
   ApiResponse<UserInterests> addToWishlist(int courseId) async {
     return post<UserInterests>(
-      'STUDENT/add-to-wishlist/$courseId',
+      'STUDENT/add-to-wishlist',
       UserInterests.fromJson,
-      null,
+      {'courseId': courseId},
     );
   }
 
   ApiResponse<bool> deleteFromWishlist(int courseId) async {
-    return delete<bool>(
-      'STUDENT/delete-wishlist/$courseId',
-      null,
-      null,
-    );
+    return delete<bool>('STUDENT/delete-wishlist/$courseId', null, null);
   }
 }

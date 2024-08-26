@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:educhain/core/models/blog.dart';
 import 'package:educhain/core/models/blog_category.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../bloc/blog_bloc.dart';
 import '../models/update_blog_request.dart';
+import 'blog_detail_screen.dart';
 
 class UpdateBlogScreen extends StatefulWidget {
   final Blog blog;
@@ -80,7 +82,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update Blog'),
+        title: const Text('Update Blog'),
         backgroundColor: Colors.blueAccent, // AppBar background color
       ),
       body: SingleChildScrollView(
@@ -101,7 +103,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                             color: Colors.grey.withOpacity(0.3),
                             spreadRadius: 2,
                             blurRadius: 4,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
@@ -115,7 +117,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Center(
                       child: ElevatedButton(
                         onPressed: _pickImage,
@@ -125,15 +127,15 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text('Upload New Photo'),
+                        child: const Text('Upload New Photo'),
                       ),
                     ),
                   ],
                 ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Title',
                   labelStyle: TextStyle(color: Colors.teal),
                   border: OutlineInputBorder(),
@@ -148,14 +150,14 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               DropdownButtonFormField<BlogCategory>(
                 value: _categories.isNotEmpty
                     ? _categories.firstWhere(
                         (category) => category.id == _selectedCategory?.id,
                         orElse: () => _categories.first)
                     : null,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Category',
                   labelStyle: TextStyle(color: Colors.teal),
                   border: OutlineInputBorder(),
@@ -164,7 +166,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   return DropdownMenuItem(
                     value: category,
                     child: Text(category.categoryName ?? '',
-                        style: TextStyle(color: Colors.black)),
+                        style: const TextStyle(color: Colors.black)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -179,10 +181,10 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _textController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Text',
                   labelStyle: TextStyle(color: Colors.teal),
                   border: OutlineInputBorder(),
@@ -198,7 +200,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               if (_photo != null) ...[
                 Container(
                   decoration: BoxDecoration(
@@ -208,7 +210,7 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                         color: Colors.grey.withOpacity(0.3),
                         spreadRadius: 2,
                         blurRadius: 4,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -222,34 +224,45 @@ class _UpdateBlogScreenState extends State<UpdateBlogScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
               ],
-              Center(
-                child: ElevatedButton(
-                  onPressed: _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.greenAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text('Update Blog'),
-                ),
-              ),
-              BlocListener<BlogBloc, BlogState>(
+              BlocConsumer<BlogBloc, BlogState>(
                 listener: (context, state) {
                   if (state is BlogUpdated) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Blog updated successfully')),
+                      const SnackBar(
+                          content: Text('Blog updated successfully')),
                     );
                     Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            BlogDetailScreen(blog: state.blog),
+                      ),
+                    );
                   } else if (state is BlogUpdateError) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: ${state.errors}')),
                     );
                   }
                 },
-                child: Container(),
+                builder: (BuildContext context, BlogState state) {
+                  return Center(
+                    child: ElevatedButton(
+                      onPressed: _submitForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.greenAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: state is BlogUpdating
+                          ? const Loader()
+                          : const Text('Update Blog'),
+                    ),
+                  );
+                },
               ),
             ],
           ),

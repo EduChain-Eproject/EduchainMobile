@@ -35,47 +35,58 @@ class _ChapterDialogState extends State<ChapterDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title:
-          Text(widget.initialChapter == null ? 'Add Chapter' : 'Edit Chapter'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_errors?['message'] != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  _errors?['message']!,
-                  style: TextStyle(color: Colors.red),
+    return BlocListener<TeacherCourseBloc, TeacherCourseState>(
+      listener: (context, state) {
+        if (state is TeacherChapterSaveError) {
+          setState(() {
+            _errors = state.errors;
+          });
+        } else if (state is TeacherChapterSaved) {
+          Navigator.pop(context);
+        }
+      },
+      child: AlertDialog(
+        title: Text(
+            widget.initialChapter == null ? 'Add Chapter' : 'Edit Chapter'),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_errors?['message'] != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    _errors?['message']!,
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                    labelText: 'Chapter Title',
+                    errorText: _errors?['chapterTitle']),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
               ),
-            TextFormField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                  labelText: 'Chapter Title',
-                  errorText: _errors?['chapterTitle']),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a title';
-                }
-                return null;
-              },
-            ),
-          ],
+            ],
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: _saveChapter,
+            child: const Text('Save'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _saveChapter,
-          child: const Text('Save'),
-        ),
-      ],
     );
   }
 
@@ -101,16 +112,6 @@ class _ChapterDialogState extends State<ChapterDialog> {
                     ),
                   ),
           );
-
-      context.read<TeacherCourseBloc>().stream.listen((state) {
-        if (state is TeacherChapterSaveError) {
-          setState(() {
-            _errors = state.errors;
-          });
-        } else if (state is TeacherChapterSaved) {
-          Navigator.pop(context);
-        }
-      });
     }
   }
 }

@@ -66,4 +66,23 @@ class User {
           : null,
     );
   }
+
+  LearningProgress getLearningProgress() {
+    int total = courseDtosParticipated?.length ?? 0;
+    int completed = courseDtosParticipated
+            ?.where((uc) => uc.completionStatus == CompletionStatus.COMPLETED)
+            .length ??
+        0;
+    double progress = completed / total;
+
+    return LearningProgress(total, completed, progress);
+  }
+}
+
+class LearningProgress {
+  final int total;
+  final int completed;
+  final double progress;
+
+  LearningProgress(this.total, this.completed, this.progress);
 }

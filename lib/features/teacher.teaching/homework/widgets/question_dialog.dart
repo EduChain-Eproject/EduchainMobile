@@ -1,5 +1,6 @@
 import 'package:educhain/core/models/homework.dart';
 import 'package:educhain/core/models/question.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
 import 'package:educhain/features/teacher.teaching/homework/models/create_question_request.dart';
 import 'package:educhain/features/teacher.teaching/homework/models/update_answer_request.dart';
@@ -25,6 +26,7 @@ class _QuestionDialogState extends State<QuestionDialog> {
   late List<FocusNode> _answerFocusNodes;
   late int _correctAnswerIndex;
   late bool _isUpdating;
+  Map<String, dynamic>? _errors;
 
   @override
   void initState() {
@@ -75,64 +77,80 @@ class _QuestionDialogState extends State<QuestionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TeacherHomeworkBloc, TeacherHomeworkState>(
+    return BlocConsumer<TeacherHomeworkBloc, TeacherHomeworkState>(
       listener: (context, state) {
         if (state is TeacherQuestionSaveError) {
-          // Handle error
+          setState(() {
+            _errors = state.errors;
+          });
         } else if (state is TeacherQuestionSaved) {
           Navigator.pop(context);
         }
       },
-      child: AlertDialog(
-        title: Text(_isUpdating ? 'Edit Question' : 'Add Question'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _questionTextController,
-              decoration: const InputDecoration(labelText: 'Question Text'),
-            ),
-            const SizedBox(height: 10),
-            ..._answerControllers.asMap().entries.map((entry) {
-              final index = entry.key;
-              final controller = entry.value;
-              return Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      focusNode: _answerFocusNodes[index],
-                      decoration:
-                          InputDecoration(labelText: 'Answer ${index + 1}'),
+      builder: (context, state) {
+        return AlertDialog(
+          title: Text(_isUpdating ? 'Edit Question' : 'Add Question'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _questionTextController,
+                decoration: InputDecoration(
+                    labelText: 'Question Text',
+                    errorText: _errors?['questionText']),
+              ),
+              const SizedBox(height: 10),
+              ..._answerControllers.asMap().entries.map((entry) {
+                final index = entry.key;
+                final controller = entry.value;
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        focusNode: _answerFocusNodes[index],
+                        decoration:
+                            InputDecoration(labelText: 'Answer ${index + 1}'),
+                      ),
                     ),
-                  ),
-                  Radio<int>(
-                    value: index,
-                    groupValue: _correctAnswerIndex,
-                    onChanged: (value) {
-                      setState(() {
-                        _correctAnswerIndex = value!;
-                      });
-                    },
-                  ),
-                ],
-              );
-            }),
+                    Radio<int>(
+                      value: index,
+                      groupValue: _correctAnswerIndex,
+                      onChanged: (value) {
+                        setState(() {
+                          _correctAnswerIndex = value!;
+                        });
+                      },
+                    ),
+                  ],
+                );
+              }),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            if (_errors?['answerTexts'] != null)
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  _errors?['answerTexts'],
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ElevatedButton(
+              onPressed: _saveQuestion,
+              child: state is TeacherQuestionSaving
+                  ? const Loader()
+                  : const Text('Save'),
+            )
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: _saveQuestion,
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

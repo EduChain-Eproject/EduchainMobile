@@ -1,6 +1,7 @@
 import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/lesson.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/features/student.learning/lesson/widgets/video_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,97 +72,113 @@ class _LessonDialogState extends State<LessonDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.initialLesson == null ? 'Add Lesson' : 'Edit Lesson'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_errors?['message'] != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  _errors!['message'],
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            if (_videoError != null)
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                color: Colors.redAccent,
-                child: Text(
-                  _videoError!,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            _controller.value.isInitialized
-                ? AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
-                  )
-                : Container(),
-            if (_controller.value.isInitialized)
-              VideoControls(controller: _controller),
-            TextFormField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                  labelText: 'Lesson Title', errorText: _errors?['title']),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a title';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: InputDecoration(
-                  labelText: 'Lesson Description',
-                  errorText: _errors?['description']),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a description';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16.0),
-            Row(
+    return BlocConsumer<TeacherCourseBloc, TeacherCourseState>(
+      listener: (context, state) {
+        if (state is TeacherLessonSaveError) {
+          setState(() {
+            _errors = state.errors;
+          });
+        } else if (state is TeacherLessonSaved) {
+          Navigator.pop(context);
+        }
+      },
+      builder: (context, state) {
+        return AlertDialog(
+          title:
+              Text(widget.initialLesson == null ? 'Add Lesson' : 'Edit Lesson'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                if (_videoFile != null)
-                  const Text(
-                    'Video selected!',
-                    style: TextStyle(fontSize: 16),
+                if (_errors?['message'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      _errors!['message'],
+                      style: const TextStyle(color: Colors.red),
+                    ),
                   ),
-                ElevatedButton(
-                  onPressed: _pickVideo,
-                  child: Text(
-                      'Pick ${(_videoFile != null) ? "Another" : "Video"}'),
+                if (_videoError != null)
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    color: Colors.redAccent,
+                    child: Text(
+                      _videoError!,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                _controller.value.isInitialized
+                    ? AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      )
+                    : Container(),
+                if (_controller.value.isInitialized)
+                  VideoControls(controller: _controller),
+                TextFormField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                      labelText: 'Lesson Title', errorText: _errors?['title']),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a title';
+                    }
+                    return null;
+                  },
                 ),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: InputDecoration(
+                      labelText: 'Lesson Description',
+                      errorText: _errors?['description']),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    if (_videoFile != null)
+                      const Text(
+                        'Video selected!',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ElevatedButton(
+                      onPressed: _pickVideo,
+                      child: Text(
+                          'Pick ${(_videoFile != null) ? "Another" : "Video"}'),
+                    ),
+                  ],
+                ),
+                if (_errors?['videoFile'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      _errors!['videoFile']!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
               ],
             ),
-            if (_errors?['videoFile'] != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  _errors!['videoFile']!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: _saveLesson,
+              child: state is TeacherLessonSaving
+                  ? const Loader()
+                  : const Text('Save'),
+            ),
           ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _saveLesson,
-          child: const Text('Save'),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -193,17 +210,6 @@ class _LessonDialogState extends State<LessonDialog> {
                     ),
                   ),
           );
-
-      // Listen to the bloc state for errors
-      context.read<TeacherCourseBloc>().stream.listen((state) {
-        if (state is TeacherLessonSaveError) {
-          setState(() {
-            _errors = state.errors;
-          });
-        } else if (state is TeacherLessonSaved) {
-          Navigator.pop(context);
-        }
-      });
     }
   }
 

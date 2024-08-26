@@ -29,6 +29,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
   void initState() {
     super.initState();
     _courseBloc = getIt<CourseBloc>();
+    if (widget.selectedCategory != null) {
+      _selectedCategoryIds.add(widget.selectedCategory!);
+    }
     _searchCourses();
   }
 
@@ -76,26 +79,6 @@ class _CourseListScreenState extends State<CourseListScreen> {
                           },
                         ),
                       ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Text('All'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Text('Popular'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Text('New'),
-                          ),
-                        ],
-                      ),
                     ),
                     BlocBuilder<CourseBloc, CourseState>(
                       builder: (context, state) {

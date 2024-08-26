@@ -1,5 +1,6 @@
+import 'package:educhain/core/auth/bloc/auth_bloc.dart';
 import 'package:educhain/core/widgets/layouts/student_layout.dart';
-import 'package:educhain/features/blog/screens/list_blogs_screen.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:educhain/core/models/blog.dart';
@@ -14,126 +15,154 @@ class BlogDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(blog.title ?? 'Blog Detail'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UpdateBlogScreen(blog: blog),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              _showDeleteConfirmationDialog(context);
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (blog.photo != null)
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8.0,
-                        offset: Offset(0, 4),
+    return BlocSelector<AuthBloc, AuthState, AuthAuthenticated>(
+      selector: (state) {
+        return state as AuthAuthenticated;
+      },
+      builder: (context, state) {
+        return BlocListener<BlogBloc, BlogState>(
+          listener: (context, state) {
+            if (state is BlogDeleted) {
+              Navigator.pop(context);
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(blog.title ?? 'Blog Detail'),
+              actions: blog.user?.id == state.user.id
+                  ? [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  UpdateBlogScreen(blog: blog),
+                            ),
+                          );
+                        },
                       ),
-                    ],
-                  ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Image.network(
-                    'http://127.0.0.1:8080/uploads/${blog.photo!}',
-                    fit: BoxFit.cover,
-                    height: 200,
-                    width: double.infinity,
-                  ),
-                ),
-              SizedBox(height: 16.0),
-              Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        blog.title ?? 'No Title',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          _showDeleteConfirmationDialog(context);
+                        },
                       ),
-                      SizedBox(height: 8.0),
-                      Text(
-                        blog.blogText ?? 'No Content',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Colors.black87,
-                                ),
+                    ]
+                  : [],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (blog.photo != null)
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8.0,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                        child: Image.network(
+                          'http://127.0.0.1:8080/uploads/${blog.photo!}',
+                          fit: BoxFit.cover,
+                          height: 200,
+                          width: double.infinity,
+                        ),
                       ),
-                      SizedBox(height: 16.0),
-                      if (blog.user != null) ...[
-                        Text(
-                          'Author: ${blog.user?.firstName ?? 'Unknown'}',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.black54,
+                    const SizedBox(height: 16.0),
+                    Card(
+                      elevation: 4.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              blog.title ?? 'No Title',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
-                        ),
-                        SizedBox(height: 8.0),
-                      ],
-                      if (blog.blogCategory != null) ...[
-                        Text(
-                          'Category: ${blog.blogCategory?.categoryName ?? 'No Category'}',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.black54,
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              blog.blogText ?? 'No Content',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    color: Colors.black87,
                                   ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            if (blog.user != null) ...[
+                              Text(
+                                'Author: ${blog.user?.firstName ?? 'Unknown'}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Colors.black54,
+                                    ),
+                              ),
+                              const SizedBox(height: 8.0),
+                            ],
+                            if (blog.blogCategory != null) ...[
+                              Text(
+                                'Category: ${blog.blogCategory?.categoryName ?? 'No Category'}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Colors.black54,
+                                    ),
+                              ),
+                              const SizedBox(height: 8.0),
+                            ],
+                            if (blog.voteUp != null) ...[
+                              Text(
+                                'Votes: ${blog.voteUp}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Colors.black54,
+                                    ),
+                              ),
+                              const SizedBox(height: 16.0),
+                            ],
+                            if (blog.blogComments != null &&
+                                blog.blogComments!.isNotEmpty) ...[
+                              CommentSection(
+                                  comments: blog.blogComments!,
+                                  blogId: blog.id!),
+                            ],
+                          ],
                         ),
-                        SizedBox(height: 8.0),
-                      ],
-                      if (blog.voteUp != null) ...[
-                        Text(
-                          'Votes: ${blog.voteUp}',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.black54,
-                                  ),
-                        ),
-                        SizedBox(height: 16.0),
-                      ],
-                      if (blog.blogComments != null &&
-                          blog.blogComments!.isNotEmpty) ...[
-                        CommentSection(
-                            comments: blog.blogComments!, blogId: blog.id!),
-                      ],
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -141,24 +170,30 @@ class BlogDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete this blog?'),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Delete'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                _deleteBlog(context);
-              },
-            ),
-          ],
+        return BlocBuilder<BlogBloc, BlogState>(
+          builder: (context, state) {
+            return AlertDialog(
+              title: const Text('Confirm Delete'),
+              content: const Text('Are you sure you want to delete this blog?'),
+              actions: [
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                if (state is! BlogDeleting)
+                  TextButton(
+                    child: const Text('Delete'),
+                    onPressed: () {
+                      _deleteBlog(context);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                if (state is BlogDeleting) const Loader()
+              ],
+            );
+          },
         );
       },
     );
@@ -166,19 +201,5 @@ class BlogDetailScreen extends StatelessWidget {
 
   void _deleteBlog(BuildContext context) {
     context.read<BlogBloc>().add(DeleteBlog(blog.id!));
-
-    // Navigate back to StudentLayout and select BlogListScreen
-    Navigator.of(context)
-        .popUntil((route) => route.settings.name == '/student-layout');
-
-    // After returning to StudentLayout, use PageController to navigate to BlogListScreen
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => StudentLayout(
-          initialPage: 2, // Index of BlogListScreen
-        ),
-      ),
-      (route) => false,
-    );
   }
 }

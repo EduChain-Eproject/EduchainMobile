@@ -78,7 +78,7 @@ class _FilterBarState extends State<FilterBar> {
           BlocBuilder<CategoriesBloc, CategoriesState>(
             builder: (context, state) {
               if (state is CategoriesLoading) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (state is CategoriesLoaded) {
                 return Wrap(
                   spacing: 8.0,
@@ -94,29 +94,9 @@ class _FilterBarState extends State<FilterBar> {
                   }).toList(),
                 );
               } else {
-                return Text('Failed to load categories');
+                return const Text('Failed to load categories');
               }
             },
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Price',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          RangeSlider(
-            values: RangeValues(90, 200),
-            min: 0,
-            max: 300,
-            divisions: 10,
-            labels: RangeLabels(
-              '\$90',
-              '\$200',
-            ),
-            onChanged: (RangeValues newRange) {},
           ),
           const SizedBox(height: 16),
           Row(
@@ -130,12 +110,12 @@ class _FilterBarState extends State<FilterBar> {
                 ),
               ),
               ChoiceChip(
-                label: Text('Price'),
+                label: const Text('Price'),
                 selected: _selectedSortOption == 'price',
                 onSelected: (_) => _onSortOptionSelected('price'),
               ),
               ChoiceChip(
-                label: Text('Title'),
+                label: const Text('Title'),
                 selected: _selectedSortOption == 'title',
                 onSelected: (_) => _onSortOptionSelected('title'),
               ),
@@ -149,6 +129,7 @@ class _FilterBarState extends State<FilterBar> {
                 onPressed: () {
                   setState(() {
                     _selectedCategoryIds.clear();
+                    _selectedSortOption = 'title';
                   });
                 },
                 style: ElevatedButton.styleFrom(

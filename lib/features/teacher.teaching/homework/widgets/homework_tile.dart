@@ -53,6 +53,14 @@ class _HomeworkTileState extends State<HomeworkTile> {
                   );
                 },
               ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  context
+                      .read<TeacherHomeworkBloc>()
+                      .add(TeacherDeleteHomework(widget.homework.id!));
+                },
+              ),
             ],
           ),
         ),

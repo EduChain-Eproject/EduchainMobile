@@ -1,5 +1,7 @@
 import 'package:educhain/features/blog/bloc/blog_bloc.dart';
 import 'package:educhain/features/blog/blog_service.dart';
+import 'package:educhain/features/student.learning/course/blocs/payment/payment_bloc.dart';
+import 'package:educhain/features/student.learning/course/payment_service.dart';
 import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
 import 'package:educhain/features/student.personal/student_personal_service.dart';
 import 'package:get_it/get_it.dart';
@@ -76,4 +78,8 @@ Future<void> initDependencies() async {
 
   getIt.registerSingleton<BlogService>(BlogService());
   getIt.registerFactory<BlogBloc>(() => BlogBloc(getIt<BlogService>()));
+
+  getIt.registerSingleton<PaymentService>(PaymentService());
+  getIt
+      .registerFactory<PaymentBloc>(() => PaymentBloc(getIt<PaymentService>()));
 }

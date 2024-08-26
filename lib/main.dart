@@ -1,4 +1,5 @@
 import 'package:educhain/features/blog/bloc/blog_bloc.dart';
+import 'package:educhain/features/student.learning/course/blocs/payment/payment_bloc.dart';
 import 'package:educhain/features/student.personal/bloc/personal_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,7 +72,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => getIt<TeacherHomeworkBloc>(),
         ),
-        BlocProvider(create: (context) => getIt<BlogBloc>())
+        BlocProvider(create: (context) => getIt<BlogBloc>()),
+        BlocProvider(create: (context) => getIt<PaymentBloc>())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -10,8 +10,7 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  static const apiUrl =
-      'https://13ad-2402-800-63b7-86dc-101b-c1ab-e88d-6637.ngrok-free.app';
+  static const apiUrl = 'https://7ebb-115-76-51-132.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -19,13 +18,26 @@ abstract class ApiService {
   ) async {
     return _performApiCall<T>(
       (headers) => http.get(Uri.parse('$apiUrl/$endpoint'), headers: headers),
-      (data) {
-        if (data is Map<String, dynamic> && fromJson != null) {
-          return fromJson(data);
-        } else {
-          throw FormatException('Expected list but got ${data.runtimeType}');
-        }
-      },
+      // (data) {
+      //   if (data is Map<String, dynamic> && fromJson != null) {
+      //     return fromJson(data);
+      //   } else {
+      //     throw FormatException('Expected list but got ${data.runtimeType}');
+      //   }
+      // },
+      fromJson != null
+          ? (data) {
+              if (data is String && T == String) {
+                return data as T; // Return as string directly
+              } else if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                  'Unexpected data type: ${data.runtimeType}',
+                );
+              }
+            }
+          : null,
     );
   }
 
@@ -80,6 +92,33 @@ abstract class ApiService {
               } else {
                 throw FormatException(
                     'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
+    );
+  }
+
+  ApiResponse<T> postPaypal<T>(
+    String endpoint,
+    T Function(dynamic)? fromJson,
+    Map<String, dynamic>? data,
+  ) async {
+    return _performApiCall<T>(
+      (headers) => http.post(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: headers,
+        body: data != null ? jsonEncode(data) : null,
+      ),
+      fromJson != null
+          ? (data) {
+              if (data is String && T == String) {
+                return data as T; // Return as string directly
+              } else if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                  'Unexpected data type: ${data.runtimeType}',
+                );
               }
             }
           : null,

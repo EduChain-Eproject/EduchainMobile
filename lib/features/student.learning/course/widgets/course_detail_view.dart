@@ -1,14 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/theme/app_pallete.dart';
+import 'package:educhain/features/student.learning/course/blocs/payment/payment_bloc.dart';
+import 'package:educhain/features/student.learning/course/widgets/bottom_button.dart';
+import 'package:educhain/features/student.learning/course/widgets/chapter_section.dart';
+import 'package:educhain/features/student.learning/course/widgets/course_info.dart';
+import 'package:educhain/features/student.learning/course/widgets/participated_users_section.dart';
+import 'package:educhain/features/student.learning/course/widgets/paypal_webview.dart';
+import 'package:educhain/features/student.learning/course/widgets/related_course_section.dart';
 import 'package:educhain/features/student.learning/lesson/screens/lesson_detail_screen.dart';
-
-import '../widgets/bottom_button.dart';
-import '../widgets/chapter_section.dart';
-import '../widgets/course_header.dart';
-import '../widgets/course_info.dart';
-import '../widgets/related_course_section.dart';
-import '../widgets/participated_users_section.dart';
+import 'package:educhain/features/teacher.teaching/course/widgets/course_header.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CourseDetailView extends StatefulWidget {
   final Course course;
@@ -20,6 +22,20 @@ class CourseDetailView extends StatefulWidget {
 
 class _CourseDetailViewState extends State<CourseDetailView> {
   String _contentToShow = 'description';
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<PaymentBloc>().stream.listen((state) {
+      if (state is PaymentSuccessState) {
+        _navigateToPayPalWebView(state.approvalUrl);
+      } else if (state is PaymentFailureState) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(state.errors.toString())),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +102,44 @@ class _CourseDetailViewState extends State<CourseDetailView> {
     );
   }
 
+  void _showEnrollmentPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Enrollment Required'),
+        content: const Text(
+            'You need to enroll in this course to view the lesson details.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _initiatePayment(context);
+            },
+            child: const Text('Enroll'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _initiatePayment(BuildContext context) {
+    final courseId = widget.course.id ?? 0;
+    context.read<PaymentBloc>().add(InitiatePayment(courseId));
+  }
+
+  void _navigateToPayPalWebView(String approvalUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PayPalWebViewScreen(approvalUrl: approvalUrl),
+      ),
+    );
+  }
+
   Row _buildContentSwitcher() {
     return Row(
       children: [
@@ -139,31 +193,6 @@ class _CourseDetailViewState extends State<CourseDetailView> {
           ),
         ),
       ],
-    );
-  }
-
-  void _showEnrollmentPrompt(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Enrollment Required'),
-        content: const Text(
-            'You need to enroll in this course to view the lesson details.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // TODO: handle enrollment
-              // context.read<CourseBloc>().add(EnrollInCourse(widget.course.courseId));
-              Navigator.of(context).pop();
-            },
-            child: const Text('Enroll'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
     );
   }
 }

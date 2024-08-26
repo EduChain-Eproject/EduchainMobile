@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 class CategoryWidget extends StatelessWidget {
   final List<Category> categories;
 
-  CategoryWidget({required this.categories});
+  const CategoryWidget({required this.categories});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120, // Increased height for better spacing
-      padding: const EdgeInsets.symmetric(vertical: 8), // Add padding
+      height: 150, // Increased height for better spacing
+      padding:
+          const EdgeInsets.symmetric(vertical: 16), // More vertical padding
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
@@ -29,22 +30,30 @@ class CategoryWidget extends StatelessWidget {
               );
             },
             child: Container(
-              width: 180, // Increased width for better content fit
-              margin: const EdgeInsets.only(right: 16), // Adjusted margin
+              width: 200, // Increased width for better content fit
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 8), // Balanced margin
               decoration: BoxDecoration(
-                color: AppPallete.accentColor,
-                borderRadius: BorderRadius.circular(12), // Rounded corners
+                gradient: const LinearGradient(
+                  colors: [
+                    AppPallete.accentColor,
+                    AppPallete.darkAccentColor
+                  ], // Gradient for visual appeal
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(15), // Rounded corners
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withOpacity(0.1),
                     spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -53,7 +62,7 @@ class CategoryWidget extends StatelessWidget {
                         child: Text(
                           category.categoryName ?? "",
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: AppPallete.lightWhiteColor,
                           ),
@@ -61,13 +70,16 @@ class CategoryWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Text(
                       category.categoryDescription ?? "",
                       style: const TextStyle(
                         fontSize: 14,
                         color: AppPallete.lightWhiteColor,
+                        fontWeight:
+                            FontWeight.w300, // Lighter text for description
                       ),
+                      maxLines: 2, // Limit the text to 2 lines for a neat look
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

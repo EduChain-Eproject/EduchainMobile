@@ -70,7 +70,6 @@ class _LessonDetailContentState extends State<LessonDetailContent> {
             widget.lesson.lessonTitle ?? '',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 16.0),
           Text(
             widget.lesson.lessonTitle ?? '',
             style: const TextStyle(

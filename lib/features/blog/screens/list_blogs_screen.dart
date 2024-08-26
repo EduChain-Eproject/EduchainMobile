@@ -23,10 +23,10 @@ class _BlogListScreenState extends State<BlogListScreen> {
   String _sortOption = 'Relevance';
   List<String> _sortOptions = [
     'Relevance',
-    'MOST_LIKE',
-    'MOST_COMMENT',
-    'DATE_ASC',
-    'DATE_DESC'
+    'Most Liked',
+    'Most Commented',
+    'Date Ascending',
+    'Date Descending'
   ];
   List<BlogCategory> _categories = [];
   List<Blog> _blogData = [];
@@ -47,18 +47,10 @@ class _BlogListScreenState extends State<BlogListScreen> {
           _categories = response.data!;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching categories: ${response.error}'),
-          ),
-        );
+        _showError('Error fetching categories: ${response.error}');
       }
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching categories: $error'),
-        ),
-      );
+      _showError('Error fetching categories: $error');
     }
   }
 
@@ -74,10 +66,19 @@ class _BlogListScreenState extends State<BlogListScreen> {
   }
 
   void _createNewBlog() {
-    // Navigate to the blog creation screen
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CreateBlogScreen()),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -85,9 +86,9 @@ class _BlogListScreenState extends State<BlogListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Blogs'),
-        backgroundColor: Colors.blueAccent, // Match the UserInterestsPage color
-        elevation: 4, // Add elevation for a subtle shadow
+        title: const Text('Blog List'),
+        backgroundColor: Colors.blueAccent,
+        elevation: 4,
       ),
       body: Column(
         children: [
@@ -107,18 +108,26 @@ class _BlogListScreenState extends State<BlogListScreen> {
           ),
           Expanded(
             child: BlocConsumer<BlogBloc, BlogState>(
-              listener: (BuildContext context, BlogState state) {
+              listener: (context, state) {
                 if (state is BlogsLoaded) {
-                  _blogData = state.blogs.content;
+                  setState(() {
+                    _blogData = state.blogs.content;
+                  });
                 } else if (state is BlogSaved) {
-                  _blogData = [state.blog, ..._blogData];
+                  setState(() {
+                    _blogData = [state.blog, ..._blogData];
+                  });
                 } else if (state is BlogUpdated) {
-                  _blogData = _blogData
-                      .map((b) => b.id == state.blog.id ? state.blog : b)
-                      .toList();
+                  setState(() {
+                    _blogData = _blogData
+                        .map((b) => b.id == state.blog.id ? state.blog : b)
+                        .toList();
+                  });
                 } else if (state is BlogDeleted) {
-                  _blogData =
-                      _blogData.where((b) => b.id != state.blog.id).toList();
+                  setState(() {
+                    _blogData =
+                        _blogData.where((b) => b.id != state.blog.id).toList();
+                  });
                 }
               },
               builder: (context, state) {
@@ -154,7 +163,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
         onPressed: _createNewBlog,
         child: const Icon(Icons.add),
         tooltip: 'Create New Blog',
-        backgroundColor: Colors.blueAccent, // Match the AppBar color
+        backgroundColor: Colors.blueAccent,
       ),
     );
   }

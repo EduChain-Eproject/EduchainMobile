@@ -27,7 +27,7 @@ class CourseInfo extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '${course.numberOfEnrolledStudents} students enrolled - ${course.numberOfLessons} lessons',
+                    '${course.numberOfEnrolledStudents} students enrolled',
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 14,

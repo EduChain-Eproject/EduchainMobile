@@ -14,22 +14,27 @@ class HomeworkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        homework.title ?? 'No title ',
-        style: TextStyle(fontSize: 18),
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      elevation: 2,
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12.0),
+        title: Text(
+          homework.title ?? 'No title',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(homework.description ?? 'No description'),
+        trailing: Icon(
+          isCurrentUserFinished ? Icons.check_circle : Icons.play_circle,
+          color: isCurrentUserFinished ? Colors.green : Colors.grey,
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            HomeworkDetailScreen.route(homework.id!),
+          );
+        },
       ),
-      subtitle: Text(homework.description ?? 'No description '),
-      trailing: Icon(
-        isCurrentUserFinished ? Icons.check_circle : Icons.play_circle,
-        color: isCurrentUserFinished ? Colors.green : Colors.grey,
-      ),
-      onTap: () {
-        Navigator.push(
-          context,
-          HomeworkDetailScreen.route(homework.id!),
-        );
-      },
     );
   }
 }

@@ -12,21 +12,20 @@ class CourseWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
           const Text(
             'Popular Courses',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
-          Column(
-            children: courses
-                .map((course) => _buildCourseCard(context, course))
-                .toList(),
-          ),
+          const SizedBox(height: 15),
+          ...courses
+              .map((course) => _buildCourseCard(context, course))
+              .toList(),
         ],
       ),
     );
@@ -40,81 +39,84 @@ class CourseWidget extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 20.0),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent.withOpacity(0.7), Colors.blue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 3,
+              blurRadius: 6,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      course.title ?? "",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      course.description ?? "",
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
                         Text(
-                          course.title ?? "",
+                          "\$ ${course.price}",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(width: 20),
                         Text(
-                          course.description ?? "",
+                          '${course.participatedUserDtos?.length ?? 0} Enrollments',
                           style: const TextStyle(
-                            color: Colors.grey,
+                            color: Colors.white70,
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        const SizedBox(height: 10),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: course.avatarPath != null
-                        ? Image.network(course.avatarPath!, fit: BoxFit.cover)
-                        : null,
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    "\$ ${course.price}",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '${course.participatedUserDtos?.length} Enrollments',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.grey[200],
+                  child: course.avatarPath != null
+                      ? Image.network(course.avatarPath!, fit: BoxFit.cover)
+                      : const Icon(Icons.image_not_supported,
+                          color: Colors.grey, size: 40),
+                ),
               ),
             ],
           ),

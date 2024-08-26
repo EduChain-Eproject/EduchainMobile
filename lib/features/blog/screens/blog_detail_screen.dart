@@ -1,4 +1,5 @@
 import 'package:educhain/core/auth/bloc/auth_bloc.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/widgets/layouts/student_layout.dart';
 import 'package:educhain/core/widgets/loader.dart';
 import 'package:flutter/material.dart';
@@ -173,7 +174,10 @@ class BlogDetailScreen extends StatelessWidget {
         return BlocBuilder<BlogBloc, BlogState>(
           builder: (context, state) {
             return AlertDialog(
-              title: const Text('Confirm Delete'),
+              title: const Text(
+                'Confirm Delete',
+                style: TextStyle(color: AppPallete.lightErrorColor),
+              ),
               content: const Text('Are you sure you want to delete this blog?'),
               actions: [
                 TextButton(

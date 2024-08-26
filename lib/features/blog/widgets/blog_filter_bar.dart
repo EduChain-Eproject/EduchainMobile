@@ -1,6 +1,8 @@
 import 'package:educhain/core/models/blog_category.dart';
 import 'package:flutter/material.dart';
 
+import 'multiselect_dialog.dart';
+
 class BlogSearchFilterBar extends StatefulWidget {
   final Function(String, List<int>, String) onFilterChanged;
   final List<String> sortOptions;
@@ -43,10 +45,11 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Search Field
           TextField(
             decoration: InputDecoration(
               contentPadding:
@@ -67,7 +70,9 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
               _applyFilters();
             },
           ),
-          SizedBox(height: 8.0),
+          SizedBox(height: 12.0),
+
+          // Sort By Dropdown
           DropdownButtonFormField<String>(
             value: _sortOption,
             decoration: InputDecoration(
@@ -87,9 +92,7 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
                 value: option,
                 child: Text(
                   _sortOptionLabels[option] ?? option,
-                  style: TextStyle(
-                    color: Colors.black87, // Slightly darker text color
-                  ),
+                  style: TextStyle(color: Colors.black87),
                 ),
               );
             }).toList(),
@@ -99,39 +102,36 @@ class _BlogSearchFilterBarState extends State<BlogSearchFilterBar> {
               });
               _applyFilters();
             },
-            style: TextStyle(
-              color: Colors.black87, // Consistent text color
-            ),
+            style: TextStyle(color: Colors.black87),
           ),
-          SizedBox(height: 8.0),
-          if (widget.categories != null) // Check if categories is not null
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 4.0,
-              children: widget.categories!.map((category) {
-                return ChoiceChip(
-                  label: Text(category.categoryName!),
-                  selected: _selectedCategoryIds.contains(category.id),
-                  selectedColor: Colors.blueAccent.withOpacity(0.2),
-                  backgroundColor: Colors.grey[200],
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedCategoryIds.add(category.id!);
-                      } else {
-                        _selectedCategoryIds.remove(category.id);
-                      }
-                    });
-                    _applyFilters();
-                  },
-                  labelStyle: TextStyle(
-                    color: _selectedCategoryIds.contains(category.id)
-                        ? Colors.blueAccent
-                        : Colors.black87,
+          SizedBox(height: 12.0),
+
+          // Categories Button
+          if (widget.categories != null && widget.categories!.isNotEmpty)
+            ElevatedButton(
+              onPressed: () async {
+                final result = await showDialog<List<int>>(
+                  context: context,
+                  builder: (context) => MultiSelectDialog(
+                    categories: widget.categories!,
+                    selectedCategoryIds: _selectedCategoryIds,
+                    onSelectionChanged: (selectedIds) {
+                      setState(() {
+                        _selectedCategoryIds = selectedIds;
+                      });
+                      _applyFilters();
+                    },
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
                 );
-              }).toList(),
+
+                if (result != null) {
+                  setState(() {
+                    _selectedCategoryIds = result;
+                  });
+                  _applyFilters();
+                }
+              },
+              child: Text('Select Categories'),
             ),
         ],
       ),

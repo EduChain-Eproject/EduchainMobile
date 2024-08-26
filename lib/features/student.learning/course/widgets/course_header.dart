@@ -9,39 +9,45 @@ class CourseHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF5F5),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 6,
+            offset: const Offset(0, 3), // changes position of shadow
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          Image.network(
-            '${course.avatarPath}',
-            height: 100,
-            width: 300,
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(height: 20),
-          if (true)
-            const Text(
-              'BESTSELLER',
-              style: TextStyle(
-                color: Colors.yellow,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              course.avatarPath ?? '',
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[200],
+                child: const Icon(Icons.image, size: 160, color: Colors.grey),
               ),
             ),
-          const SizedBox(height: 10),
+          ),
+          const SizedBox(height: 12),
           Text(
             course.title ?? '',
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 24,
+              fontSize: 26,
+              color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
         ],
       ),
     );

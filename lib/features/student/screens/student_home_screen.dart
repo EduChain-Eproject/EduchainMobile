@@ -32,19 +32,29 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         body: BlocBuilder<StudentHomeBloc, StudentHomeState>(
           builder: (context, state) {
             if (state is StudentHomeLoading) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (state is StudentHomeLoaded) {
               return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const HeaderWidget(),
-                    ProgressSection(),
-                    CategoryWidget(categories: state.categories),
-                    CourseWidget(courses: state.courses),
-                    BestTeacherWidget(teacher: state.bestTeacher),
-                    StatisticsWidget(statistics: state.statistics),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0), // Add horizontal padding
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const HeaderWidget(),
+                      const SizedBox(height: 20),
+                      ProgressSection(),
+                      const SizedBox(height: 20),
+                      CategoryWidget(categories: state.categories),
+                      const SizedBox(height: 20),
+                      CourseWidget(courses: state.courses),
+                      const SizedBox(height: 20),
+                      BestTeacherWidget(teacher: state.bestTeacher),
+                      const SizedBox(height: 20),
+                      StatisticsWidget(statistics: state.statistics),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               );
             } else if (state is StudentHomeError) {

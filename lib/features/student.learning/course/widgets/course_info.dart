@@ -19,14 +19,6 @@ class CourseInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title ?? '',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
                     '${course.numberOfEnrolledStudents} students enrolled',
                     style: const TextStyle(
                       color: Colors.grey,

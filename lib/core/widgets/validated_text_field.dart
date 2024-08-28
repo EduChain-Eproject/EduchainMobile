@@ -20,15 +20,22 @@ class ValidatedTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        errorText: errorText,
-      ),
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      onChanged: onChanged,
+    return Column(
+      children: [
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            errorText: errorText,
+          ),
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          onChanged: onChanged,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
     );
   }
 }

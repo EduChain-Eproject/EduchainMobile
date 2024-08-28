@@ -1,3 +1,4 @@
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/types/text_field_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,43 +76,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (state is AuthLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          return Padding(
+          return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ..._textFields.map((field) {
                   return field.generateTextField((_) => _clearError(field));
                 }).toList(),
-                const SizedBox(height: 20),
-                Column(
+                Row(
                   children: [
-                    RadioListTile<String>(
-                      title: const Text('Student'),
-                      value: 'STUDENT',
-                      groupValue: _accountType,
-                      onChanged: (value) {
-                        setState(() {
-                          _accountType = value!;
-                        });
-                      },
+                    Flexible(
+                      child: RadioListTile<String>(
+                        title: const Text('Student'),
+                        value: 'STUDENT',
+                        groupValue: _accountType,
+                        onChanged: (value) {
+                          setState(() {
+                            _accountType = value!;
+                          });
+                        },
+                      ),
                     ),
-                    RadioListTile<String>(
-                      title: const Text('Teacher'),
-                      value: 'TEACHER',
-                      groupValue: _accountType,
-                      onChanged: (value) {
-                        setState(() {
-                          _accountType = value!;
-                        });
-                      },
+                    Flexible(
+                      child: RadioListTile<String>(
+                        title: const Text('Teacher'),
+                        value: 'TEACHER',
+                        groupValue: _accountType,
+                        onChanged: (value) {
+                          setState(() {
+                            _accountType = value!;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _onRegisterPressed,
-                  child: const Text('Register'),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _onRegisterPressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppPallete.lightPrimaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: const Text(
+                      'Register',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppPallete.lightBackgroundColor,
+                      ),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 50),
               ],
             ),
           );

@@ -50,13 +50,9 @@ class _LessonDetailContentState extends State<LessonDetailContent> {
       child: ListView(
         children: [
           if (_videoError != null)
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              color: Colors.redAccent,
-              child: Text(
-                _videoError!,
-                style: const TextStyle(color: Colors.white),
-              ),
+            Text(
+              _videoError!,
+              style: const TextStyle(color: Colors.white),
             ),
           _controller.value.isInitialized
               ? AspectRatio(
@@ -66,10 +62,6 @@ class _LessonDetailContentState extends State<LessonDetailContent> {
               : Container(),
           if (_controller.value.isInitialized)
             VideoControls(controller: _controller),
-          Text(
-            widget.lesson.lessonTitle ?? '',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
           Text(
             widget.lesson.lessonTitle ?? '',
             style: const TextStyle(

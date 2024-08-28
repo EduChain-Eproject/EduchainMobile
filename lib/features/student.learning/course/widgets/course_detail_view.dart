@@ -8,9 +8,10 @@ import 'package:educhain/features/student.learning/course/widgets/participated_u
 import 'package:educhain/features/student.learning/course/widgets/paypal_webview.dart';
 import 'package:educhain/features/student.learning/course/widgets/related_course_section.dart';
 import 'package:educhain/features/student.learning/lesson/screens/lesson_detail_screen.dart';
-import 'package:educhain/features/teacher.teaching/course/widgets/course_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'course_header.dart';
 
 class CourseDetailView extends StatefulWidget {
   final Course course;
@@ -63,6 +64,7 @@ class _CourseDetailViewState extends State<CourseDetailView> {
                     _buildContentSwitcher(),
                     if (_contentToShow == 'curriculum')
                       ChaptersSection(
+                        isEnrolled: isEnrolled,
                         chapters: widget.course.chapterDtos ?? [],
                         onLessonTap: (lessonId) {
                           if (isEnrolled) {

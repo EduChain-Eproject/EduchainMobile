@@ -75,20 +75,20 @@ class CourseCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              if (course.currentUserCourse != null) ...[
-                LinearProgressIndicator(
-                  value: course.currentUserCourse?.progress ?? 0,
-                  minHeight: 8,
-                  backgroundColor: Colors.grey[300],
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Completed ${(course.currentUserCourse?.progress ?? 0) * 100}%',
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ],
+              // const SizedBox(height: 8),
+              // if (course.currentUserCourse != null) ...[
+              //   LinearProgressIndicator(
+              //     value: course.currentUserCourse?.progress ?? 0,
+              //     minHeight: 8,
+              //     backgroundColor: Colors.grey[300],
+              //     valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+              //   ),
+              //   const SizedBox(height: 4),
+              //   Text(
+              //     'Completed ${(course.currentUserCourse?.progress ?? 0) * 100}%',
+              //     style: const TextStyle(fontSize: 12),
+              //   ),
+              // ],
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -103,6 +103,9 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   TextFormField(
                     controller: _descriptionController,
                     decoration: const InputDecoration(labelText: 'Description'),
@@ -116,38 +119,75 @@ class _TeacherHomeworkFormScreenState extends State<TeacherHomeworkFormScreen> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          Theme.of(context).primaryColor, // Text color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 14.0, horizontal: 24.0),
+                    ),
                     onPressed: _saveHomework,
                     child: state is TeacherHomeworkSaving
-                        ? const Loader()
-                        : Text(_isUpdating
-                            ? 'Update Homework'
-                            : 'Create Homework'),
+                        ? const CircularProgressIndicator() // Use a spinner for loading
+                        : Text(
+                            _isUpdating ? 'Update Homework' : 'Create Homework',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
                   ),
                   if (_isUpdating) ...[
                     const SizedBox(height: 20),
                     Text('Questions',
                         style: Theme.of(context).textTheme.headlineSmall),
-                    ..._questions.map((question) => ListTile(
-                          title:
-                              Text(question.questionText ?? 'No question text'),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () =>
-                                    _editQuestion(context, question),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () => _deleteQuestion(question),
-                              ),
-                            ],
-                          ),
-                        )),
+                    Card(
+                      child: Column(
+                        children: _questions
+                            .map((question) => ListTile(
+                                  title: Text(question.questionText ??
+                                      'No question text'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () =>
+                                            _editQuestion(context, question),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () =>
+                                            _deleteQuestion(question),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
                     ListTile(
-                      title: const Text('Add Question'),
-                      trailing: const Icon(Icons.add),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 2.0, horizontal: 10.0),
+                      tileColor: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      title: Text(
+                        'Add Question',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      trailing: Icon(
+                        Icons.add,
+                        color: Theme.of(context).primaryColor,
+                      ),
                       onTap: () => _addQuestion(context),
                     ),
                   ]

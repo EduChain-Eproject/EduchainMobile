@@ -1,8 +1,6 @@
 import 'package:educhain/core/models/user_course.dart';
 import 'package:flutter/material.dart';
 
-import 'package:educhain/core/models/user.dart';
-
 class ParticipatedUsersSection extends StatelessWidget {
   final List<UserCourse> userCourses;
 

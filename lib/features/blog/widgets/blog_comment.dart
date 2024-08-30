@@ -3,7 +3,7 @@ import 'package:educhain/core/models/blog_comment.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:educhain/features/blog/bloc/blog_bloc.dart';
 import 'package:educhain/features/blog/models/blogComment/create_comment_request.dart';
-import 'package:intl/intl.dart'; // For formatting dates
+import 'package:intl/intl.dart';
 
 class CommentSection extends StatefulWidget {
   final List<BlogComment> comments;
@@ -19,52 +19,76 @@ class CommentSection extends StatefulWidget {
 class _CommentSectionState extends State<CommentSection> {
   final TextEditingController _commentController = TextEditingController();
   int? _parentCommentId;
+  late List<BlogComment> _parentComments;
+  late Map<int?, List<BlogComment>> _repliesMap;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeComments();
+  }
+
+  void _initializeComments() {
+    _parentComments =
+        widget.comments.where((c) => c.parentCommentId == null).toList();
+    _repliesMap = {
+      for (var c in widget.comments) c.parentCommentId: <BlogComment>[]
+    };
+    for (var comment in widget.comments) {
+      if (comment.parentCommentId != null) {
+        _repliesMap[comment.parentCommentId]?.add(comment);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final parentComments = <BlogComment>[];
-    final repliesMap = <int, List<BlogComment>>{};
-
-    // Separate comments into parent comments and replies
-    for (var comment in widget.comments) {
-      if (comment.parentCommentId == null) {
-        parentComments.add(comment);
-      } else {
-        if (!repliesMap.containsKey(comment.parentCommentId)) {
-          repliesMap[comment.parentCommentId!] = [];
+    return BlocConsumer<BlogBloc, BlogState>(
+      listener: (context, state) {
+        if (state is BlogCommentSaved) {
+          final newBlogCmt = state.blogComment;
+          setState(() {
+            if (newBlogCmt.parentCommentId == null) {
+              _parentComments.insert(0, newBlogCmt);
+            } else {
+              _repliesMap[newBlogCmt.parentCommentId]?.insert(0, newBlogCmt);
+            }
+          });
         }
-        repliesMap[comment.parentCommentId!]!.add(comment);
-      }
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Comments:',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.black, // Set the title color to black
+      },
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Comments:',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+            ),
+            const SizedBox(height: 8.0),
+            SizedBox(
+              height: 400.0,
+              child: ListView.builder(
+                itemCount: _parentComments.length,
+                itemBuilder: (context, index) {
+                  return _buildComment(
+                      _parentComments[index], _repliesMap, context, 0);
+                },
               ),
-        ),
-        SizedBox(height: 8.0),
-        Container(
-          height: 400.0,
-          child: ListView(
-            children: parentComments.map((comment) {
-              return _buildComment(comment, repliesMap, context, 0);
-            }).toList(),
-          ),
-        ),
-        SizedBox(height: 16.0),
-        _buildCommentInputSection(context),
-      ],
+            ),
+            const SizedBox(height: 16.0),
+            _buildCommentInputSection(context),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildComment(
       BlogComment comment,
-      Map<int, List<BlogComment>> repliesMap,
+      Map<int?, List<BlogComment>> repliesMap,
       BuildContext context,
       int indentLevel) {
     return Padding(
@@ -76,13 +100,14 @@ class _CommentSectionState extends State<CommentSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
+                radius: 20.0,
+                backgroundColor: Colors.blue,
                 child: Text(
                   comment.user?.firstName?.substring(0, 1) ?? 'U',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                backgroundColor: Colors.blue,
               ),
-              SizedBox(width: 8.0),
+              const SizedBox(width: 8.0),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,41 +116,31 @@ class _CommentSectionState extends State<CommentSection> {
                       comment.user?.firstName ?? 'Unknown User',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors
-                                .black, // Set the commenter's name color to black
+                            color: Colors.black87,
                           ),
                     ),
                     Text(
                       DateFormat('MM/dd/yyyy hh:mm a')
                           .format(comment.createdAt ?? DateTime.now()),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors
-                                .black, // Set the comment time color to black
+                            color: Colors.grey[600],
                           ),
                     ),
-                    SizedBox(height: 4.0),
+                    const SizedBox(height: 4.0),
                     Text(
                       comment.text ?? 'No Content',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors
-                                .black, // Set the comment text color to black
+                            color: Colors.black87,
                           ),
                     ),
-                    SizedBox(height: 4.0),
-                    if (repliesMap.containsKey(comment.id)) ...[
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
-                        child: Column(
-                          children: repliesMap[comment.id]!
-                              .map((reply) => _buildComment(
-                                  reply, repliesMap, context, indentLevel + 1))
-                              .toList(),
-                        ),
+                    const SizedBox(height: 8.0),
+                    if (repliesMap.containsKey(comment.id))
+                      Column(
+                        children: repliesMap[comment.id]!
+                            .map((reply) => _buildComment(
+                                reply, repliesMap, context, indentLevel + 1))
+                            .toList(),
                       ),
-                    ],
-                    SizedBox(height: 8.0),
-                    _buildReplyButton(comment.id!),
                   ],
                 ),
               ),
@@ -133,17 +148,6 @@ class _CommentSectionState extends State<CommentSection> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildReplyButton(int commentId) {
-    return TextButton(
-      onPressed: () {
-        setState(() {
-          _parentCommentId = commentId;
-        });
-      },
-      child: Text('Reply'),
     );
   }
 
@@ -155,15 +159,31 @@ class _CommentSectionState extends State<CommentSection> {
           controller: _commentController,
           decoration: InputDecoration(
             labelText: 'Add a comment...',
-            border: OutlineInputBorder(),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.blue),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
           ),
+          maxLines: null,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _submitComment(context),
         ),
-        SizedBox(height: 8.0),
-        ElevatedButton(
-          onPressed: () {
-            _submitComment(context);
-          },
-          child: Text('Post Comment'),
+        const SizedBox(height: 8.0),
+        Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton(
+            onPressed: () => _submitComment(context),
+            style: ElevatedButton.styleFrom(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+            child: const Text('Post Comment'),
+          ),
         ),
       ],
     );
@@ -184,5 +204,11 @@ class _CommentSectionState extends State<CommentSection> {
         _parentCommentId = null;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 }

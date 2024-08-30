@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'lesson_dialog.dart';
 
-class ChapterTile extends StatefulWidget {
+class ChapterTile extends StatelessWidget {
   final Chapter chapter;
   final VoidCallback onEditChapter;
   final VoidCallback onDeleteChapter;
@@ -20,16 +20,101 @@ class ChapterTile extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ChapterTileState createState() => _ChapterTileState();
-}
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildChapterHeader(),
+            const SizedBox(height: 8.0),
+            _buildLessonList(context),
+            _buildAddLessonButton(context),
+          ],
+        ),
+      ),
+    );
+  }
 
-class _ChapterTileState extends State<ChapterTile> {
-  late List<Lesson> _lessons;
+  Widget _buildChapterHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            chapter.chapterTitle ?? '',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            overflow:
+                TextOverflow.ellipsis, // Handles overflow by truncating text
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: onEditChapter,
+              iconSize: 20, // Adjust icon size if needed
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: onDeleteChapter,
+              iconSize: 20, // Adjust icon size if needed
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    _lessons = widget.chapter.lessonDtos ?? [];
+  Widget _buildLessonList(BuildContext context) {
+    final lessons = chapter.lessonDtos ?? [];
+
+    if (lessons.isEmpty) {
+      return const Center(child: Text('No lessons added yet.'));
+    }
+
+    return Column(
+      children: lessons.map((lesson) {
+        return ListTile(
+          title: Text(lesson.lessonTitle ?? ''),
+          onTap: () => Navigator.push(
+            context,
+            TeacherListHomeworksByLessonScreen.route(lesson.id ?? 0),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.blue),
+                onPressed: () => _editLesson(context, lesson),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => _deleteLesson(context, lesson),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildAddLessonButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.add),
+        label: const Text('Add Lesson'),
+        onPressed: () => _addLesson(context),
+      ),
+    );
   }
 
   void _editLesson(BuildContext context, Lesson lesson) {
@@ -37,94 +122,23 @@ class _ChapterTileState extends State<ChapterTile> {
       context: context,
       builder: (context) => LessonDialog(
         initialLesson: lesson,
-        chapter: widget.chapter,
+        chapter: chapter,
       ),
     );
-  }
-
-  void _deleteLesson(Lesson lesson) {
-    context.read<TeacherCourseBloc>().add(TeacherDeleteLesson(lesson.id!));
   }
 
   void _addLesson(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => LessonDialog(
-        chapter: widget.chapter,
+        chapter: chapter,
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocListener<TeacherCourseBloc, TeacherCourseState>(
-      listener: (context, state) {
-        if (state is TeacherLessonSaved) {
-          switch (state.status) {
-            case 'created':
-              _lessons = [..._lessons, state.lesson];
-
-              break;
-            case 'updated':
-              _lessons = _lessons.map((l) {
-                return l.id == state.lesson.id ? state.lesson : l;
-              }).toList();
-
-              break;
-            case 'deleted':
-              _lessons = _lessons.where((l) {
-                return l.id != state.lesson.id;
-              }).toList();
-
-              break;
-          }
-        }
-      },
-      child: ExpansionTile(
-        title: Text(widget.chapter.chapterTitle ?? ''),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: widget.onEditChapter,
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: widget.onDeleteChapter,
-            ),
-          ],
-        ),
-        children: [
-          ..._lessons.map((lesson) {
-            return ListTile(
-              title: Text(lesson.lessonTitle ?? ''),
-              onTap: () => Navigator.push(
-                context,
-                TeacherListHomeworksByLessonScreen.route(lesson.id ?? 0),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => _editLesson(context, lesson),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteLesson(lesson),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-          ListTile(
-            title: const Text('Add Lesson'),
-            trailing: const Icon(Icons.add),
-            onTap: () => _addLesson(context),
-          ),
-        ],
-      ),
-    );
+  void _deleteLesson(BuildContext context, Lesson lesson) {
+    context.read<TeacherCourseBloc>().add(
+          TeacherDeleteLesson(lesson.id!),
+        );
   }
 }

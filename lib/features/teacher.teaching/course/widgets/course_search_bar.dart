@@ -13,6 +13,7 @@ class CourseSearchBar extends StatelessWidget {
         decoration: const InputDecoration(
           labelText: 'Search Courses',
           border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.search),
         ),
         onChanged: (e) => onSearch(e),
       ),

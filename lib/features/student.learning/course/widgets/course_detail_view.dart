@@ -1,11 +1,12 @@
 import 'package:educhain/core/models/course.dart';
 import 'package:educhain/core/theme/app_pallete.dart';
+import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/features/student.learning/course/blocs/payment/payment_bloc.dart';
 import 'package:educhain/features/student.learning/course/widgets/bottom_button.dart';
 import 'package:educhain/features/student.learning/course/widgets/chapter_section.dart';
 import 'package:educhain/features/student.learning/course/widgets/course_info.dart';
 import 'package:educhain/features/student.learning/course/widgets/participated_users_section.dart';
-import 'package:educhain/features/student.learning/course/widgets/paypal_webview.dart';
+import 'package:educhain/features/student.learning/course/screens/paypal_webview_screen.dart';
 import 'package:educhain/features/student.learning/course/widgets/related_course_section.dart';
 import 'package:educhain/features/student.learning/lesson/screens/lesson_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -107,23 +108,38 @@ class _CourseDetailViewState extends State<CourseDetailView> {
   void _showEnrollmentPrompt(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Enrollment Required'),
-        content: const Text(
-            'You need to enroll in this course to view the lesson details.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _initiatePayment(context);
-            },
-            child: const Text('Enroll'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-        ],
+      builder: (context) => BlocBuilder<PaymentBloc, PaymentState>(
+        builder: (context, state) {
+          return AlertDialog(
+            title: const Text(
+              'Enrollment Required',
+              style: TextStyle(color: AppPallete.lightErrorColor),
+            ),
+            content: const Text(
+                'You need to enroll in this course to view the lesson details.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _initiatePayment(context);
+                },
+                child: state is PaymentLoading
+                    ? const Loader()
+                    : const Text(
+                        'Enroll',
+                        style: TextStyle(color: AppPallete.accentColor),
+                      ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: AppPallete.warningColor),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

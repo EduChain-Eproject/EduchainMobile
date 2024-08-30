@@ -1,5 +1,6 @@
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/course.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -47,7 +48,9 @@ class _ChapterDialogState extends State<ChapterDialog> {
       },
       child: AlertDialog(
         title: Text(
-            widget.initialChapter == null ? 'Add Chapter' : 'Edit Chapter'),
+          widget.initialChapter == null ? 'Add Chapter' : 'Edit Chapter',
+          style: const TextStyle(color: AppPallete.accentColor),
+        ),
         content: Form(
           key: _formKey,
           child: Column(
@@ -58,7 +61,7 @@ class _ChapterDialogState extends State<ChapterDialog> {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
                     _errors?['message']!,
-                    style: TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
               TextFormField(

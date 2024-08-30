@@ -88,7 +88,18 @@ class _TeacherCourseListScreenState extends State<TeacherCourseListScreen> {
     if (state is TeacherCoursesLoading) {
       return const Center(child: CircularProgressIndicator());
     } else if (state is TeacherCoursesError) {
-      return Center(child: Text('Error: ${state.errors?['message']}'));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Error: ${state.errors?['message']}',
+            style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
     } else if (state is TeacherCoursesLoaded) {
       final courses = state.courses.content;
       return Column(
@@ -107,9 +118,16 @@ class _TeacherCourseListScreenState extends State<TeacherCourseListScreen> {
   }
 
   Widget _buildLoadMoreButton() {
-    return TextButton(
-      onPressed: _loadMoreCourses,
-      child: const Text('Load More'),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton(
+        onPressed: _loadMoreCourses,
+        child: const Text('Load More'),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blueAccent,
+        ),
+      ),
     );
   }
 

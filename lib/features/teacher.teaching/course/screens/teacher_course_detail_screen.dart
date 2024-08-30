@@ -7,15 +7,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/course/teacher_course_bloc.dart';
 import '../widgets/chapter_dialog.dart';
-import '../widgets/chapter_tile.dart';
+import '../widgets/chapter_list.dart';
+import '../widgets/course_header.dart';
 import 'teacher_course_form_screen.dart';
 
 class TeacherCourseDetailScreen extends StatefulWidget {
   static Route route(int courseId) => MaterialPageRoute(
         builder: (context) => AuthenticatedWidget(
-          child: TeacherCourseDetailScreen(
-            courseId: courseId,
-          ),
+          child: TeacherCourseDetailScreen(courseId: courseId),
         ),
       );
 
@@ -46,53 +45,25 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
       ),
       body: BlocConsumer<TeacherCourseBloc, TeacherCourseState>(
         listener: (context, state) {
-          if (state is TeacherCourseSaved) {
-            setState(() {
-              _course = state.course;
-            });
-          } else if (state is TeacherCourseDetailLoaded) {
-            setState(() {
-              _course = state.courseDetail;
-            });
+          if (state is TeacherCourseDetailLoaded) {
+            _course = state.courseDetail;
+          } else if (state is TeacherCourseSaved) {
+            _course = state.course;
           } else if (state is TeacherChapterSaved) {
-            switch (state.status) {
-              case 'created':
-                _course = _course?.copyWith(
-                  chapterDtos: [...?_course?.chapterDtos, state.chapter],
-                );
-                break;
-              case 'updated':
-                _course = _course?.copyWith(
-                  chapterDtos: _course?.chapterDtos?.map((c) {
-                    return c.id == state.chapter.id ? state.chapter : c;
-                  }).toList(),
-                );
-                break;
-              case 'deleted':
-                _course = _course?.copyWith(
-                  chapterDtos: _course?.chapterDtos?.where((c) {
-                    return c.id != state.chapter.id;
-                  }).toList(),
-                );
-                break;
-            }
+            _updateChapterState(state);
+          } else if (state is TeacherCourseDetailError) {
+            _showErrorDialog(
+                context, state.errors?['message'] ?? 'An error occurred');
           }
         },
         builder: (context, state) {
-          return BlocBuilder<TeacherCourseBloc, TeacherCourseState>(
-            builder: (context, state) {
-              if (state is TeacherCourseDetailLoading ||
-                  state is TeacherCourseSaving ||
-                  _course == null) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is TeacherCourseDetailError) {
-                return Center(
-                    child: Text('Error: ${state.errors?['message']}'));
-              } else {
-                return _buildCourseDetail();
-              }
-            },
-          );
+          if (state is TeacherCourseDetailLoading ||
+              state is TeacherCourseSaving ||
+              _course == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return _buildCourseDetail();
+          }
         },
       ),
     );
@@ -102,79 +73,57 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
     context.read<TeacherCourseBloc>().add(FetchCourseDetail(widget.courseId));
   }
 
-  Widget _buildCourseDetail() {
-    return ListView(
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        _buildCourseHeader(),
-        const SizedBox(height: 16.0),
-        _buildCourseDescription(),
-        const SizedBox(height: 16.0),
-        ..._buildChapterTiles(),
-        _buildAddChapterTile(),
-      ],
-    );
-  }
-
-  Widget _buildCourseHeader() {
-    return Column(
-      children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(_course?.avatarPath ?? ""),
-        ),
-        Text(
-          _course?.title ?? '',
-          style: const TextStyle(
-              fontSize: 15, color: AppPallete.lightPrimaryColor),
-        ),
-        if (_course?.status == CourseStatus.DEACTIVATED)
-          Text(
-            'Your course is deactivated!',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: _updateCourse,
-              child: const Text('Update'),
-            ),
-            const SizedBox(width: 2),
-            if (_course?.status == CourseStatus.APPROVED)
-              ElevatedButton(
-                onPressed: _showDeactivateConfirmation,
-                child: const Text('Deactivate'),
-              ),
-          ],
-        )
-      ],
-    );
-  }
-
-  Widget _buildCourseDescription() {
-    return Column(children: [
-      Text(
-        _course?.description ?? '',
-        style: const TextStyle(color: AppPallete.lightGreyColor, fontSize: 12),
-      ),
-    ]);
-  }
-
-  List<Widget> _buildChapterTiles() {
-    return _course?.chapterDtos?.map((chapter) {
-          return ChapterTile(
-            chapter: chapter,
-            onEditChapter: () => _editChapter(context, chapter),
-            onDeleteChapter: () => _deleteChapter(chapter),
+  void _updateChapterState(TeacherChapterSaved state) {
+    setState(() {
+      switch (state.status) {
+        case 'created':
+          _course = _course?.copyWith(
+            chapterDtos: [...?_course?.chapterDtos, state.chapter],
           );
-        }).toList() ??
-        [];
+          break;
+        case 'updated':
+          _course = _course?.copyWith(
+            chapterDtos: _course?.chapterDtos?.map((c) {
+              return c.id == state.chapter.id ? state.chapter : c;
+            }).toList(),
+          );
+          break;
+        case 'deleted':
+          _course = _course?.copyWith(
+            chapterDtos: _course?.chapterDtos?.where((c) {
+              return c.id != state.chapter.id;
+            }).toList(),
+          );
+          break;
+      }
+    });
   }
 
-  Widget _buildAddChapterTile() {
-    return ListTile(
-      title: const Text('Add Chapter'),
-      trailing: const Icon(Icons.add),
-      onTap: () => _addChapter(context),
+  Widget _buildCourseDetail() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: [
+          CourseHeader(
+            course: _course,
+            onUpdate: _updateCourse,
+            onDeactivate: _showDeactivateConfirmation,
+          ),
+          const Divider(height: 40),
+          Text(
+            _course?.description ?? '',
+            style: const TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+          const SizedBox(height: 16.0),
+          ChapterList(
+            showCreateButton: true,
+            chapters: _course?.chapterDtos ?? [],
+            onEditChapter: _editChapter,
+            onDeleteChapter: _deleteChapter,
+            onAddChapter: _addChapter,
+          ),
+        ],
+      ),
     );
   }
 
@@ -192,15 +141,13 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
         return AlertDialog(
           title: const Text(
             'Confirm Deactivation',
-            style: TextStyle(color: AppPallete.lightPrimaryColor),
+            style: TextStyle(color: AppPallete.lightErrorColor),
           ),
           content:
               const Text('Are you sure you want to deactivate this course?'),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
             ElevatedButton(
@@ -208,11 +155,10 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
                 Navigator.of(context).pop();
                 _deactivateCourse();
               },
-              child: const Text(
-                'Confirm',
-                style: TextStyle(color: AppPallete.lightErrorColor),
-              ),
-            )
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              child: const Text('Confirm'),
+            ),
           ],
         );
       },
@@ -220,12 +166,12 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   }
 
   void _deactivateCourse() {
-    context.read<TeacherCourseBloc>().add(
-          TeacherDeactivateCourse(_course?.id ?? 0),
-        );
+    context
+        .read<TeacherCourseBloc>()
+        .add(TeacherDeactivateCourse(_course?.id ?? 0));
   }
 
-  void _editChapter(BuildContext context, Chapter chapter) {
+  void _editChapter(Chapter chapter) {
     showDialog(
       context: context,
       builder: (context) => ChapterDialog(
@@ -235,7 +181,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
     );
   }
 
-  void _addChapter(BuildContext context) {
+  void _addChapter() {
     showDialog(
       context: context,
       builder: (context) => ChapterDialog(
@@ -245,8 +191,24 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   }
 
   void _deleteChapter(Chapter chapter) {
-    context.read<TeacherCourseBloc>().add(
-          TeacherDeleteChapter(chapter.id!),
+    context.read<TeacherCourseBloc>().add(TeacherDeleteChapter(chapter.id!));
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
         );
+      },
+    );
   }
 }

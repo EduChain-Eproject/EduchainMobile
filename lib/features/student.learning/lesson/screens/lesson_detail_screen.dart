@@ -1,5 +1,4 @@
 import 'package:educhain/core/widgets/authenticated_widget.dart';
-import 'package:educhain/features/student.learning/homework/screens/homework_detail_screen.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

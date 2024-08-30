@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:educhain/core/models/user.dart';
-import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/widgets/authenticated_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -153,7 +152,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         ElevatedButton(
           onPressed: _pickAvatar,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color.fromARGB(
+            backgroundColor: const Color.fromARGB(
                 255, 207, 68, 58), // Custom color for avatar button
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

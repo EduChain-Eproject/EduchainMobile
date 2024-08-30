@@ -18,6 +18,8 @@ class CategorySelector extends StatefulWidget {
 }
 
 class _CategorySelectorState extends State<CategorySelector> {
+  bool _isCategoryListVisible = false; // Track visibility of category list
+
   @override
   void initState() {
     super.initState();
@@ -42,29 +44,42 @@ class _CategorySelectorState extends State<CategorySelector> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              ...teacherCategories.map((category) {
-                final isSelected =
-                    widget.selectedCategoryIds.contains(category.id);
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _isCategoryListVisible = !_isCategoryListVisible;
+                  });
+                },
+                child: Text(_isCategoryListVisible
+                    ? 'Hide Categories'
+                    : 'Show Categories'),
+              ),
+              if (_isCategoryListVisible) ...[
+                const SizedBox(height: 8),
+                ...teacherCategories.map((category) {
+                  final isSelected =
+                      widget.selectedCategoryIds.contains(category.id);
 
-                return CheckboxListTile(
-                  title: Text(category.categoryName ?? ""),
-                  value: isSelected,
-                  onChanged: (isChecked) {
-                    final updatedCategoryIds =
-                        List<int>.from(widget.selectedCategoryIds);
+                  return CheckboxListTile(
+                    title: Text(category.categoryName ?? ""),
+                    value: isSelected,
+                    onChanged: (isChecked) {
+                      final updatedCategoryIds =
+                          List<int>.from(widget.selectedCategoryIds);
 
-                    if (isChecked == true) {
-                      if (!updatedCategoryIds.contains(category.id)) {
-                        updatedCategoryIds.add(category.id ?? 0);
+                      if (isChecked == true) {
+                        if (!updatedCategoryIds.contains(category.id)) {
+                          updatedCategoryIds.add(category.id ?? 0);
+                        }
+                      } else {
+                        updatedCategoryIds.remove(category.id);
                       }
-                    } else {
-                      updatedCategoryIds.remove(category.id);
-                    }
 
-                    widget.onCategorySelected(updatedCategoryIds);
-                  },
-                );
-              }).toList(),
+                      widget.onCategorySelected(updatedCategoryIds);
+                    },
+                  );
+                }).toList(),
+              ],
             ],
           );
         } else {

@@ -1,5 +1,6 @@
 import 'package:educhain/core/models/homework.dart';
 import 'package:educhain/core/models/question.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/features/teacher.teaching/homework/bloc/teacher_homework_bloc.dart';
 import 'package:educhain/features/teacher.teaching/homework/models/create_question_request.dart';
@@ -89,7 +90,10 @@ class _QuestionDialogState extends State<QuestionDialog> {
       },
       builder: (context, state) {
         return AlertDialog(
-          title: Text(_isUpdating ? 'Edit Question' : 'Add Question'),
+          title: Text(
+            _isUpdating ? 'Edit Question' : 'Add Question',
+            style: const TextStyle(color: AppPallete.accentColor),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -103,25 +107,32 @@ class _QuestionDialogState extends State<QuestionDialog> {
               ..._answerControllers.asMap().entries.map((entry) {
                 final index = entry.key;
                 final controller = entry.value;
-                return Row(
+                return Column(
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: controller,
-                        focusNode: _answerFocusNodes[index],
-                        decoration:
-                            InputDecoration(labelText: 'Answer ${index + 1}'),
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: controller,
+                            focusNode: _answerFocusNodes[index],
+                            decoration: InputDecoration(
+                                labelText: 'Answer ${index + 1}'),
+                          ),
+                        ),
+                        Radio<int>(
+                          value: index,
+                          groupValue: _correctAnswerIndex,
+                          onChanged: (value) {
+                            setState(() {
+                              _correctAnswerIndex = value!;
+                            });
+                          },
+                        ),
+                      ],
                     ),
-                    Radio<int>(
-                      value: index,
-                      groupValue: _correctAnswerIndex,
-                      onChanged: (value) {
-                        setState(() {
-                          _correctAnswerIndex = value!;
-                        });
-                      },
-                    ),
+                    const SizedBox(
+                      height: 10,
+                    )
                   ],
                 );
               }),

@@ -14,17 +14,45 @@ class CourseList extends StatelessWidget {
       itemCount: courses.length,
       itemBuilder: (context, index) {
         final course = courses[index];
-        return ListTile(
-          title: Text(course.title ?? ""),
-          subtitle: Text(course.description ?? ""),
-          onTap: () {
-            if (course.id != null) {
-              Navigator.push(
-                context,
-                TeacherCourseDetailScreen.route(course.id!),
-              );
-            }
-          },
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16.0),
+            leading: CircleAvatar(
+              backgroundImage: course.avatarPath != null &&
+                      course.avatarPath!.isNotEmpty
+                  ? NetworkImage(course.avatarPath!)
+                  : const AssetImage('assets/images/placeholder.png')
+                      as ImageProvider, // Replace with your placeholder image
+              radius: 30,
+            ),
+            title: Text(
+              course.title ?? "",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
+            ),
+            subtitle: Text(
+              course.description ?? "",
+              style: const TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              if (course.id != null) {
+                Navigator.push(
+                  context,
+                  TeacherCourseDetailScreen.route(course.id!),
+                );
+              }
+            },
+          ),
         );
       },
     );

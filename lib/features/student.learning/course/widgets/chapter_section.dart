@@ -1,5 +1,4 @@
 import 'package:educhain/core/models/chapter.dart';
-import 'package:educhain/features/student.learning/lesson/screens/lesson_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChaptersSection extends StatelessWidget {

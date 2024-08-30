@@ -31,12 +31,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
         backgroundColor: Colors.blueAccent,
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             onPressed: () {
               if (user != null) {
                 Navigator.of(context).push(
@@ -72,17 +72,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 'https://via.placeholder.com/150'),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             '${user!.firstName} ${user!.lastName}',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Column(
@@ -90,43 +90,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.email,
+                                  const Icon(Icons.email,
                                       color: Colors.blue, size: 24),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(user!.email ?? 'N/A'),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Row(
                                 children: [
-                                  Icon(Icons.phone,
+                                  const Icon(Icons.phone,
                                       color: Colors.green, size: 24),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(user!.phone ?? 'N/A'),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Row(
                                 children: [
-                                  Icon(Icons.home, color: Colors.red, size: 24),
-                                  SizedBox(width: 10),
+                                  const Icon(Icons.home,
+                                      color: Colors.red, size: 24),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(user!.address ?? 'N/A'),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   if (user!.role == 'STUDENT') ...[
                     _buildActionCard(
                       context,
@@ -139,13 +140,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(
                             builder: (context) => BlocProvider.value(
                               value: context.read<PersonalBloc>(),
-                              child: FetchParticipatedCoursesPage(),
+                              child: const FetchParticipatedCoursesPage(),
                             ),
                           ),
                         );
                       },
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     _buildActionCard(
                       context,
                       icon: Icons.assignment,
@@ -157,13 +158,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(
                             builder: (context) => BlocProvider.value(
                               value: context.read<PersonalBloc>(),
-                              child: UserHomeworkPage(),
+                              child: const UserHomeworkPage(),
                             ),
                           ),
                         );
                       },
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     _buildActionCard(
                       context,
                       icon: Icons.favorite,
@@ -175,66 +176,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(
                             builder: (context) => BlocProvider.value(
                               value: context.read<PersonalBloc>(),
-                              child: UserInterestsPage(),
+                              child: const UserInterestsPage(),
                             ),
                           ),
                         );
                       },
                     ),
-                    SizedBox(height: 8),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.emoji_events,
-                      color: Colors.orange,
-                      title: 'My Awards',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: context.read<PersonalBloc>(),
-                              child: UserInterestsPage(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 8),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.emoji_events,
-                      color: Colors.blueGrey,
-                      title: 'My Certificates',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: context.read<PersonalBloc>(),
-                              child: UserInterestsPage(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 8),
-                    _buildActionCard(
-                      context,
-                      icon: Icons.description,
-                      color: Colors.teal,
-                      title: 'Terms & Conditions',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: context.read<PersonalBloc>(),
-                              child: UserInterestsPage(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    const SizedBox(height: 8),
                   ] else if (user!.role == 'TEACHER') ...[
                     _buildActionCard(
                       context,
@@ -252,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                   ...[
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     _buildActionCard(
                       context,
                       icon: Icons.logout,
@@ -269,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else if (state is ProfileError) {
             return Center(child: Text('Error: ${state.error}'));
           } else {
-            return Center(child: Text('Unknown state'));
+            return const Center(child: Text('Unknown state'));
           }
         },
       ),
@@ -284,7 +232,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Card(
       elevation: 2,
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         leading: Icon(icon, color: color, size: 28),
         title: Text(title,
             style: TextStyle(color: color, fontWeight: FontWeight.bold)),

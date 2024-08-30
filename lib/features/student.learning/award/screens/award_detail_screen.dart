@@ -1,5 +1,4 @@
 import 'package:educhain/core/models/award.dart';
-import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -79,7 +79,7 @@ class _LessonDetailContentState extends State<LessonDetailContent> {
           if (widget.lesson.homeworkDtos != null &&
               widget.lesson.homeworkDtos!.isNotEmpty) ...[
             Text(
-              'Homework',
+              'Homeworks',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             ...widget.lesson.homeworkDtos!.map((homework) => HomeworkTile(

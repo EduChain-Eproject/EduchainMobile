@@ -1,4 +1,5 @@
 import 'package:educhain/core/models/lesson.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,6 +18,7 @@ class TeacherListHomeworksByLessonScreen extends StatefulWidget {
 
   const TeacherListHomeworksByLessonScreen({Key? key, required this.lessonId})
       : super(key: key);
+
   @override
   State<TeacherListHomeworksByLessonScreen> createState() =>
       _TeacherListHomeworksByLessonScreenState();
@@ -25,6 +27,7 @@ class TeacherListHomeworksByLessonScreen extends StatefulWidget {
 class _TeacherListHomeworksByLessonScreenState
     extends State<TeacherListHomeworksByLessonScreen> {
   Lesson? lesson;
+
   @override
   void initState() {
     super.initState();
@@ -78,40 +81,35 @@ class _TeacherListHomeworksByLessonScreenState
             final homeworks = lesson?.homeworkDtos;
 
             return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          lesson?.lessonTitle ?? 'No Title',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          lesson?.description ?? 'No Description',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: homeworks?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        final homework = homeworks?[index];
-                        return HomeworkTile(
-                          homework: homework!,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lesson?.lessonTitle ?? 'No Title',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppPallete.lightPrimaryColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    lesson?.description ?? 'No Description',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  if (homeworks != null && homeworks.isNotEmpty)
+                    ...homeworks.map((homework) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: HomeworkTile(
+                          homework: homework,
                           lessonId: widget.lessonId,
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                        ),
+                      );
+                    }).toList(),
+                  if (homeworks == null || homeworks.isEmpty)
+                    const Center(child: Text('No homeworks available.')),
+                ],
               ),
             );
           }

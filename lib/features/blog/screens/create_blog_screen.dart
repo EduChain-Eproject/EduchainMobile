@@ -10,6 +10,8 @@ import '../bloc/blog_bloc.dart';
 import '../models/create_blog_request.dart';
 
 class CreateBlogScreen extends StatefulWidget {
+  const CreateBlogScreen({super.key});
+
   @override
   _CreateBlogScreenState createState() => _CreateBlogScreenState();
 }
@@ -38,22 +40,21 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
           _categories = response.data!;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching categories: ${response.error}'),
-          ),
-        );
+        _showSnackBar('Error fetching categories: ${response.error}');
       }
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching categories: $error')),
-      );
+      _showSnackBar('Error fetching categories: $error');
     }
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _photo = image;
     });
@@ -62,9 +63,7 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       if (_photo == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a photo')),
-        );
+        _showSnackBar('Please select a photo');
         return;
       }
 
@@ -84,148 +83,149 @@ class _CreateBlogScreenState extends State<CreateBlogScreen> {
     return BlocConsumer<BlogBloc, BlogState>(
       listener: (context, state) {
         if (state is BlogSaved) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Blog created successfully')),
-          );
+          _showSnackBar('Blog created successfully');
           Navigator.pop(context);
         } else if (state is BlogSaveError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${state.errors}')),
-          );
+          _showSnackBar('Error: ${state.errors}');
         }
       },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(title: const Text('Create Blog')),
-          body: SingleChildScrollView(
+          body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title Field
-                  TextFormField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 16.0),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a title';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Category Dropdown
-                  DropdownButtonFormField<BlogCategory>(
-                    value: _selectedCategory,
-                    decoration: const InputDecoration(
-                      labelText: 'Category',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 16.0),
-                    ),
-                    items: _categories.map((category) {
-                      return DropdownMenuItem(
-                        value: category,
-                        child: Text(
-                          category.categoryName ?? '',
-                          style: const TextStyle(
-                              color: Colors.black), // Set text color to black
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCategory = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a category';
-                      }
-                      return null;
-                    },
-                    style: const TextStyle(
-                        color:
-                            Colors.black), // Set dropdown text color to black
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Blog Text Field
-                  TextFormField(
-                    controller: _textController,
-                    decoration: const InputDecoration(
-                      labelText: 'Text',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 16.0),
-                    ),
-                    maxLines: 5,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the blog text';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Upload Photo Button
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 16.0),
-                    ),
-                    child: const Text('Upload Photo'),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Photo Preview
-                  if (_photo != null)
-                    Container(
-                      margin: const EdgeInsets.only(top: 8.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.file(
-                          File(_photo!.path),
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 16),
-
-                  // Create Blog Button
-                  if (state is! BlogSaving)
-                    ElevatedButton(
-                      onPressed: _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 16.0),
-                      ),
-                      child: const Text('Create Blog'),
-                    ),
-                  if (state is BlogSaving) const Loader(),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTitleField(),
+                    const SizedBox(height: 16),
+                    _buildCategoryDropdown(),
+                    const SizedBox(height: 16),
+                    _buildTextField(),
+                    const SizedBox(height: 16),
+                    _buildUploadButton(),
+                    const SizedBox(height: 16),
+                    if (_photo != null) _buildPhotoPreview(),
+                    const SizedBox(height: 16),
+                    _buildCreateBlogButton(state),
+                    if (state is BlogSaving) const Loader(),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTitleField() {
+    return TextFormField(
+      controller: _titleController,
+      decoration: const InputDecoration(
+        labelText: 'Title',
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a title';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return DropdownButtonFormField<BlogCategory>(
+      value: _selectedCategory,
+      decoration: const InputDecoration(
+        labelText: 'Category',
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      ),
+      items: _categories.map((category) {
+        return DropdownMenuItem(
+          value: category,
+          child: Text(
+            category.categoryName ?? '',
+            style: const TextStyle(color: Colors.black),
+          ),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedCategory = value;
+        });
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select a category';
+        }
+        return null;
+      },
+      style: const TextStyle(color: Colors.black),
+    );
+  }
+
+  Widget _buildTextField() {
+    return TextFormField(
+      controller: _textController,
+      decoration: const InputDecoration(
+        labelText: 'Text',
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      ),
+      maxLines: 5,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter the blog text';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildUploadButton() {
+    return ElevatedButton.icon(
+      onPressed: _pickImage,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      ),
+      icon: const Icon(Icons.upload_file),
+      label: const Text('Upload Photo'),
+    );
+  }
+
+  Widget _buildPhotoPreview() {
+    return Container(
+      margin: const EdgeInsets.only(top: 8.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Image.file(
+          File(_photo!.path),
+          height: 200,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreateBlogButton(BlogState state) {
+    return ElevatedButton(
+      onPressed: state is! BlogSaving ? _submitForm : null,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      ),
+      child: const Text('Create Blog'),
     );
   }
 

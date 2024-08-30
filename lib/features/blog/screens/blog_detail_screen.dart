@@ -1,6 +1,5 @@
 import 'package:educhain/core/auth/bloc/auth_bloc.dart';
 import 'package:educhain/core/theme/app_pallete.dart';
-import 'package:educhain/core/widgets/layouts/student_layout.dart';
 import 'package:educhain/core/widgets/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

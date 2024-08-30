@@ -10,8 +10,7 @@ import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  static const apiUrl =
-      'https://2075-2402-800-63b7-82d4-45c1-963c-8fa1-1054.ngrok-free.app';
+  static const apiUrl = 'https://cf66-23-97-62-112.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -236,7 +235,7 @@ abstract class ApiService {
             return Response(error: {'message': 'Unexpected data format'});
           }
         } else {
-          return Response(data: response.body as T);
+          return Response(data: _castResponseBody<T>(response.body));
         }
       } else if (response.statusCode == 403) {
         final newAccessToken = await _refreshToken();
@@ -387,5 +386,19 @@ abstract class ApiService {
 
     // Return the result directly (not using Future)
     return response;
+  }
+
+  T _castResponseBody<T>(String body) {
+    if (T == int) {
+      return int.tryParse(body) as T;
+    } else if (T == double) {
+      return double.tryParse(body) as T;
+    } else if (T == String) {
+      return body as T;
+    } else if (T == bool) {
+      return (body.toLowerCase() == 'true') as T;
+    } else {
+      throw UnsupportedError('Unsupported type: $T');
+    }
   }
 }

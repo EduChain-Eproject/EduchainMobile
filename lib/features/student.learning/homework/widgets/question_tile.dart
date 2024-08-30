@@ -1,5 +1,6 @@
 import 'package:educhain/core/models/answer.dart';
 import 'package:educhain/core/models/user_answer.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/features/student.learning/homework/models/answer_question_request.dart';
 import 'package:flutter/material.dart';
 import 'package:educhain/core/models/question.dart';
@@ -24,46 +25,51 @@ class QuestionTile extends StatelessWidget {
     final currentUserAnswer = question.currentUserAnswerDto;
     final answers = question.answerDtos ?? [];
 
-    return BlocBuilder<HomeworkBloc, HomeworkState>(
-      builder: (context, state) {
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              Text(
-                question.questionText ?? 'Untitled',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              question.questionText ?? 'Untitled',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              if (answers.isNotEmpty)
-                ...answers.map((answer) => ListTile(
-                      title: Text(answer.answerText ?? 'No Answer Text'),
-                      leading: Icon(
-                        _getIconForAnswer(answer, currentUserAnswer),
-                        color: _getColorForAnswer(answer, currentUserAnswer),
-                      ),
-                      onTap: showCorrectAnswers
-                          ? null
-                          : () {
-                              context.read<HomeworkBloc>().add(AnswerQuestion(
-                                  homeworkId,
-                                  AnswerQuestionRequest(
-                                      answerId: answer.id ?? 0,
-                                      questionId: question.id ?? 0)));
-                            },
-                    )),
-              if (answers.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text("No answers available for this question."),
-                ),
-            ],
-          ),
-        );
-      },
+            ),
+            const SizedBox(height: 8.0),
+            if (answers.isNotEmpty)
+              ...answers.map((answer) =>
+                  _buildAnswerTile(context, answer, currentUserAnswer))
+            else
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text("No answers available for this question."),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnswerTile(
+      BuildContext context, Answer answer, UserAnswer? currentUserAnswer) {
+    return ListTile(
+      title: Text(answer.answerText ?? 'No Answer Text'),
+      leading: Icon(
+        _getIconForAnswer(answer, currentUserAnswer),
+        color: _getColorForAnswer(answer, currentUserAnswer),
+      ),
+      onTap: showCorrectAnswers
+          ? null
+          : () {
+              context.read<HomeworkBloc>().add(AnswerQuestion(
+                  homeworkId,
+                  AnswerQuestionRequest(
+                      answerId: answer.id ?? 0, questionId: question.id ?? 0)));
+            },
     );
   }
 
@@ -95,7 +101,7 @@ class QuestionTile extends StatelessWidget {
     } else {
       return currentUserAnswer != null &&
               currentUserAnswer.answerId == answer.id
-          ? Colors.blue
+          ? AppPallete.lightPrimaryColor
           : Colors.grey;
     }
   }

@@ -10,13 +10,15 @@ class TextFieldModel {
   final bool obscureText;
   final TextInputType keyboardType;
 
-  TextFieldModel({
-    required this.label,
-    this.errorText,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
-  }) {
+  TextFieldModel(
+      {required this.label,
+      this.errorText,
+      this.obscureText = false,
+      this.keyboardType = TextInputType.text,
+      String? initText}) {
     controller = TextEditingController();
+    controller.text = initText ?? '';
+
     camelLabel = _toCamelCase(label);
   }
 

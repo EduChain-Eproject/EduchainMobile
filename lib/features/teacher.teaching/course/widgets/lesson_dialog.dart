@@ -1,6 +1,7 @@
 import 'package:educhain/core/api_service.dart';
 import 'package:educhain/core/models/chapter.dart';
 import 'package:educhain/core/models/lesson.dart';
+import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/features/student.learning/lesson/widgets/video_control.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,6 @@ class _LessonDialogState extends State<LessonDialog> {
           setState(() {
             _videoError = 'Error initializing video player: $error';
           });
-          print('Error initializing video player: $error');
         });
     } else {
       _controller = VideoPlayerController.networkUrl(Uri.parse(""));
@@ -84,8 +84,10 @@ class _LessonDialogState extends State<LessonDialog> {
       },
       builder: (context, state) {
         return AlertDialog(
-          title:
-              Text(widget.initialLesson == null ? 'Add Lesson' : 'Edit Lesson'),
+          title: Text(
+            widget.initialLesson == null ? 'Add Lesson' : 'Edit Lesson',
+            style: const TextStyle(color: AppPallete.accentColor),
+          ),
           content: Form(
             key: _formKey,
             child: Column(

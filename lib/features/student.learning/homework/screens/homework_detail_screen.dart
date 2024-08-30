@@ -1,5 +1,4 @@
 import 'package:educhain/core/widgets/authenticated_widget.dart';
-import 'package:educhain/core/widgets/loader.dart';
 import 'package:educhain/init_dependency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,8 +8,10 @@ import '../widgets/homework_detail_view.dart';
 
 class HomeworkDetailScreen extends StatelessWidget {
   static Route route(int homeworkId) => MaterialPageRoute(
-      builder: (context) => AuthenticatedWidget(
-          child: HomeworkDetailScreen(homeworkId: homeworkId)));
+        builder: (context) => AuthenticatedWidget(
+          child: HomeworkDetailScreen(homeworkId: homeworkId),
+        ),
+      );
 
   final int homeworkId;
 
@@ -23,6 +24,9 @@ class HomeworkDetailScreen extends StatelessWidget {
       create: (context) =>
           getIt<HomeworkBloc>()..add(FetchHomeworkDetail(homeworkId)),
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Homework Detail'),
+        ),
         body: BlocBuilder<HomeworkBloc, HomeworkState>(
           builder: (context, state) {
             if (state is HomeworkLoading) {
@@ -34,24 +38,38 @@ class HomeworkDetailScreen extends StatelessWidget {
                 award: state.award,
               );
             } else if (state is HomeworkError) {
-              return Center(child: Text('Error: ${state.message}'));
+              return _buildErrorState(state.message['message']);
             } else if (state is HomeworkQuestionAnswering) {
-              return const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [Text("Answering question..."), Loader()],
-              );
+              return _buildLoadingState("Answering question...");
             } else if (state is HomeworkSubmitting) {
-              return const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [Text("Submitting homework..."), Loader()],
-              );
+              return _buildLoadingState("Submitting homework...");
             } else {
               return const Center(child: Text('Unknown state'));
             }
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Text(
+        'Error: $message',
+        style: const TextStyle(color: Colors.red, fontSize: 18),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(message, style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 20),
+          const CircularProgressIndicator(),
+        ],
       ),
     );
   }

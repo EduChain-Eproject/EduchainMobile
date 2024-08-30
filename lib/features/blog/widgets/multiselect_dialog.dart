@@ -1,5 +1,4 @@
 import 'package:educhain/core/models/blog_category.dart';
-import 'package:educhain/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 class MultiSelectDialog extends StatefulWidget {
@@ -7,7 +6,8 @@ class MultiSelectDialog extends StatefulWidget {
   final List<int> selectedCategoryIds;
   final void Function(List<int>) onSelectionChanged;
 
-  MultiSelectDialog({
+  const MultiSelectDialog({
+    super.key,
     required this.categories,
     required this.selectedCategoryIds,
     required this.onSelectionChanged,
@@ -29,44 +29,68 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        'Select Categories',
-        style: TextStyle(color: AppPallete.lightErrorColor),
-      ),
+      title: const Text('Select Categories'),
       content: SingleChildScrollView(
-        child: ListBody(
-          children: widget.categories.map((category) {
-            return CheckboxListTile(
-              title: Text(category.categoryName ?? 'No Name'),
-              value: _selectedIds.contains(category.id),
-              onChanged: (selected) {
-                setState(() {
-                  if (selected ?? false) {
-                    _selectedIds.add(category.id!);
-                  } else {
-                    _selectedIds.remove(category.id);
-                  }
-                });
-              },
-            );
-          }).toList(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildCategoryList(),
+          ],
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () {
-            widget.onSelectionChanged(_selectedIds);
-            Navigator.of(context).pop();
-          },
-          child: Text('OK'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Cancel'),
-        ),
-      ],
+      actions: _buildDialogActions(context),
     );
+  }
+
+  Widget _buildCategoryList() {
+    return ListBody(
+      children: widget.categories.map((category) {
+        return CheckboxListTile(
+          title: Text(category.categoryName ?? 'No Name'),
+          value: _selectedIds.contains(category.id),
+          onChanged: (selected) {
+            _onCategorySelectionChanged(category.id!, selected ?? false);
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  List<Widget> _buildDialogActions(BuildContext context) {
+    return [
+      TextButton(
+        onPressed: () {
+          _clearSelections();
+        },
+        child: const Text('Clear All'),
+      ),
+      TextButton(
+        onPressed: () {
+          widget.onSelectionChanged(_selectedIds);
+          Navigator.of(context).pop();
+        },
+        child: const Text('OK'),
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text('Cancel'),
+      ),
+    ];
+  }
+
+  void _onCategorySelectionChanged(int categoryId, bool isSelected) {
+    setState(() {
+      isSelected
+          ? _selectedIds.add(categoryId)
+          : _selectedIds.remove(categoryId);
+    });
+  }
+
+  void _clearSelections() {
+    setState(() {
+      _selectedIds.clear();
+    });
   }
 }

@@ -24,12 +24,12 @@ class Statistics {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'numberOfEnrollments': numberOfEnrollments,
-      'certificationsMade': certificationsMade,
-      'satisfactionRate': satisfactionRate,
-      'bestFeedbacks': bestFeedbacks?.map((item) => item.toJson()).toList(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'numberOfEnrollments': numberOfEnrollments,
+  //     'certificationsMade': certificationsMade,
+  //     'satisfactionRate': satisfactionRate,
+  //     'bestFeedbacks': bestFeedbacks?.map((item) => item.toJson()).toList(),
+  //   };
+  // }
 }

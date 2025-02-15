@@ -26,12 +26,24 @@ class Chapter {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'chapterTitle': chapterTitle,
-      'courseDto': courseDto?.toJson(),
-      'lessonDtos': lessonDtos?.map((e) => e.toJson()).toList(),
-    };
+  Chapter copyWith({
+    int? id,
+    String? chapterTitle,
+    List<Lesson>? lessonDtos,
+  }) {
+    return Chapter(
+      id: id ?? this.id,
+      chapterTitle: chapterTitle ?? this.chapterTitle,
+      lessonDtos: lessonDtos ?? this.lessonDtos,
+    );
   }
+
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'chapterTitle': chapterTitle,
+  //     'courseDto': courseDto?.toJson(),
+  //     'lessonDtos': lessonDtos?.map((e) => e.toJson()).toList(),
+  //   };
+  // }
 }

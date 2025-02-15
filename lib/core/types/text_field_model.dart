@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/validated_text_field.dart';
+
 class TextFieldModel {
   final String label;
   late final TextEditingController controller;
@@ -8,14 +10,27 @@ class TextFieldModel {
   final bool obscureText;
   final TextInputType keyboardType;
 
-  TextFieldModel({
-    required this.label,
-    this.errorText,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
-  }) {
+  TextFieldModel(
+      {required this.label,
+      this.errorText,
+      this.obscureText = false,
+      this.keyboardType = TextInputType.text,
+      String? initText}) {
     controller = TextEditingController();
+    controller.text = initText ?? '';
+
     camelLabel = _toCamelCase(label);
+  }
+
+  Widget generateTextField(ValueChanged<String>? onChanged) {
+    return ValidatedTextField(
+      controller: controller,
+      label: label,
+      errorText: errorText,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+    );
   }
 
   String _toCamelCase(String label) {

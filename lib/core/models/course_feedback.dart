@@ -24,12 +24,12 @@ class CourseFeedback {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'message': message,
-      'rating': rating,
-      'userDto': userDto?.toJson(),
-      'courseDto': courseDto?.toJson(),
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'message': message,
+  //     'rating': rating,
+  //     'userDto': userDto?.toJson(),
+  //     'courseDto': courseDto?.toJson(),
+  //   };
+  // }
 }

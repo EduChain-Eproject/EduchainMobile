@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'package:educhain/init_dependency.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:mime/mime.dart';
 import 'types/api_response.dart';
 import 'types/page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiService {
-  final String apiUrl =
-      'https://2d98-2402-800-63b7-d5cc-cc5-a77e-f3bd-86f.ngrok-free.app';
+  static const apiUrl = 'https://cf66-23-97-62-112.ngrok-free.app';
 
   ApiResponse<T> get<T>(
     String endpoint,
@@ -15,13 +18,26 @@ abstract class ApiService {
   ) async {
     return _performApiCall<T>(
       (headers) => http.get(Uri.parse('$apiUrl/$endpoint'), headers: headers),
-      (data) {
-        if (data is Map<String, dynamic> && fromJson != null) {
-          return fromJson(data);
-        } else {
-          throw FormatException('Expected list but got ${data.runtimeType}');
-        }
-      },
+      // (data) {
+      //   if (data is Map<String, dynamic> && fromJson != null) {
+      //     return fromJson(data);
+      //   } else {
+      //     throw FormatException('Expected list but got ${data.runtimeType}');
+      //   }
+      // },
+      fromJson != null
+          ? (data) {
+              if (data is String && T == String) {
+                return data as T; // Return as string directly
+              } else if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                  'Unexpected data type: ${data.runtimeType}',
+                );
+              }
+            }
+          : null,
     );
   }
 
@@ -69,6 +85,85 @@ abstract class ApiService {
         headers: headers,
         body: jsonEncode(data),
       ),
+      fromJson != null
+          ? (data) {
+              if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                    'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
+    );
+  }
+
+  ApiResponse<T> postPaypal<T>(
+    String endpoint,
+    T Function(dynamic)? fromJson,
+    Map<String, dynamic>? data,
+  ) async {
+    return _performApiCall<T>(
+      (headers) => http.post(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: headers,
+        body: data != null ? jsonEncode(data) : null,
+      ),
+      fromJson != null
+          ? (data) {
+              if (data is String && T == String) {
+                return data as T; // Return as string directly
+              } else if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                  'Unexpected data type: ${data.runtimeType}',
+                );
+              }
+            }
+          : null,
+    );
+  }
+
+  ApiResponse<T> postMultipart<T>(
+      String endpoint,
+      T Function(Map<String, dynamic>)? fromJson,
+      Map<String, String> fields,
+      XFile? file,
+      String? fileField,
+      {String? method}) async {
+    String? mimeType = file != null ? lookupMimeType(file.path) : null;
+    final mediaType = mimeType != null
+        ? MediaType.parse(mimeType)
+        : MediaType('application', 'octet-stream');
+
+    return _performApiCall<T>(
+      setMediaType: false,
+      (headers) async {
+        final uri = Uri.parse('$apiUrl/$endpoint');
+        final request = http.MultipartRequest(method ?? 'POST', uri);
+
+        fields.forEach((key, value) {
+          request.fields[key] = value;
+        });
+
+        if (file != null) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              fileField ?? 'file',
+              await file.readAsBytes(),
+              filename: file.name,
+              contentType: mediaType,
+            ),
+          );
+        }
+
+        request.headers.addAll(headers);
+
+        final streamedResponse = await request.send();
+        final response = http.Response.fromStream(streamedResponse);
+        return response;
+      },
       (data) {
         if (data is Map<String, dynamic> && fromJson != null) {
           return fromJson(data);
@@ -100,39 +195,47 @@ abstract class ApiService {
     );
   }
 
-  ApiResponse<void> delete(String endpoint) async {
-    return _performApiCall<void>(
-      (headers) =>
-          http.delete(Uri.parse('$apiUrl/$endpoint'), headers: headers),
-      null,
+  ApiResponse<T> delete<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>)? fromJson,
+    Map<String, dynamic>? data,
+  ) async {
+    return _performApiCall<T>(
+      (headers) => http.delete(Uri.parse('$apiUrl/$endpoint'),
+          headers: headers, body: data),
+      fromJson != null
+          ? (data) {
+              if (data is Map<String, dynamic>) {
+                return fromJson(data);
+              } else {
+                throw FormatException(
+                    'Expected list but got ${data.runtimeType}');
+              }
+            }
+          : null,
     );
   }
 
-  Future<Response<T>> _performApiCall<T>(
-    Future<http.Response> Function(Map<String, String> headers) apiCall,
-    T Function(dynamic data)? fromJson,
-  ) async {
+  ApiResponse<T> _performApiCall<T>(
+      Future<http.Response> Function(Map<String, String> headers) apiCall,
+      T Function(dynamic data)? fromJson,
+      {bool? setMediaType}) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(setMediaType: setMediaType ?? true);
       var response = await apiCall(headers);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-
         if (fromJson != null) {
-          // Check if responseData is a Map or List
+          final responseData = jsonDecode(response.body);
           if (responseData is List) {
-            // Handle List responses
             return Response(data: fromJson(responseData));
           } else if (responseData is Map) {
-            // Handle Map responses
             return Response(data: fromJson(responseData));
           } else {
-            // Unexpected format
             return Response(error: {'message': 'Unexpected data format'});
           }
         } else {
-          return Response(data: responseData as T);
+          return Response(data: _castResponseBody<T>(response.body));
         }
       } else if (response.statusCode == 403) {
         final newAccessToken = await _refreshToken();
@@ -166,13 +269,21 @@ abstract class ApiService {
     }
   }
 
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> _getHeaders({bool setMediaType = true}) async {
     final prefs = getIt<SharedPreferences>();
     final token = prefs.getString('accessToken');
-    return {
-      'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
+
+    final headers = <String, String>{};
+
+    if (setMediaType) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    return headers;
   }
 
   Response<T> _handleErrorResponse<T>(http.Response response) {
@@ -218,6 +329,76 @@ abstract class ApiService {
       }
     } else {
       return null;
+    }
+  }
+
+  MediaType getMediaType(XFile file) {
+    String? extension = path.extension(file.path).toLowerCase();
+
+    switch (extension) {
+      case '.jpg':
+      case '.jpeg':
+        return MediaType('image', 'jpeg');
+      case '.png':
+        return MediaType('image', 'png');
+      case '.gif':
+        return MediaType('image', 'gif');
+      case '.mp4':
+        return MediaType('video', 'mp4');
+      case '.mov':
+        return MediaType('video', 'quicktime');
+      case '.avi':
+        return MediaType('video', 'x-msvideo');
+      default:
+        return MediaType('application', 'octet-stream');
+    }
+  }
+
+  ApiResponse<List<T>> postList<T>(
+    String endpoint,
+    T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? data,
+  ) {
+    // Perform the API call synchronously
+    final response = _performApiCall<List<T>>(
+      (headers) => http.post(
+        Uri.parse('$apiUrl/$endpoint'),
+        headers: headers,
+        body: jsonEncode(data),
+      ),
+      (responseData) {
+        if (responseData is List<dynamic>) {
+          // Convert each item in the list to type T
+          return responseData.map((item) {
+            if (item is Map<String, dynamic>) {
+              return fromJson(item);
+            } else {
+              throw FormatException(
+                  'Expected Map<String, dynamic> but got ${item.runtimeType}');
+            }
+          }).toList();
+        } else {
+          throw FormatException(
+              'Expected List<dynamic> but got ${responseData.runtimeType}');
+        }
+      },
+    );
+
+    // Return the result directly (not using Future)
+    return response;
+  }
+
+  T _castResponseBody<T>(String body) {
+    if (T == int) {
+      return int.tryParse(body) as T;
+    } else if (T == double) {
+      return double.tryParse(body) as T;
+    } else if (T == String) {
+      return body as T;
+    } else if (T == bool) {
+      return (body.toLowerCase() == 'true') as T;
+    } else {
+      throw UnsupportedError('Unsupported type: $T');
     }
   }
 }
